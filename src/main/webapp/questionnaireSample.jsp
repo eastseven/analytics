@@ -12,7 +12,8 @@
 	<%
 		Questionnaire paper = QuestionnaireFactory.getSampleQuestionnaire();
 	%>
-	<form action="">
+	<form action="handler.jsp" method="post">
+		<input type="submit" value="提交"/><br/>
 		<%
 			for(int index = 0; index < paper.getQuestions().size(); index++) {
 				QuestionGroup item = (QuestionGroup)paper.getQuestions().get(index);
@@ -24,7 +25,7 @@
 					List options = q.getOptions();
 					for(int index2 = 0; index2 < options.size(); index2++) {
 						Option option = (Option)options.get(index2);
-						html += "  <input type='radio' name='"+("q_"+index1)+"' value='"+option.getKey()+"'>" + option.getValue() + " ";
+						html += "  <input type='radio' name='"+ ("question_"+q.getId()) +"' value='"+option.getKey()+"'>" + option.getValue() + " ";
 					}
 					out.println(html+"<br/>");
 				}

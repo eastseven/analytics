@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class QuestionGroup {
 
+	private int id;
+
 	private String title;
 
 	private List<Question> questions;
@@ -21,6 +23,14 @@ public class QuestionGroup {
 		super();
 		this.title = title;
 		this.questions = group;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getTitle() {

@@ -11,15 +11,17 @@ import java.util.List;
  */
 public class Question {
 
+	private int id;
+
 	/**
 	 * 问题
 	 */
-	String content;
+	private String content;
 
 	/**
 	 * 选项集合
 	 */
-	List<Option> options;
+	private List<Option> options;
 
 	public Question() {
 		super();
@@ -34,6 +36,14 @@ public class Question {
 		super();
 		this.content = content;
 		this.options = options;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getContent() {

@@ -11,10 +11,20 @@ import java.util.List;
  */
 public class Questionnaire {
 
+	private int id;
+
 	/**
 	 * Œ Ã‚ºØ<br/>
 	 */
 	private List<QuestionGroup> questions;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public List<QuestionGroup> getQuestions() {
 		return questions;
@@ -28,10 +38,10 @@ public class Questionnaire {
 		String text = "";
 		if (this.questions != null && !this.questions.isEmpty()) {
 			int indexGroup = 1;
-			for(QuestionGroup group : this.questions) {
+			for (QuestionGroup group : this.questions) {
 				text += indexGroup + "." + group.getTitle() + " :\n";
 				int index = 1;
-				for(Question question : group.getQuestions()) {
+				for (Question question : group.getQuestions()) {
 					text += index + "." + question + "\n";
 					index++;
 				}
@@ -40,7 +50,7 @@ public class Questionnaire {
 		}
 		return text;
 	}
-	
+
 	public void print() {
 		System.out.println(text());
 	}

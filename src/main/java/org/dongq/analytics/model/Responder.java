@@ -9,6 +9,8 @@ package org.dongq.analytics.model;
  */
 public class Responder {
 
+	private int id;
+
 	private String name;
 	private String company;
 	private String gender;
@@ -16,6 +18,14 @@ public class Responder {
 	private int age;
 	private String education;// 教育程度
 	private String discipline;// 学科
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

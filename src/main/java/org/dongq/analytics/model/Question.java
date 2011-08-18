@@ -21,20 +21,19 @@ public class Question {
 	 */
 	List<Option> options;
 
-	/**
-	 * 正确选项
-	 */
-	int rightOption;
-
 	public Question() {
 		super();
 	}
 
-	public Question(String content, List<Option> options, int rightOption) {
+	public Question(String content) {
+		super();
+		this.content = content;
+	}
+
+	public Question(List<Option> options, String content) {
 		super();
 		this.content = content;
 		this.options = options;
-		this.rightOption = rightOption;
 	}
 
 	public String getContent() {
@@ -51,14 +50,6 @@ public class Question {
 
 	public void setOptions(List<Option> options) {
 		this.options = options;
-	}
-
-	public int getRightOption() {
-		return rightOption;
-	}
-
-	public void setRightOption(int rightOption) {
-		this.rightOption = rightOption;
 	}
 
 	@Override

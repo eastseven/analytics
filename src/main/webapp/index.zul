@@ -19,5 +19,10 @@
 		</menu>
 		<menuitem label="About" id="about" />
 	</menubar>
-	<div id="mainDiv"></div>
+	<div id="mainDiv">
+		<!-- 
+		 <include src="demo.zul"/>
+		 -->
+		 <include src="questionnaireSample.jsp"/>
+	</div>
 </window>

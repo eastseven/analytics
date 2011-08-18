@@ -14,24 +14,35 @@ public class Questionnaire {
 	/**
 	 * Œ Ã‚ºØ<br/>
 	 */
-	List<Question> questions;
+	private List<QuestionGroup> questions;
 
-	public List<Question> getQuestions() {
+	public List<QuestionGroup> getQuestions() {
 		return questions;
 	}
 
-	public void setQuestions(List<Question> questions) {
+	public void setQuestions(List<QuestionGroup> questions) {
 		this.questions = questions;
 	}
 
-	void print() {
+	public String text() {
+		String text = "";
 		if (this.questions != null && !this.questions.isEmpty()) {
-			int index = 1;
-			for(Question question : this.questions) {
-				System.out.println(index+"."+question.toString()+"\n");
-				index++;
+			int indexGroup = 1;
+			for(QuestionGroup group : this.questions) {
+				text += indexGroup + "." + group.getTitle() + " :\n";
+				int index = 1;
+				for(Question question : group.getQuestions()) {
+					text += index + "." + question + "\n";
+					index++;
+				}
+				indexGroup++;
 			}
 		}
+		return text;
+	}
+	
+	public void print() {
+		System.out.println(text());
 	}
 
 }

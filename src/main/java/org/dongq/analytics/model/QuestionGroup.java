@@ -11,14 +11,16 @@ import java.util.List;
  */
 public class QuestionGroup {
 
-	String title;
+	private String title;
 
-	List<Question> group;
+	private List<Question> questions;
+
+	private List<Option> options;
 
 	public QuestionGroup(String title, List<Question> group) {
 		super();
 		this.title = title;
-		this.group = group;
+		this.questions = group;
 	}
 
 	public String getTitle() {
@@ -29,12 +31,38 @@ public class QuestionGroup {
 		this.title = title;
 	}
 
-	public List<Question> getGroup() {
-		return group;
+	public List<Question> getQuestions() {
+		return questions;
 	}
 
-	public void setGroup(List<Question> group) {
-		this.group = group;
+	public void setQuestions(List<Question> questions) {
+		this.questions = questions;
+	}
+
+	public List<Option> getOptions() {
+		return options;
+	}
+
+	public String getOptionsDescribe() {
+		String describe = "";
+
+		if (this.options != null && !this.options.isEmpty()) {
+			for (Option option : this.options) {
+				describe += option.getKey() + "=" + option.getValue() + ",";
+			}
+		}
+
+		return describe;
+	}
+
+	public void setOptions(List<Option> options) {
+		this.options = options;
+
+		if (this.questions != null && !this.questions.isEmpty()) {
+			for (Question q : this.questions) {
+				q.setOptions(options);
+			}
+		}
 	}
 
 }

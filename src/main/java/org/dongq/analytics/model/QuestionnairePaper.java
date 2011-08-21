@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class QuestionnairePaper {
 
-	private int id;
+	private long id;
 
 	private Questionnaire questionnaire;
 
@@ -20,13 +20,17 @@ public class QuestionnairePaper {
 
 	private Date date;
 
-	private Map<Integer, Integer> answers;
+	private Map<Long, Integer> answers;
 
-	public int getId() {
+	public QuestionnairePaper() {
+		this.date = new Date();
+	}
+	
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -54,11 +58,11 @@ public class QuestionnairePaper {
 		this.date = date;
 	}
 
-	public Map<Integer, Integer> getAnswers() {
+	public Map<Long, Integer> getAnswers() {
 		return answers;
 	}
 
-	public void setAnswers(Map<Integer, Integer> answers) {
+	public void setAnswers(Map<Long, Integer> answers) {
 		this.answers = answers;
 	}
 

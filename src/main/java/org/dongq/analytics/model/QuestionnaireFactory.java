@@ -39,7 +39,7 @@ public class QuestionnaireFactory {
 		group = new QuestionGroup("请根据以下描述与您个人情况相符合的程度进行打分", list);
 		group.setOptions(getOptions());
 		group.setQuestions(list);
-		group.setId(1);
+		group.setId(System.currentTimeMillis());
 		groups.add(group);
 		
 		contents = new String[] {"我总是能够相信销售主管的解释和说明","销售主管通常信守其承诺(如遵守公司的销售政策)","销售主管提供的信息往往是准确的","销售主管是真心诚意地对待我的"};
@@ -53,10 +53,11 @@ public class QuestionnaireFactory {
 		group = new QuestionGroup("请根据以下描述与您个人情况相符合的程度进行打分", list);
 		group.setOptions(getOptions());
 		group.setQuestions(list);
-		group.setId(2);
+		group.setId(System.currentTimeMillis());
 		groups.add(group);
 		
 		paper.setQuestions(groups);
+		paper.setId(System.currentTimeMillis());
 		
 		return paper;
 	}

@@ -3,6 +3,8 @@
  */
 package org.dongq.analytics.model;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,8 +34,21 @@ public class Questionnaire {
 
 	public void setQuestions(List<QuestionGroup> questions) {
 		this.questions = questions;
+		
 	}
 
+	public List<Question> getAllQuestions() {
+		List<Question> list = new ArrayList<Question>();
+		if(this.getQuestions() != null && !this.getQuestions().isEmpty()) {
+			Iterator<QuestionGroup> iter = this.getQuestions().iterator();
+			while(iter.hasNext()) {
+				QuestionGroup group = iter.next();
+				list.addAll(group.getQuestions());
+			}
+		}
+		return list;
+	}
+	
 	public String text() {
 		String text = "";
 		if (this.questions != null && !this.questions.isEmpty()) {

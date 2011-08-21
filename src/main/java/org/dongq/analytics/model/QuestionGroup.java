@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class QuestionGroup {
 
-	private int id;
+	private long id;
 
 	private String title;
 
@@ -25,11 +25,11 @@ public class QuestionGroup {
 		this.questions = group;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

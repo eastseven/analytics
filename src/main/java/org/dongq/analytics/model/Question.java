@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Question {
 
-	private int id;
+	private long id;
 
 	/**
 	 * Œ Ã‚
@@ -38,11 +38,11 @@ public class Question {
 		this.options = options;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

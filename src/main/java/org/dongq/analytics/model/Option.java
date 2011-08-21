@@ -9,11 +9,11 @@ package org.dongq.analytics.model;
  */
 public class Option {
 
-	int key;
+	private long key;
 
-	String value;
+	private String value;
 
-	int version;
+	private int version;
 
 	public Option() {
 		super();
@@ -25,11 +25,11 @@ public class Option {
 		this.value = value;
 	}
 
-	public int getKey() {
+	public long getKey() {
 		return key;
 	}
 
-	public void setKey(int key) {
+	public void setKey(long key) {
 		this.key = key;
 	}
 

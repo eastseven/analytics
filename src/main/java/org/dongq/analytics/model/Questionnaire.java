@@ -11,18 +11,18 @@ import java.util.List;
  */
 public class Questionnaire {
 
-	private int id;
+	private long id;
 
 	/**
 	 * Œ Ã‚ºØ<br/>
 	 */
 	private List<QuestionGroup> questions;
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

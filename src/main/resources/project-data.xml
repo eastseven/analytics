@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<question_option option_version="1" option_key="1" option_value="完全不符合"/>
+	<question_option option_version="1" option_key="2" option_value="基本不符合"/>
+	<question_option option_version="1" option_key="3" option_value="有点不符合"/>
+	<question_option option_version="1" option_key="4" option_value="一般"/>
+	<question_option option_version="1" option_key="5" option_value="有点符合"/>
+	<question_option option_version="1" option_key="6" option_value="基本符合"/>
+	<question_option option_version="1" option_key="7" option_value="完全符合"/>
+	
+	<question question_id="1" parent_id="" option_version="1" content="请根据以下描述与您个人情况相符合的程度进行打分" />
+	<question question_id="10" parent_id="1" option_version="1" content="我能和他人有效地相处" />
+	<question question_id="11" parent_id="1" option_version="1" content="我善于与人交谈" />
+	<question question_id="12" parent_id="1" option_version="1" content="我能清晰明白地表达我的看法" />
+	<question question_id="13" parent_id="1" option_version="1" content="我能轻松与人交谈不同话题" />
+	<question question_id="14" parent_id="1" option_version="1" content="我口头表达流利" />
+	<question question_id="15" parent_id="1" option_version="1" content="我能轻易察觉交往中的潜规则" />
+	<question question_id="16" parent_id="1" option_version="1" content="我点子多" />
+	<question question_id="17" parent_id="1" option_version="1" content="我直觉很灵敏" />
+	<question question_id="18" parent_id="1" option_version="1" content="我能很快找到问题的核心" />
+	<question question_id="19" parent_id="1" option_version="1" content="我的常识比一般人多" />
+	
+	<question question_id="2" parent_id="" option_version="1" content="请根据以下描述与您个人情况相符合的程度进行打分" />
+	<question question_id="20" parent_id="2" option_version="1" content="我总是能够相信销售主管的解释和说明" />
+	<question question_id="21" parent_id="2" option_version="1" content="销售主管通常信守其承诺(如遵守公司的销售政策)" />
+	<question question_id="22" parent_id="2" option_version="1" content="销售主管提供的信息往往是准确的" />
+	<question question_id="23" parent_id="2" option_version="1" content="销售主管是真心诚意地对待我的" />	
+	
+	<questionnaire questionnaire_id="0" question_id="1"/>
+	<questionnaire questionnaire_id="0" question_id="10"/>
+	<questionnaire questionnaire_id="0" question_id="13"/>
+	<questionnaire questionnaire_id="0" question_id="15"/>
+	<questionnaire questionnaire_id="0" question_id="17"/>
+	<questionnaire questionnaire_id="0" question_id="2"/>
+	<questionnaire questionnaire_id="0" question_id="20"/>
+	<questionnaire questionnaire_id="0" question_id="21"/>
+	<questionnaire questionnaire_id="0" question_id="22"/>
+</data>

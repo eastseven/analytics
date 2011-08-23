@@ -1,29 +1,32 @@
 package org.dongq.analytics;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.math.RandomUtils;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.dongq.analytics.model.Option;
 import org.dongq.analytics.model.Question;
 import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnaireFactory;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
-import org.javalite.activejdbc.Base;
+import org.dongq.analytics.service.QuestionnairePaperServiceImpl;
+import org.dongq.analytics.utils.DbHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,14 +38,18 @@ public final class Main {
 	final static Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) throws Exception {
-		List<QuestionnairePaper> papers = new ArrayList<QuestionnairePaper>();
-		int count = 0;
-		while(count < 10) {
-			papers.add(getQuestionnairePaper());
-			count++;
-		}
-
-		excel(papers);
+//		List<QuestionnairePaper> papers = new ArrayList<QuestionnairePaper>();
+//		int count = 0;
+//		while(count < 10) {
+//			papers.add(getQuestionnairePaper());
+//			count++;
+//		}
+//
+//		excel(papers);
+		
+		db();
+		
+		new QuestionnairePaperServiceImpl().getQuestionnaire(0);
 	}
 
 	public static QuestionnairePaper getQuestionnairePaper() throws Exception {
@@ -57,8 +64,8 @@ public final class Main {
 			for(Question q : group.getQuestions()) {
 				int item = RandomUtils.nextInt(group.getOptions().size()) + 1;
 				answers.put(q.getId(), item);
-				String answer = "题号："+q.getId()+"选择："+item;
-				logger.info(answer);
+//				String answer = "题号："+q.getId()+"选择："+item;
+//				logger.info(answer);
 			}
 		}
 		paper.setAnswers(answers);
@@ -88,9 +95,6 @@ public final class Main {
 	    }
 	    
 	    logger.info("title cell number is " + title.getRowNum() + "|" + title.getPhysicalNumberOfCells());
-	    for(Iterator<Cell> iter = title.cellIterator(); iter.hasNext();) {
-	    	logger.info(iter.next().getStringCellValue());
-	    }
 	    
 	    //打印本组问卷集
 	    int rownum = 1;
@@ -106,8 +110,8 @@ public final class Main {
 	    	for(Iterator<Question> iter = questions.iterator(); iter.hasNext();) {
 	    		Question q = iter.next();
 	    		int answer = answers.get(q.getId());
-	    		Cell c = title.getCell(index);
-	    		logger.debug("问卷题号：["+c.getStringCellValue()+"|"+q.getId()+"]选择值："+answer);
+	    		//Cell c = title.getCell(index);
+	    		//logger.debug("问卷题号：["+c.getStringCellValue()+"|"+q.getId()+"]选择值："+answer);
 	    		row.createCell(index).setCellValue(String.valueOf(answer));
 	    		index++;
 	    	}
@@ -123,30 +127,19 @@ public final class Main {
 	}
 	
 	public static void db() throws Exception {
-		Base.open(driver, url, null);
-		
-		String drop = "DROP TABLE people";
-		String create  = "CREATE TABLE people (name VARCHAR(56) NOT NULL,last_name VARCHAR(56), createTime TIME)";
-		try {
-			Base.exec(drop);
-		} catch (Exception e) {
-			logger.info("people表不存在，将自动创建");
-		}
-		Base.exec(create);
-		
-		Base.close();
-		logger.info("done...");
-		
-		InputStream input = new FileInputStream("/Users/eastseven/Desktop/网络数据1-26-交流频率已反向.xls");
-		POIFSFileSystem fs = new POIFSFileSystem(input);  
-		HSSFWorkbook wb = new HSSFWorkbook(fs);  
-		int numberOfSheets = wb.getNumberOfSheets();
-		logger.info("Number Of Sheets "+numberOfSheets);
-		HSSFSheet sheet = null;
-		for(int index = 0; index < numberOfSheets; index++) {
-			sheet = wb.getSheetAt(index);
-			logger.info(sheet.getSheetName());
-		}
-		
+		final String sql = "select a.* from questionnaire_paper_answer a ";
+		Connection conn = DbHelper.getConnection();
+		QueryRunner query = new QueryRunner();
+		query.query(conn, sql, new ResultSetHandler<Option>() {
+
+			public Option handle(ResultSet rs) throws SQLException {
+				while(rs.next()) {
+					//logger.info(rs.getObject(1) + "-" + rs.getObject(2) + "-" + rs.getObject(3) + "-" +rs.getObject(4));
+					logger.info(rs.getObject(1) + "-" + rs.getObject(2));
+				}
+				return null;
+			}
+			
+		});
 	}
 }

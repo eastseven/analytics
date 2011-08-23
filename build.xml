@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     2011-8-22 下午3:36:25                                                        
+
+     analytics    
+     description
+                   
+     eastseven                                                                
+     ====================================================================== -->
+<project name="analytics" default="default">
+	<description>
+            问卷调查软件
+    </description>
+
+	<property file="src/main/resources/jdbc.properties"/>
+	
+	<!-- ================================= 
+          target: default              
+         ================================= -->
+	<target name="default" depends="depends" description="description">
+
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="depends" depends="database-setup">
+	</target>
+
+	<path id="runtime-classpath">
+		<fileset dir="${user.home}/.m2/repository">
+			<include name="**/*.jar" />
+			<include name="/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar"/>
+			<include name="/org/apache/ddlutils/ddlutils/1.0/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="database-setup" description="Creates the database structure and inserts data into the database">
+		<taskdef name="ddlToDatabase" classname="org.apache.ddlutils.task.DdlToDatabaseTask">
+			<classpath refid="runtime-classpath" />
+		</taskdef>
+		<delete dir="${db.path}" verbose="true"/>
+		<ddlToDatabase>
+			<database url="${db.url}" driverClassName="${db.driver}" username="" password="" />
+			<fileset dir="src/main/resources">
+				<include name="project-schema.xml" />
+			</fileset>
+
+			<createDatabase failonerror="false" />
+
+			<writeSchemaToDatabase />
+			<!--
+			-->
+			<writeDataToDatabase datafile="src/main/resources/project-data.xml" />
+		</ddlToDatabase>
+	</target>
+</project>

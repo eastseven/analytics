@@ -12,7 +12,7 @@
 
 	<%
 		QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
-		Questionnaire paper = service.getQuestionnaire();
+		Questionnaire paper = service.getQuestionnaire(0);
 	%>
 	<form action="handler.jsp" method="post">
 		<input type="submit" value="提交"/><br/>
@@ -35,7 +35,7 @@
 			}
 		%>
 		<br />
-		<p>
+		<p><input type="hidden" name="questionnaireId" value="<%=paper.getId()%>"/>
 			姓名：<input type="text" name="username"/>  性别：<input type="radio" name="gender" value="male"/>男 <input type="radio" name="gender" value="female"/>女
 		</p>
 		<p><input type="submit" value="提交"/></p>

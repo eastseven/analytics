@@ -1,9 +1,6 @@
-<%@page import="org.dongq.analytics.model.Responder"%>
-<%@page import="org.dongq.analytics.model.QuestionnairePaper"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Iterator"%>
-<%@page import="java.util.Set"%>
-<%@page import="java.util.Map"%>
+<%@page import="org.dongq.analytics.model.*"%>
+<%@page import="org.dongq.analytics.service.*"%>
+<%@page import="java.util.*"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 	final String prefix = "question_";
@@ -15,13 +12,13 @@
 		if(key.startsWith(prefix)) {
 			Object[] value = (Object[])params.get(key);
 			key = key.replaceAll(prefix, "");
-			answers.put(Integer.parseInt(key), Integer.parseInt(value[0]));
-			
+			answers.put(Long.valueOf(key), Integer.valueOf(value[0].toString()));
 		}
 	}
 	
 	if(!answers.isEmpty()) {
 		QuestionnairePaper paper = new QuestionnairePaper();
+		paper.setId(Long.valueOf(request.getParameter("questionnaireId")));
 		paper.setAnswers(answers);
 		String username = request.getParameter("username");
 		String gender = request.getParameter("gender");
@@ -30,5 +27,8 @@
 		responder.setGender(gender);
 		
 		paper.setResponder(responder);
+		
+		boolean bln = new QuestionnairePaperServiceImpl().saveQuestionnairePaper(paper);
+		out.print(bln);
 	}
 %>

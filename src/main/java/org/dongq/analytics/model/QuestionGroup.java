@@ -19,6 +19,10 @@ public class QuestionGroup {
 
 	private List<Option> options;
 
+	public QuestionGroup() {
+		super();
+	}
+
 	public QuestionGroup(String title, List<Question> group) {
 		super();
 		this.title = title;

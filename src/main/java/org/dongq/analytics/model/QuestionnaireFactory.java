@@ -62,7 +62,7 @@ public class QuestionnaireFactory {
 		return paper;
 	}
 	
-	static List<Option> getOptions() {
+	public static List<Option> getOptions() {
 		List<Option> options = new ArrayList<Option>();
 		
 		options.add(new Option(1, "完全不符合"));

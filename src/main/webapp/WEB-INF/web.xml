@@ -41,6 +41,17 @@
 		<servlet-name>auEngine</servlet-name>
 		<url-pattern>/zkau/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>Init</servlet-name>
+		<servlet-class>org.dongq.analytics.utils.InitServlet</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>classpath:jdbc.properties</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>

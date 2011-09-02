@@ -1,28 +1,15 @@
 <?page title="Analytics"?>
 <!-- 
-录入试题，选择试题，生成问卷，填写问卷，统计并导出
- -->
-<window title="${desktop.webApp.version}" border="normal" apply="org.dongq.analytics.ui.IndexComposer" height="100%">
+	录入试题，选择试题，生成问卷，填写问卷，统计并导出
+-->
+<window title="${desktop.webApp.version}" border="normal"
+	apply="org.dongq.analytics.ui.IndexComposer" height="100%">
 	<menubar>
-		<menu label="题库" apply="org.dongq.analytics.ui.OptionComposer">
-			<menupopup>
-				<menuitem label="选项" id="optionBtn"/>
-				<menuitem label="题目" id="questionBtn"/>
-			</menupopup>
-		</menu>
-		<menu label="File">
-			<menupopup>
-				<menuitem label="New" id="newBtn" />
-				<menuseparator />
-				<menuitem label="Open" id="openBtn" />
-			</menupopup>
-		</menu>
-		<menuitem label="About" id="about" />
+		<menuitem label="上传问卷" upload="true" id="file"/>
+		<menuitem label="下载问卷模板" id="download"/>
+		<menuitem label="关于" id="about" />
 	</menubar>
 	<div id="mainDiv">
-		<!-- 
-		 <include src="demo.zul"/>
-		 -->
-		 <include src="questionnaireSample.jsp"/>
+		<!-- <include src="questionnaireSample.jsp"/> -->
 	</div>
 </window>

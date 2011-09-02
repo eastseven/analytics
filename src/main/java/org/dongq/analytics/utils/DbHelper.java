@@ -22,8 +22,8 @@ public class DbHelper {
 
 	final static Log logger = LogFactory.getLog(DbHelper.class);
 	
-	private static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
-	private static String url = "jdbc:derby:database;create=true";
+	public static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
+	public static String url = "jdbc:derby:database;create=true";
 	
 	static {
 		try {
@@ -31,10 +31,10 @@ public class DbHelper {
 			driver = config.getString("db.driver");
 			url = config.getString("db.url");
 			url = url.replace(config.getString("db.name"), config.getString("db.path")).replace("true", "false");
-			logger.info(driver + "|" + url);
+			//logger.info(driver + "|" + url);
 		} catch (ConfigurationException e) {
 			//e.printStackTrace();
-			logger.info("ÅäÖÃÎÄ¼þjdbc.properties¼ÓÔØÊ§°Ü");
+			logger.info("ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½jdbc.propertiesï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");
 		}
 		DbUtils.loadDriver(driver);
 	}
@@ -42,7 +42,7 @@ public class DbHelper {
 	public static Connection getConnection() {
 		Connection conn = null;
 		try {
-			logger.info(url);
+			logger.debug(url);
 			conn = DriverManager.getConnection(url);
 		} catch (Exception e) {
 			e.printStackTrace();

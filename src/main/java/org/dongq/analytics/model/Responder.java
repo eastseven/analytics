@@ -3,21 +3,34 @@
  */
 package org.dongq.analytics.model;
 
+import java.util.Set;
+
 /**
  * @author eastseven<br/>
- *         受访者基本信息
+ * 
  */
 public class Responder {
 
 	private long id;
 
 	private String name;
-	private String company;
-	private String gender;
-	private String marriage;
-	private int age;
-	private String education;// 教育程度
-	private String discipline;// 学科
+
+	private long version;
+
+	private Set<ResponderProperty> properties;
+
+	public Responder() {
+		super();
+	}
+
+	public Responder(long id, String name, long version,
+			Set<ResponderProperty> properties) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.version = version;
+		this.properties = properties;
+	}
 
 	public long getId() {
 		return id;
@@ -35,52 +48,20 @@ public class Responder {
 		this.name = name;
 	}
 
-	public String getCompany() {
-		return company;
+	public long getVersion() {
+		return version;
 	}
 
-	public void setCompany(String company) {
-		this.company = company;
+	public void setVersion(long version) {
+		this.version = version;
 	}
 
-	public String getGender() {
-		return gender;
+	public Set<ResponderProperty> getProperties() {
+		return properties;
 	}
 
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-
-	public String getMarriage() {
-		return marriage;
-	}
-
-	public void setMarriage(String marriage) {
-		this.marriage = marriage;
-	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-
-	public String getEducation() {
-		return education;
-	}
-
-	public void setEducation(String education) {
-		this.education = education;
-	}
-
-	public String getDiscipline() {
-		return discipline;
-	}
-
-	public void setDiscipline(String discipline) {
-		this.discipline = discipline;
+	public void setProperties(Set<ResponderProperty> properties) {
+		this.properties = properties;
 	}
 
 }

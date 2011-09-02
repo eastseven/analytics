@@ -25,7 +25,6 @@ import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnaireFactory;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
-import org.dongq.analytics.service.QuestionnairePaperServiceImpl;
 import org.dongq.analytics.utils.DbHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +43,12 @@ public final class Main {
 //			papers.add(getQuestionnairePaper());
 //			count++;
 //		}
-//
+
 //		excel(papers);
 		
-		db();
-		
-		new QuestionnairePaperServiceImpl().getQuestionnaire(0);
+//		db();
+//		
+//		new QuestionnairePaperServiceImpl().getQuestionnaire(0);
 	}
 
 	public static QuestionnairePaper getQuestionnairePaper() throws Exception {

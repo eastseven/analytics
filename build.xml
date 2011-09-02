@@ -50,8 +50,8 @@
 
 			<writeSchemaToDatabase />
 			<!--
-			-->
 			<writeDataToDatabase datafile="src/main/resources/project-data.xml" />
+			-->
 		</ddlToDatabase>
 	</target>
 </project>

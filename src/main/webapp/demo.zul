@@ -1,30 +1,26 @@
 <?page title="Questionnaire Demo" contentType="text/html;charset=UTF-8"?>
 
 <zk>
-	<window title="Questionnaire Demo" border="normal" width="100%" height="100%">
-		<grid id="grid" apply="org.dongq.analytics.ui.QuestionnaireSampleComposer">
+	<window title="Questionnaire Demo" border="normal" width="100%"
+		height="100%">
+		<button label="Export" onClick="" />
+		<grid>
 			<columns>
-				<column label="" />
-				<column label="" />
+				<column label="" width="23px"/>
+				<column label="AAAAAAAAAAAAA" />
+				<column label="BBBBBBBBBBBBB" />
 			</columns>
-			<rows id="rows">
-				<row style="font-family:Arial,Verdana,Sans-serif;font-weight: bold;font-style:italic;" height="30px">
-					<cell colspan="2">
-						请根据以下描述与您个人情况相符合的程度进行打分(1=完全不符合,2=基本不符合,3=有点不符合,4=一般,5=有点符合,6=基本符合,7=完全符合,)
-					</cell>
+			<rows>
+				<row>
+					<detail></detail>
+					<cell>aaaaaaaaaaaaa</cell>
+					<cell>aaaaaaaaaaaaa</cell>
 				</row>
 				<row>
-					aaaaaaaaaa
-					<hbox>
-						<radiogroup>
-							<radio label="1" value="1" />
-							<radio label="2" value="2" />
-							<radio label="3" value="3" />
-						</radiogroup>
-					</hbox>
+					<detail></detail>
+					<cell>bbbbbbbbbbbbb</cell>
+					<cell>bbbbbbbbbbbbb</cell>
 				</row>
-				<!-- 
-				 -->
 			</rows>
 		</grid>
 	</window>

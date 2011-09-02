@@ -25,6 +25,7 @@ import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnaireFactory;
 import org.dongq.analytics.model.QuestionnairePaper;
+import org.dongq.analytics.model.Responder;
 import org.dongq.analytics.model.ResponderProperty;
 import org.dongq.analytics.utils.DbHelper;
 
@@ -151,66 +152,18 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			//｛参与调查的人员信息属性｝
 			Sheet responderProperty = workbook.getSheetAt(0);
 			logger.debug(responderProperty.getSheetName());
-			parseResponderProperty(responderProperty, version);
+			//parseResponderProperty(responderProperty, version);
 			
 			//｛参与调查的人员信息｝
 			Sheet responders = workbook.getSheetAt(1);
 			logger.info(responders.getSheetName());
-			
-			QueryRunner query = new QueryRunner();
-			final String sql = "select * from responder_property where version = " + version;
-			List<ResponderProperty> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<ResponderProperty>>() {
-				@Override
-				public List<ResponderProperty> handle(ResultSet rs) throws SQLException {
-					List<ResponderProperty> list = new ArrayList<ResponderProperty>();
-					while(rs.next()) {
-						list.add(new ResponderProperty(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getLong(5)));
-					}
-					return list;
-				}
-			});
-			logger.info(list.size());
-			//取表头属性名
-			int attributeIndex = 0;
-			for(Iterator<Cell> iter = responders.getRow(0).cellIterator(); iter.hasNext(); ) {
-				Cell c = iter.next();
-				if(c != null && !StringUtils.isBlank(c.getStringCellValue())) {
-					attributeIndex++;
-				}
-			}
-			int index = 0;
-			for(Iterator<Row> rowIter = responders.iterator(); rowIter.hasNext();) {
-				Row row = rowIter.next();
-				if(index == 0) {
-					int _index = 1;
-					for(Iterator<Cell> iter = row.cellIterator(); iter.hasNext();) {
-						Cell c = iter.next();
-						logger.info(_index + "." + c);
-						_index++;
-					}
-				} else {
-					Cell firstCell = row.getCell(0);
-					if(firstCell != null && !StringUtils.isBlank(firstCell.getStringCellValue())) {
-						//Responder Object loop
-						for(int columnIndex = 0; columnIndex < attributeIndex; columnIndex++) {
-							Cell column = row.getCell(columnIndex);
-							switch (columnIndex) {
-							case 0:
-								//column.getStringCellValue()
-								break;
-
-							default:
-								break;
-							}
-						}
-					}
-				}
-				index++;
-			}
+			//parseResponders(responders, version);
 			
 			//{问卷题目}
 			Sheet requestions = workbook.getSheetAt(2);
 			logger.info(requestions.getSheetName());
+			parseRequestions(requestions, version);
+			
 			//{矩阵题}
 			Sheet matrix = workbook.getSheetAt(3);
 			logger.info(matrix.getSheetName());
@@ -256,6 +209,75 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					logger.debug(row);
 				}
 				
+			}
+			index++;
+		}
+	}
+	
+	void parseResponders(Sheet responders, long version) throws Exception {
+		QueryRunner query = new QueryRunner();
+		String sql = "select * from responder_property where version = " + version;
+		List<ResponderProperty> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<ResponderProperty>>() {
+			@Override
+			public List<ResponderProperty> handle(ResultSet rs) throws SQLException {
+				List<ResponderProperty> list = new ArrayList<ResponderProperty>();
+				while(rs.next()) {
+					list.add(new ResponderProperty(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getLong(5)));
+				}
+				return list;
+			}
+		});
+		logger.info(list.size());
+		//取表头属性名
+		int attributeIndex = 0;
+		for(Iterator<Cell> iter = responders.getRow(0).cellIterator(); iter.hasNext(); ) {
+			Cell c = iter.next();
+			if(c != null && !StringUtils.isBlank(c.getStringCellValue())) {
+				attributeIndex++;
+			}
+		}
+		int index = 0;
+		for(Iterator<Row> rowIter = responders.iterator(); rowIter.hasNext();) {
+			Row row = rowIter.next();
+			if(index == 0) {
+				int _index = 1;
+				for(Iterator<Cell> iter = row.cellIterator(); iter.hasNext();) {
+					Cell c = iter.next();
+					logger.info(_index + "." + c);
+					_index++;
+				}
+			} else {
+				Cell firstCell = row.getCell(0);
+				if(firstCell != null && !StringUtils.isBlank(firstCell.getStringCellValue())) {
+					//Responder Object loop
+					Responder responder = new Responder();
+					for(int columnIndex = 0; columnIndex < attributeIndex; columnIndex++) {
+						Cell column = row.getCell(columnIndex);
+						switch (columnIndex) {
+						case 0:
+							logger.info(columnIndex+"-"+column.getStringCellValue());
+							responder.setName(column.getStringCellValue());
+							break;
+						default:
+							logger.info(columnIndex+"="+column.getStringCellValue());
+							break;
+						}
+					}
+					sql = "insert into responder(responder_id,responder_name,version) values(?,?,?)";
+					long id = System.currentTimeMillis() + index * Math.round(System.currentTimeMillis()) * 1000;
+					query.update(DbHelper.getConnection(), sql, id, responder.getName(), version);
+				}
+			}
+			index++;
+		}
+	}
+	
+	void parseRequestions(Sheet requestions, long version) throws Exception {
+		int index = 0;
+		for(Iterator<Row> rowIter = requestions.iterator(); rowIter.hasNext();) {
+			Row row = rowIter.next();
+			if(row.getCell(0) != null && index > 0) {
+				logger.info(index + " : " + row.getCell(0));
 			}
 			index++;
 		}

@@ -114,11 +114,6 @@
 			<version>10.8.1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.javalite</groupId>
-			<artifactId>activejdbc</artifactId>
-			<version>1.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
@@ -159,12 +154,6 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.javalite</groupId>
-			<artifactId>activejdbc-root</artifactId>
-			<version>1.2-SNAPSHOT</version>
-			<type>pom</type>
 		</dependency>
 	</dependencies>
 	<build>

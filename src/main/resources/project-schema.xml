@@ -8,31 +8,46 @@
 		<column name="responder_property_value" type="SMALLINT" />
 		<column name="version" type="BIGINT" />
 	</table>
-	<table name="responder">
-		<column name="responder_id" type="BIGINT" primaryKey="true" />
-		<column name="responder_name" type="VARCHAR" size="100" />
-		<column name="version" type="BIGINT" />
-		<column name="responder_property_id" type="BIGINT" />
+	<table name="responder_properties">
+		<column name="responder_id" type="BIGINT"/>
+		<column name="responder_property_id" type="BIGINT"/>
+		<column name="version" type="BIGINT"/>
+		
+		<foreign-key foreignTable="responder">
+			<reference foreign="responder_id" local="responder_id"/>
+		</foreign-key>
+		
 		<foreign-key foreignTable="responder_property">
 			<reference foreign="responder_property_id" local="responder_property_id"/>
 		</foreign-key>
 	</table>
-	<!-- 
+	<table name="responder">
+		<column name="responder_id" type="BIGINT" primaryKey="true" />
+		<column name="responder_name" type="VARCHAR" size="100" />
+		<column name="version" type="BIGINT" />
+	</table>
 	<table name="question_option">
-		<column name="option_version" type="BIGINT"/>
+		<column name="option_group_id" type="BIGINT"/>
 		<column name="option_key" type="BIGINT"/>
 		<column name="option_value" type="VARCHAR" size="50"/>
+		<column name="version" type="BIGINT" />
 	</table>
 	<table name="question">
 		<column name="question_id" type="BIGINT" primaryKey="true" />
-		<column name="parent_id" type="BIGINT" />
+		<column name="title" type="VARCHAR" size="4000" />
 		<column name="content" type="VARCHAR" size="4000" />
-		<column name="option_version" type="BIGINT" />
+		<column name="option_group_id" type="BIGINT" />
+		<column name="version" type="BIGINT" />
+		<column name="type" type="SMALLINT" />
 	</table>
 	<table name="questionnaire">
-		<column name="questionnaire_id" type="BIGINT" />
+		<column name="responder_id" type="BIGINT" />
 		<column name="question_id" type="BIGINT" />
+		<column name="type" type="SMALLINT" />
+		<column name="option_key" type="BIGINT"/>
+		<column name="version" type="BIGINT" />
 	</table>
+	<!-- 
 	<table name="questionnaire_paper">
 		<column name="paper_id" type="BIGINT" primaryKey="true" />
 		<column name="title" type="VARCHAR" size="4000" />

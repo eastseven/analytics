@@ -11,32 +11,18 @@ import java.util.List;
  */
 public class Question {
 
+	public static final int TYPE_NORMAL = 1;
+	public static final int TYPE_MATRIX = 2;
+
 	private long id;
 
-	/**
-	 * 问题
-	 */
+	private String title;
 	private String content;
+	private long optionId;
+	private long version;
+	private int type;
 
-	/**
-	 * 选项集合
-	 */
 	private List<Option> options;
-
-	public Question() {
-		super();
-	}
-
-	public Question(String content) {
-		super();
-		this.content = content;
-	}
-
-	public Question(List<Option> options, String content) {
-		super();
-		this.content = content;
-		this.options = options;
-	}
 
 	public long getId() {
 		return id;
@@ -44,6 +30,14 @@ public class Question {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getContent() {
@@ -54,6 +48,30 @@ public class Question {
 		this.content = content;
 	}
 
+	public long getOptionId() {
+		return optionId;
+	}
+
+	public void setOptionId(long optionId) {
+		this.optionId = optionId;
+	}
+
+	public long getVersion() {
+		return version;
+	}
+
+	public void setVersion(long version) {
+		this.version = version;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
 	public List<Option> getOptions() {
 		return options;
 	}
@@ -62,12 +80,28 @@ public class Question {
 		this.options = options;
 	}
 
+	public String getSelect() {
+		String html = "";
+		if(this.options != null && !this.options.isEmpty()) {
+			/*
+			<select name="">
+				<option value="">1</option>
+			</select> 
+			*/
+			html = "<select name='question_"+this.id+"'>";
+			for(Option o : this.options) {
+				html += "<option value='"+o.getKey()+"'>"+o.getValue()+"</option>";
+			}
+			html += "</select>";
+		}
+		return html;
+	}
+	
 	@Override
 	public String toString() {
-		String optionString = "";
-		for (Option option : this.options) {
-			optionString += "  " + option.toString();
-		}
-		return this.content + "\n" + optionString;
+		return "Question [id=" + id + ", title=" + title + ", content="
+				+ content + ", optionId=" + optionId + ", version=" + version
+				+ ", type=" + type + "]";
 	}
+
 }

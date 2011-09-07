@@ -1,0 +1,49 @@
+<?page title="Questionnaire Grid" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<fileupload id="file"/>
+	<grid id="grid" apply="org.dongq.analytics.ui.QuestionnaireComposer" mold="paging">
+		<columns>
+			<column width="40px" />
+			<column label="问卷编号" />
+			<column label="上传时间" />
+			<column label="题目数量" />
+		</columns>
+		<rows>
+			<row>
+				<detail>
+					<hbox>
+						<image sclass="myimg" width="100px"
+							height="100px" src="/widgets/grid/master_detail/img/item1.jpg" />
+						<vbox>
+							<label
+								value="Item Specifics - Item Condition"
+								style="font-weight:bold;font-style: italic;" />
+							<hbox>
+								<label value="Condition:" />
+								<label value="Used" sclass="heavy" />
+							</hbox>
+							<hbox>
+								<label value="Brand:" />
+								<label value="Apple" sclass="heavy" />
+							</hbox>
+							<hbox>
+								<label value="Technology:" />
+								<label value="DVI" sclass="heavy" />
+							</hbox>
+							<hbox>
+								<label value="Monitor Type:" />
+								<label value="LCD/Flat Panel"
+									sclass="heavy" />
+							</hbox>
+						</vbox>
+					</hbox>
+				</detail>
+				<label
+					value="Apple 20-inch Aluminum Cinema Display M9177/A" />
+				<label style="color:green;float:right;"
+					value="US $202.50" />
+				<label value="Tulsa, OK, United States" />
+			</row>
+		</rows>
+	</grid>
+</zk>

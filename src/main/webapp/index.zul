@@ -5,11 +5,13 @@
 <window title="${desktop.webApp.version}" border="normal"
 	apply="org.dongq.analytics.ui.IndexComposer" height="100%">
 	<menubar>
-		<menuitem label="上传问卷" upload="true" id="file"/>
+		<menuitem label="上传问卷" id="file" />
 		<menuitem label="下载问卷模板" id="download"/>
+		<menuitem label="问卷" id="open" disabled="true"/>
+		<menuitem label="答题" id="answer"/>
 		<menuitem label="关于" id="about" />
 	</menubar>
 	<div id="mainDiv">
-		<!-- <include src="questionnaireSample.jsp"/> -->
+		<include src="questionnaire_grid.zul"/>
 	</div>
 </window>

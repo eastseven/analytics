@@ -71,12 +71,6 @@ public class QuestionGroup {
 
 	public void setOptions(List<Option> options) {
 		this.options = options;
-
-		if (this.questions != null && !this.questions.isEmpty()) {
-			for (Question q : this.questions) {
-				q.setOptions(options);
-			}
-		}
 	}
 
 }

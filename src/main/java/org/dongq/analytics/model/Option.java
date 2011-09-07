@@ -8,28 +8,24 @@ package org.dongq.analytics.model;
  * 
  */
 public class Option {
-
-	private long key;
-
+	private long id;
+	private int key;
 	private String value;
+	private long version;
 
-	private int version;
-
-	public Option() {
-		super();
+	public long getId() {
+		return id;
 	}
 
-	public Option(int key, String value) {
-		super();
-		this.key = key;
-		this.value = value;
+	public void setId(long id) {
+		this.id = id;
 	}
 
-	public long getKey() {
+	public int getKey() {
 		return key;
 	}
 
-	public void setKey(long key) {
+	public void setKey(int key) {
 		this.key = key;
 	}
 
@@ -41,16 +37,18 @@ public class Option {
 		this.value = value;
 	}
 
-	public int getVersion() {
+	public long getVersion() {
 		return version;
 	}
 
-	public void setVersion(int version) {
+	public void setVersion(long version) {
 		this.version = version;
 	}
 
 	@Override
 	public String toString() {
-		return this.key + "." + this.value;
+		return "Option [id=" + id + ", key=" + key + ", value=" + value
+				+ ", version=" + version + "]";
 	}
+
 }

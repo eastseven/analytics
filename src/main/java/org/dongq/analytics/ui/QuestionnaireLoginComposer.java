@@ -7,31 +7,33 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
-import org.zkoss.zul.Div;
+import org.zkoss.zul.Combobox;
 
 /**
  * @author eastseven
  *
  */
-public class OptionComposer extends GenericForwardComposer {
+public class QuestionnaireLoginComposer extends GenericForwardComposer {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log log = LogFactory.getLog(OptionComposer.class);
+	private static final Log logger = LogFactory.getLog(QuestionnaireLoginComposer.class);
 	
-	Div mainDiv;
+	Combobox version;
+	Combobox responders;
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		log.info(comp);
+		logger.info(comp);
 	}
 	
-	public void onClick$optionBtn() {
+	void init() {
 		
 	}
 	
-	public void onClick$questionBtn() {
-		this.alert("question");
+	public void onClick$submitBtn() {
+		this.alert("submitBtn");
 	}
+	
 }

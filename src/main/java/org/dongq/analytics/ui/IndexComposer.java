@@ -4,16 +4,11 @@
 package org.dongq.analytics.ui;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dongq.analytics.service.QuestionnairePaperService;
-import org.dongq.analytics.service.QuestionnairePaperServiceImpl;
-import org.zkoss.util.media.Media;
 import org.zkoss.zk.Version;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
@@ -28,33 +23,13 @@ public class IndexComposer extends GenericForwardComposer {
 
 	private static final Log logger = LogFactory.getLog(IndexComposer.class);
 	
-	private final String FILE_SUFFIX = "xls,xlsx";
-	
 	Div mainDiv;
-	QuestionnairePaperService service;
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		service = new QuestionnairePaperServiceImpl();
-	}
-	
-	/**
-	 * 上传
-	 * @param event
-	 */
-	public void onUpload$file(UploadEvent event) {
-		Media file = event.getMedia();
-		logger.info(file.getName());
-		logger.info(file.getContentType());
-		logger.info(file.getFormat());
-		if(FILE_SUFFIX.equalsIgnoreCase(file.getFormat())) {
-			InputStream excel = file.getStreamData();
-			logger.info(excel);
-			service.parseQuestionnaireTemplate(excel);
-		} else {
-			alert("非excel格式文件不能上传");
-		}
+		logger.debug(comp + ":" + comp.getId());
+		logger.debug(mainDiv + ":" + mainDiv.getId());
 	}
 	
 	/**
@@ -71,15 +46,15 @@ public class IndexComposer extends GenericForwardComposer {
 	}
 	
 	//
-	public void onClick$checkBtn() {
-		logger.info("check button");
+	public void onClick$open() {
+		mainDiv.getChildren().clear();
+		logger.debug("opening..." + mainDiv + ":" + mainDiv.getId());
+		Component comp = execution.createComponents("questionnaire_grid.zul", mainDiv, null);
+		logger.debug(comp);
 	}
 
-	//
-	public void onClick$demoBtn() {
-		logger.info("demo button");
-		mainDiv.getChildren().clear();
-		execution.createComponents("questionnaireSample.jsp", mainDiv, null);
+	public void onClick$answer() {
+		execution.sendRedirect("questionnaire_login.zul", "blank");
 	}
 	
 	public void onClick$about() {

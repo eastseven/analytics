@@ -1,0 +1,32 @@
+<?page title="Questionnaire Login" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window title="Questionnaire Login" border="normal" width="100%" height="100%" apply="org.dongq.analytics.ui.QuestionnaireLoginComposer">
+		<grid>
+			<columns>
+				<column label="Type" width="150px" />
+				<column label="Content" />
+			</columns>
+			<rows>
+				<row>
+					<label value="问卷编号" width="150px" />
+					<combobox id="version">
+						<comboitem label="A" />
+						<comboitem label="B" />
+					</combobox>
+				</row>
+				<row>
+					<label value="人员姓名" width="150px"/>
+					<combobox id="responders">
+						<comboitem label="A" />
+						<comboitem label="B" />
+					</combobox>
+				</row>
+				<row>
+					<cell colspan="2" style="text-align:center">
+						<button label="提交" width="100px" height="30px" id="submitBtn"/>
+					</cell>
+				</row>
+			</rows>
+		</grid>
+	</window>
+</zk>

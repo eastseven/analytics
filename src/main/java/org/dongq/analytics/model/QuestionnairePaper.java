@@ -3,67 +3,67 @@
  */
 package org.dongq.analytics.model;
 
-import java.util.Date;
-import java.util.Map;
-
 /**
  * @author eastseven
  * 
  */
 public class QuestionnairePaper {
 
-	private long id;
+	private long responderId;
 
-	private Questionnaire questionnaire;
+	private long questionId;
 
-	private Responder responder;
+	private long optionKey;
 
-	private Date date;
+	private int type;
 
-	private Map<Long, Integer> answers;
+	private long version;
 
-	public QuestionnairePaper() {
-		this.date = new Date();
-	}
-	
-	public long getId() {
-		return id;
+	public long getResponderId() {
+		return responderId;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setResponderId(long responderId) {
+		this.responderId = responderId;
 	}
 
-	public Questionnaire getQuestionnaire() {
-		return questionnaire;
+	public long getQuestionId() {
+		return questionId;
 	}
 
-	public void setQuestionnaire(Questionnaire questionnaire) {
-		this.questionnaire = questionnaire;
+	public void setQuestionId(long questionId) {
+		this.questionId = questionId;
 	}
 
-	public Responder getResponder() {
-		return responder;
+	public long getOptionKey() {
+		return optionKey;
 	}
 
-	public void setResponder(Responder responder) {
-		this.responder = responder;
+	public void setOptionKey(long optionKey) {
+		this.optionKey = optionKey;
 	}
 
-	public Date getDate() {
-		return date;
+	public long getVersion() {
+		return version;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setVersion(long version) {
+		this.version = version;
 	}
 
-	public Map<Long, Integer> getAnswers() {
-		return answers;
+	public int getType() {
+		return type;
 	}
 
-	public void setAnswers(Map<Long, Integer> answers) {
-		this.answers = answers;
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return "QuestionnairePaper [responderId=" + responderId
+				+ ", questionId=" + questionId + ", optionKey=" + optionKey
+				+ ", type=" + type + ", version=" + version + "]";
 	}
 
 }

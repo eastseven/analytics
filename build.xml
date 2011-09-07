@@ -34,12 +34,14 @@
 			<include name="/org/apache/ddlutils/ddlutils/1.0/*.jar" />
 		</fileset>
 	</path>
-
-	<target name="database-setup" description="Creates the database structure and inserts data into the database">
+	<target name="clean">
+		<delete dir="${db.path}" verbose="true"/>
+	</target>
+	<target name="database-setup" depends="clean" description="Creates the database structure and inserts data into the database">
 		<taskdef name="ddlToDatabase" classname="org.apache.ddlutils.task.DdlToDatabaseTask">
 			<classpath refid="runtime-classpath" />
 		</taskdef>
-		<delete dir="${db.path}" verbose="true"/>
+		
 		<ddlToDatabase>
 			<database url="${db.url}" driverClassName="${db.driver}" username="" password="" />
 			<fileset dir="src/main/resources">

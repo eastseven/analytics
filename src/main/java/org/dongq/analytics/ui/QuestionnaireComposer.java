@@ -25,6 +25,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Detail;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Html;
@@ -138,11 +139,12 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 			if(data instanceof HashMap) {
 				@SuppressWarnings("unchecked")
 				HashMap<Object, Object> map = (HashMap<Object, Object>)data;
-				
-				String version = DateFormatUtils.format((Long)map.get("version"), "yyyyMMdd HH:mm:ss");
+				final String pattern = "yyyy-MM-dd HH:mm:ss";
+				String version = DateFormatUtils.format((Long)map.get("version"), pattern);
 
 				QueryRunner query = new QueryRunner();
-				String sql = "select * from responder a where a.version = " + map.get("version");
+				String sql = "select a.responder_id, a.responder_name, (select min(b.finish_time) from questionnaire b where a.responder_id = b.responder_id) finish_time from responder a where a.version = " + map.get("version");
+				logger.debug(sql);
 				List<Map<String, String>> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Map<String, String>>>() {
 					@Override
 					public List<Map<String, String>> handle(ResultSet rs) throws SQLException {
@@ -151,19 +153,25 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 							Map<String, String> map = new HashMap<String, String>();
 							map.put("responder_id", rs.getObject("responder_id").toString());
 							map.put("responder_name", rs.getObject("responder_name").toString());
+							Object time = rs.getObject("finish_time");
+							if(time != null) {
+								map.put("finish_time", rs.getObject("finish_time").toString());
+							}
+							logger.debug(map);
 							list.add(map);
 						}
 						return list;
 					}
 				});
-				String content = "<table>";
-				content += "<thead><tr><th >编号</th><th>姓名</th><th>操作</th></tr></thead>";
+				String content = "<table align='center'>";
+				content += "<thead><tr><th width='25%'>编号</th><th width='25%'>姓名</th><th width='25%'>操作</th><th width='25%'>时间</th></tr></thead>";
 				content += "<tbody>";
 				for(Map<String, String> e : list) {
 					String id = e.get("responder_id");
 					String name = e.get("responder_name");
-					String link = "<a href='questionnaire.jsp?id="+id+"' target='_blank'>开始答题</a>";
-					String _row = "<tr><td>"+id+"</td><td>"+name+"</td><td>"+link+"</td></tr>";
+					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
+					String link = "<a href='questionnaire.jsp?id="+id+"' target='_blank'>答题</a>";
+					String _row = "<tr><td>"+id+"</td><td>"+name+"</td><td>"+link+"</td><td>"+time+"</td></tr>";
 					content += _row;
 				}
 				content += "</tbody></table>";
@@ -175,6 +183,16 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				row.appendChild(new Label(map.get("version").toString()));
 				row.appendChild(new Label(version));
 				row.appendChild(new Label(map.get("questions").toString()));
+				//按钮
+				Button btn = new Button("生成Excel数据");
+				btn.addEventListener("onClick", new EventListener() {
+					
+					@Override
+					public void onEvent(Event event) throws Exception {
+						org.zkoss.zhtml.Messagebox.show("TODO:生成Excel数据\n" + event.getName());
+					}
+				});
+				row.appendChild(btn);
 			}
 			
 		}

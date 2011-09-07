@@ -19,6 +19,8 @@ public class QuestionnairePaper {
 
 	private long version;
 
+	private long finishTime;
+
 	public long getResponderId() {
 		return responderId;
 	}
@@ -59,11 +61,20 @@ public class QuestionnairePaper {
 		this.type = type;
 	}
 
+	public long getFinishTime() {
+		return finishTime;
+	}
+
+	public void setFinishTime(long finishTime) {
+		this.finishTime = finishTime;
+	}
+
 	@Override
 	public String toString() {
 		return "QuestionnairePaper [responderId=" + responderId
 				+ ", questionId=" + questionId + ", optionKey=" + optionKey
-				+ ", type=" + type + ", version=" + version + "]";
+				+ ", type=" + type + ", version=" + version + ", finishTime="
+				+ finishTime + "]";
 	}
 
 }

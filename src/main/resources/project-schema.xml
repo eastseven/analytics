@@ -46,6 +46,7 @@
 		<column name="type" type="SMALLINT" />
 		<column name="option_key" type="BIGINT"/>
 		<column name="version" type="BIGINT" />
+		<column name="finish_time" type="BIGINT"/>
 	</table>
 	<!-- 
 	<table name="questionnaire_paper">

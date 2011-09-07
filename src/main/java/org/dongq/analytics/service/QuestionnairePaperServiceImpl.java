@@ -208,7 +208,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		final String prefix_question = "question_";
 		final String prefix_matrix   = "matrix_";
 		final String prefix_property = "property_";
-		
+		final long finishTime = System.currentTimeMillis();
 		try {
 			
 			if(responder.getId() == 0) {
@@ -230,6 +230,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					row.setQuestionId(questionId);
 					row.setOptionKey(optionKey);
 					row.setType(Question.TYPE_NORMAL);
+					row.setFinishTime(finishTime);
 					logger.debug("Normal: "+row);
 					list.add(row);
 				}
@@ -244,6 +245,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						row.setQuestionId(questionId);
 						row.setOptionKey(optionKey);
 						row.setType(Question.TYPE_MATRIX);
+						row.setFinishTime(finishTime);
 						logger.debug("Matrix: "+row);
 						list.add(row);
 					}
@@ -251,7 +253,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			}
 			
 			if(!list.isEmpty()) {
-				Object[][] params = new Object[list.size()][5];
+				Object[][] params = new Object[list.size()][6];
 				int index = 0;
 				for(QuestionnairePaper e : list) {
 					params[index][0] = e.getResponderId();
@@ -259,9 +261,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					params[index][2] = e.getType();
 					params[index][3] = e.getOptionKey();
 					params[index][4] = e.getVersion();
+					params[index][5] = e.getFinishTime();
 					index++;
 				}
-				final String insert = "insert into questionnaire values(?,?,?,?,?)";
+				final String insert = "insert into questionnaire values(?,?,?,?,?,?)";
 				int[] records = query.batch(DbHelper.getConnection(), insert, params);
 				logger.debug(records.length);
 			}

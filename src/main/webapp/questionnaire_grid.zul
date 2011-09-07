@@ -7,6 +7,7 @@
 			<column label="问卷编号" />
 			<column label="上传时间" />
 			<column label="题目数量" />
+			<column label="操作"/>
 		</columns>
 		<rows>
 			<row>
@@ -43,6 +44,7 @@
 				<label style="color:green;float:right;"
 					value="US $202.50" />
 				<label value="Tulsa, OK, United States" />
+				<button label="生成Excel数据"/>
 			</row>
 		</rows>
 	</grid>

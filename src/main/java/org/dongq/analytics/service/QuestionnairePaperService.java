@@ -11,9 +11,15 @@ public interface QuestionnairePaperService {
 
 	public Questionnaire getQuestionnaire(long responderId);
 	
+	public Questionnaire getBlankQuestionnaire(long version);
+	
 	public boolean saveQuestionnairePaper(QuestionnairePaper paper);
 	
 	public boolean saveQuestionnairePaper(Responder responder, Map<String, Object> answer);
 	
 	public boolean parseQuestionnaireTemplate(InputStream excel);
+	
+	public Object[][] calculate(long version);
+	
+	public Map<Object, Object[][]> calculateForMatrix(long version);
 }

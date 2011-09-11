@@ -30,8 +30,10 @@
 	}
 	
 	String responderId = request.getParameter("responderId");
+	String version = request.getParameter("version");
 	Responder responder = new Responder();
 	responder.setId(Long.valueOf(responderId));
+	responder.setVersion(Long.valueOf(version));
 	
 	boolean bln = new QuestionnairePaperServiceImpl().saveQuestionnairePaper(responder, answer);
 	out.print("<h1>"+bln+"</h1>");

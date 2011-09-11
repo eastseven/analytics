@@ -143,7 +143,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				String version = DateFormatUtils.format((Long)map.get("version"), pattern);
 
 				QueryRunner query = new QueryRunner();
-				String sql = "select a.responder_id, a.responder_name, (select min(b.finish_time) from questionnaire b where a.responder_id = b.responder_id) finish_time from responder a where a.version = " + map.get("version");
+				String sql = "select a.responder_id, a.responder_name, a.version, (select min(b.finish_time) from questionnaire b where a.responder_id = b.responder_id) finish_time from responder a where a.version = " + map.get("version");
 				logger.debug(sql);
 				List<Map<String, String>> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Map<String, String>>>() {
 					@Override
@@ -153,6 +153,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 							Map<String, String> map = new HashMap<String, String>();
 							map.put("responder_id", rs.getObject("responder_id").toString());
 							map.put("responder_name", rs.getObject("responder_name").toString());
+							map.put("version", rs.getObject("version").toString());
 							Object time = rs.getObject("finish_time");
 							if(time != null) {
 								map.put("finish_time", rs.getObject("finish_time").toString());
@@ -170,7 +171,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					String id = e.get("responder_id");
 					String name = e.get("responder_name");
 					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
-					String link = "<a href='questionnaire.jsp?id="+id+"' target='_blank'>答题</a>";
+					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>答题</a>";
 					String _row = "<tr><td>"+id+"</td><td>"+name+"</td><td>"+link+"</td><td>"+time+"</td></tr>";
 					content += _row;
 				}

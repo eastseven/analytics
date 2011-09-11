@@ -64,4 +64,32 @@ public class Responder {
 		this.properties = properties;
 	}
 
+	@Override
+	public String toString() {
+		return "Responder [id=" + id + ", name=" + name + ", version="
+				+ version + ", properties=" + properties + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Responder other = (Responder) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 }

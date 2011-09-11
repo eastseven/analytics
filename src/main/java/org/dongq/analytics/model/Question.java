@@ -23,6 +23,7 @@ public class Question {
 	private int type;
 
 	private List<Option> options;
+	private List<Responder> people;
 
 	public long getId() {
 		return id;
@@ -80,23 +81,26 @@ public class Question {
 		this.options = options;
 	}
 
+	public List<Responder> getPeople() {
+		return people;
+	}
+
+	public void setPeople(List<Responder> people) {
+		this.people = people;
+	}
+
 	public String getSelect() {
 		String html = "";
-		if(this.options != null && !this.options.isEmpty()) {
-			/*
-			<select name="">
-				<option value="">1</option>
-			</select> 
-			*/
-			html = "<select name='question_"+this.id+"'>";
-			for(Option o : this.options) {
-				html += "<option value='"+o.getKey()+"'>"+o.getValue()+"</option>";
+		if (this.options != null && !this.options.isEmpty()) {
+			html = "<select name='question_" + this.id + "'>";
+			for (Option o : this.options) {
+				html += "<option value='" + o.getKey() + "'>" + o.getValue() + "</option>";
 			}
 			html += "</select>";
 		}
 		return html;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Question [id=" + id + ", title=" + title + ", content="

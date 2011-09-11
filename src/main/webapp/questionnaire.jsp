@@ -21,12 +21,12 @@
 </style>
 <script>
 	$(function() {
-		$( "#selectable" ).selectable();
+		//$( "#selectable" ).selectable();
 	});
 </script>
 </head>
 <body>
-
+<!-- 
 <div class="demo">
 
 <ol id="selectable">
@@ -45,18 +45,20 @@
 </ol>
 
 </div>
-
+ -->
 	<%
 		String _id = request.getParameter("id");
-		long id = Long.valueOf(_id);
+		String version = request.getParameter("v");
+		long responderId = Long.valueOf(_id);
 		QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
-		Questionnaire paper = service.getQuestionnaire(id);
+		Questionnaire paper = service.getQuestionnaire(responderId);
 	%>
-	<br /><strong> <h1><%=id%></h1> </strong>
+	<br /><strong> <h1><%=responderId%></h1> </strong>
 	<form action="handler.jsp" method="post">
 		<p>
 			<input type="submit" value="提交" />
-			<input type="hidden" name="responderId" value="<%=id%>"/>
+			<input type="hidden" name="responderId" value="<%=responderId %>"/>
+			<input type="hidden" name="version" value="<%=version %>" />
 		</p>
 		<%
 			List matrix = paper.getMatrix();
@@ -67,9 +69,8 @@
 				String content = "";
 				for(int peopleIndex = 0; peopleIndex < people.size(); peopleIndex++) {
 					Responder person = (Responder)people.get(peopleIndex);
+					if(person.getId() == responderId) continue;
 					content += "<input type='checkbox' name='matrix_"+q.getId()+"' value='"+person.getId()+"'/>" + person.getName();
-					person.getId();
-					person.getName();
 				}
 				out.print(content + "<br />");
 			}

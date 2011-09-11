@@ -1,11 +1,11 @@
 package org.dongq.analytics.service;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +13,8 @@ import java.util.Set;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.KeyedHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,6 +71,22 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return blankPaper;
 	}
 
+	@Override
+	public Questionnaire getBlankQuestionnaire(long version) {
+		Questionnaire blankPaper = new Questionnaire();
+		try {
+			//Group
+			blankPaper.setGroup(getQuestionGroupOfVersion(version));
+			//Matrix
+			blankPaper.setMatrix(getQuestionsOfVersion(version));
+			//People
+			blankPaper.setPeople(getRespondersOfVersion(version));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return blankPaper;
+	}
+	
 	List<Responder> getRespondersOfVersion(long version) throws SQLException {
 		List<Responder> list = new ArrayList<Responder>();
 		String sql = "select * from responder a where a.version = " + version;
@@ -130,7 +148,6 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					e.setOptionId(rs.getLong("option_group_id"));
 					e.setVersion(rs.getLong("version"));
 					e.setType(rs.getInt("type"));
-					//e.setOptions(getOptionsForQuestion(e.getOptionId()));
 					logger.debug(e);
 					list.add(e);
 				}
@@ -209,6 +226,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		final String prefix_matrix   = "matrix_";
 		final String prefix_property = "property_";
 		final long finishTime = System.currentTimeMillis();
+		QueryRunner query = new QueryRunner();
 		try {
 			
 			if(responder.getId() == 0) {
@@ -217,7 +235,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			}
 			
 			long responderId = responder.getId();
-			QueryRunner query = new QueryRunner();
+			long version = responder.getVersion();
 			Set<String> keySet = answer.keySet();
 			List<QuestionnairePaper> list = new ArrayList<QuestionnairePaper>();
 			for(String key : keySet) {
@@ -230,6 +248,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					row.setQuestionId(questionId);
 					row.setOptionKey(optionKey);
 					row.setType(Question.TYPE_NORMAL);
+					row.setVersion(version);
 					row.setFinishTime(finishTime);
 					logger.debug("Normal: "+row);
 					list.add(row);
@@ -245,6 +264,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						row.setQuestionId(questionId);
 						row.setOptionKey(optionKey);
 						row.setType(Question.TYPE_MATRIX);
+						row.setVersion(version);
 						row.setFinishTime(finishTime);
 						logger.debug("Matrix: "+row);
 						list.add(row);
@@ -498,11 +518,144 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return update;
 	}
 	
+	@Override
+	public Object[][] calculate(long version) {
+		Object[][] data = null;
+		QueryRunner query = new QueryRunner();
+		try {
+			Questionnaire template = getBlankQuestionnaire(version);
+			List<Question> questions = new ArrayList<Question>();
+			for(QuestionGroup g : template.getGroup()) {
+				questions.addAll(g.getQuestions());
+			}
+
+			Connection conn = DbHelper.getConnection();
+			
+			//get responder of question
+			String sql = "select a.responder_id from questionnaire a where a.type = " + Question.TYPE_NORMAL + " and a.version = " + version + " group by a.responder_id";
+			logger.debug(sql);
+			List<Object> list = query.query(conn, sql, new ColumnListHandler());
+
+			int rowSize = list.size() + 1;
+			int columnSize = questions.size() + 1;
+			data = new Object[rowSize][columnSize];
+			
+			data[0][0] = "";
+			//表头
+			for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
+				Question q = questions.get(columnIndex-1);
+				data[0][columnIndex] = q.getId() + "|" + q.getContent();
+			}
+			
+			for(int rowIndex = 1; rowIndex < rowSize; rowIndex++) {
+				Long responderId = (Long)list.get(rowIndex-1);
+				sql = "select a.question_id, a.option_key from questionnaire a where a.type = "+Question.TYPE_NORMAL+" and a.responder_id = " + responderId;
+				logger.debug(sql);
+				Map<Object, Map<String, Object>> map = query.query(conn, sql, new KeyedHandler());
+				logger.debug(map);
+				if(map.isEmpty()) continue;
+				data[rowIndex][0] = responderId;
+				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
+					String ref = (String)data[0][columnIndex];
+					logger.debug(ref);
+					String key = ref.split("\\|")[0];
+					Map<String, Object> value = map.get(Long.valueOf(key));
+					logger.debug(key + ":" + value);
+					data[rowIndex][columnIndex] = value.get("OPTION_KEY");
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+	
+	@Override
+	public Map<Object, Object[][]> calculateForMatrix(long version) {
+		Map<Object, Object[][]> map = new HashMap<Object, Object[][]>();
+		
+		try {
+			
+			List<Responder> people = getRespondersOfVersion(version);
+			
+			
+			List<Question> matrixQuestion = getQuestionsOfVersion(version);
+			for(Question question : matrixQuestion) {
+				question.setPeople(people);
+				map.put(question, calculateForMatrix(question));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return map;
+	}
+	
+	Object[][] calculateForMatrix(Question question) throws Exception {
+		List<Responder> people = question.getPeople();
+		int rowSize = people.size() + 1;
+		int columnSize = rowSize;
+		Object[][] data = new Object[rowSize][columnSize];
+		
+		QueryRunner query = new QueryRunner();
+		Connection conn = DbHelper.getConnection();
+		
+		//第一行赋值
+		for(int index = 1; index < rowSize; index++) {
+			data[0][index] = people.get(index - 1);
+		}
+
+		for(int index = 1; index < columnSize; index++) {
+			//第一列赋值
+			Responder responder = people.get(index - 1);
+			data[index][0] = responder;
+			final String sql = "select a.option_key from questionnaire a where a.type = " + Question.TYPE_MATRIX + " and a.question_id = " + question.getId() + " and a.responder_id = " + responder.getId();
+			List<Object> list = query.query(conn, sql, new ColumnListHandler());
+			logger.debug(sql);
+			logger.debug(list);
+			for(Object object : list) {
+				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
+					Responder person = (Responder)data[0][columnIndex];
+					if(person.getId() == (Long)object) {
+						data[index][columnIndex] = 1;
+					}
+				}
+			}
+		}
+		
+		return data;
+	}
+	
 	public static void main(String[] arg) throws Exception {
 		QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
-		final String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
-		System.out.println(name);
-		InputStream excel = new FileInputStream(name);
-		service.parseQuestionnaireTemplate(excel);
+//		final String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
+//		System.out.println(name);
+//		InputStream excel = new FileInputStream(name);
+//		service.parseQuestionnaireTemplate(excel);
+		QueryRunner query = new QueryRunner();
+		String sql = "select a.version from question a";
+		@SuppressWarnings("rawtypes")
+		Map map = query.query(DbHelper.getConnection(), sql, new KeyedHandler());
+		Long version = (Long)map.keySet().iterator().next();
+		System.out.println(version);
+		Object[][] result = service.calculate(version);
+		for(int i = 0; i < result.length; i++) {
+			String row = "";
+			for(int j = 0; j < result[i].length; j++) {
+				row += result[i][j] + ",";
+			}
+			System.out.println(row);
+		}
+		
+		Map<Object, Object[][]> matrix = service.calculateForMatrix(version);
+		for(Object[][] data : matrix.values()) {
+			for(int i = 0; i < data.length; i++) {
+				for(int j = 0; j < data.length; j++) {
+					System.out.println("data["+i+"]["+j+"] : " + data[i][j]);
+				}
+			}
+		}
 	}
 }

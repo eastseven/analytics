@@ -3,6 +3,7 @@ package org.dongq.analytics.service;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
@@ -22,4 +23,8 @@ public interface QuestionnairePaperService {
 	public Object[][] calculate(long version);
 	
 	public Map<Object, Object[][]> calculateForMatrix(long version);
+	
+	public Workbook generateExcelForQuestionnaire(long version);
+	
+	public Workbook generateExcelForQuestionnaire(Object[][] normalQuestion, Map<Object, Object[][]> matrixQuestion);
 }

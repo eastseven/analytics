@@ -3,6 +3,9 @@
  */
 package org.dongq.analytics.ui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,17 +19,20 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dongq.analytics.service.QuestionnairePaperService;
 import org.dongq.analytics.service.QuestionnairePaperServiceImpl;
 import org.dongq.analytics.utils.DbHelper;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Detail;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Label;
@@ -140,7 +146,8 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				@SuppressWarnings("unchecked")
 				HashMap<Object, Object> map = (HashMap<Object, Object>)data;
 				final String pattern = "yyyy-MM-dd HH:mm:ss";
-				String version = DateFormatUtils.format((Long)map.get("version"), pattern);
+				final Long fileName = (Long)map.get("version");
+				final String version = DateFormatUtils.format((Long)map.get("version"), pattern);
 
 				QueryRunner query = new QueryRunner();
 				String sql = "select a.responder_id, a.responder_name, a.version, (select min(b.finish_time) from questionnaire b where a.responder_id = b.responder_id) finish_time from responder a where a.version = " + map.get("version");
@@ -190,7 +197,33 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					
 					@Override
 					public void onEvent(Event event) throws Exception {
-						org.zkoss.zhtml.Messagebox.show("TODO:生成Excel数据\n" + event.getName());
+						String msg = "TODO:生成Excel数据\n";
+						msg += event.getName() + "\n";
+						msg += event.getPage() + "\n";
+						msg += event.getTarget() + "\n";
+						Execution exe = event.getPage().getDesktop().getExecution();
+						msg += "\nRemoteAddr:" + exe.getRemoteAddr();
+						msg += "\nRemoteHost:" + exe.getRemoteHost();
+						msg += "\nServer:" + exe.getServerName() + ":" + exe.getServerPort() + exe.getContextPath();
+						msg += "\nNativeRequest:" + exe.getNativeRequest();
+						msg += "\nNativeResponse:" + exe.getNativeResponse();
+//						org.zkoss.zhtml.Messagebox.show(msg);
+						logger.debug(msg);
+						String path = exe.getServerName() + ":" + exe.getServerPort() + exe.getContextPath();
+						logger.debug(path);
+						try {
+							File file = new File(fileName + ".xls");
+							if(!file.exists()) file.createNewFile();
+							logger.debug(file.getAbsolutePath());
+							String contentType = "application/vnd.ms-excel";
+							QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
+							Workbook wb = service.generateExcelForQuestionnaire(Long.valueOf(version));
+							wb.write(new FileOutputStream(file));
+							//Filedownload.save(new FileInputStream(file), contentType, null);
+							Filedownload.save(file.toURL(), null);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
 				});
 				row.appendChild(btn);

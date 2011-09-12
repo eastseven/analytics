@@ -1,5 +1,6 @@
 package org.dongq.analytics.service;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,6 +19,7 @@ import org.apache.commons.dbutils.handlers.KeyedHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -544,7 +546,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			//表头
 			for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
 				Question q = questions.get(columnIndex-1);
-				data[0][columnIndex] = q.getId() + "|" + q.getContent();
+				data[0][columnIndex] = q;
 			}
 			
 			for(int rowIndex = 1; rowIndex < rowSize; rowIndex++) {
@@ -556,10 +558,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				if(map.isEmpty()) continue;
 				data[rowIndex][0] = responderId;
 				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
-					String ref = (String)data[0][columnIndex];
+					Question ref = (Question)data[0][columnIndex];
 					logger.debug(ref);
-					String key = ref.split("\\|")[0];
-					Map<String, Object> value = map.get(Long.valueOf(key));
+					long key = ref.getId();
+					Map<String, Object> value = map.get(key);
 					logger.debug(key + ":" + value);
 					data[rowIndex][columnIndex] = value.get("OPTION_KEY");
 				}
@@ -620,12 +622,87 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					Responder person = (Responder)data[0][columnIndex];
 					if(person.getId() == (Long)object) {
 						data[index][columnIndex] = 1;
+					} else {
+						data[index][columnIndex] = "";
 					}
 				}
 			}
 		}
 		
 		return data;
+	}
+	
+	@Override
+	public Workbook generateExcelForQuestionnaire(long version) {
+		Object[][] normalQuestion = calculate(version);
+		Map<Object, Object[][]> matrixQuestion = calculateForMatrix(version);
+		return generateExcelForQuestionnaire(normalQuestion, matrixQuestion);
+	}
+	
+	@Override
+	public Workbook generateExcelForQuestionnaire(Object[][] normalQuestion, Map<Object, Object[][]> matrixQuestion) {
+		Workbook excel = null;
+		//OutputStream out ;
+		try {
+			
+			Workbook workbook = new HSSFWorkbook();
+			Sheet normal = workbook.createSheet("normal");
+			int _rowIndex = 0;
+			for(Object[] rowData : normalQuestion) {
+				Row row = normal.createRow(_rowIndex);
+				int colIndex = 0;
+				for(Object colData : rowData) {
+					logger.debug(colData);
+					Cell cell = row.createCell(colIndex);
+					Object data = normalQuestion[_rowIndex][colIndex];
+					if (data instanceof Question) {
+						Question q = (Question) data;
+						cell.setCellValue(q.getContent());
+					} else {
+						cell.setCellValue(data.toString());
+					}
+					colIndex++;
+				}
+				
+				_rowIndex++;
+			}
+			
+			for(Iterator<Object> iter = matrixQuestion.keySet().iterator(); iter.hasNext();) {
+				Object key = iter.next();
+				Sheet sheet = null;
+				if (key instanceof Question) {
+					Question q = (Question) key;
+					logger.debug(q);
+					sheet = workbook.createSheet(q.getTitle());
+				}
+				Object[][] matrixData = matrixQuestion.get(key);
+				int rownum = matrixData.length;
+				int colnum = rownum;
+				for(int rowIndex = 0; rowIndex < rownum; rowIndex++) {
+					Row row = sheet.createRow(rowIndex);
+					for(int colIndex = 0; colIndex < colnum; colIndex++) {
+						Cell cell = row.createCell(colIndex);
+						Object data = matrixData[rowIndex][colIndex];
+						if(data != null) {
+							if (data instanceof Responder) {
+								Responder r = (Responder) data;
+								cell.setCellValue(r.getName());
+							} else {
+								cell.setCellValue(data.toString());
+							}
+						} else {
+							cell.setCellValue("");
+						}
+					}
+				}
+				
+			}
+			excel = workbook;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return excel;
 	}
 	
 	public static void main(String[] arg) throws Exception {
@@ -657,5 +734,11 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				}
 			}
 		}
+		
+		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
+		Workbook wb = service.generateExcelForQuestionnaire(result, matrix);
+		wb.write(fileOut);
+	    fileOut.close();
+	    System.out.println("done...");
 	}
 }

@@ -9,9 +9,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.Version;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.SuspendNotAllowedException;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Window;
 
 /**
  * @author eastseven
@@ -25,11 +27,28 @@ public class IndexComposer extends GenericForwardComposer {
 	
 	Div mainDiv;
 	
+	Window main;
+	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		logger.debug(comp + ":" + comp.getId());
 		logger.debug(mainDiv + ":" + mainDiv.getId());
+	}
+	
+	public void onClick$upload() {
+		Component comp = execution.createComponents("questionnaire_upload.zul", main, null);
+		logger.debug(comp);
+		if (comp instanceof Window) {
+			Window win = (Window) comp;
+			try {
+				win.doModal();
+			} catch (SuspendNotAllowedException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**

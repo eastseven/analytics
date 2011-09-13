@@ -1,0 +1,6 @@
+<?page title="Upload" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window title="Upload" border="normal" closable="true" apply="org.dongq.analytics.ui.UploadComposer">
+		<fileupload id="file" />
+	</window>
+</zk>

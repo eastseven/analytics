@@ -4,6 +4,7 @@
 package org.dongq.analytics.ui;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -16,6 +17,8 @@ import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,8 +79,6 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					
 					@Override
 					public void onEvent(Event event) throws Exception {
-//						mainDiv.getChildren().clear();
-//						Executions.createComponents("questionnaire_grid.zul", mainDiv, null);
 						init();
 					}
 				});
@@ -178,8 +179,12 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					String id = e.get("responder_id");
 					String name = e.get("responder_name");
 					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
-					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>答题</a>";
-					String _row = "<tr><td>"+id+"</td><td>"+name+"</td><td>"+link+"</td><td>"+time+"</td></tr>";
+					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
+					
+					String _row = "<tr><td>"+id+"</td><td>"+name+"</td><td>";
+					_row += StringUtils.isBlank(time) ? link : "答题完毕";
+					_row += "</td><td>"+time+"</td></tr>";
+					
 					content += _row;
 				}
 				content += "</tbody></table>";
@@ -207,20 +212,21 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 						msg += "\nServer:" + exe.getServerName() + ":" + exe.getServerPort() + exe.getContextPath();
 						msg += "\nNativeRequest:" + exe.getNativeRequest();
 						msg += "\nNativeResponse:" + exe.getNativeResponse();
-//						org.zkoss.zhtml.Messagebox.show(msg);
 						logger.debug(msg);
 						String path = exe.getServerName() + ":" + exe.getServerPort() + exe.getContextPath();
 						logger.debug(path);
 						try {
 							File file = new File(fileName + ".xls");
-							if(!file.exists()) file.createNewFile();
 							logger.debug(file.getAbsolutePath());
+							FileOutputStream out = FileUtils.openOutputStream(file);
+							FileInputStream in = FileUtils.openInputStream(file);
 							String contentType = "application/vnd.ms-excel";
 							QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
-							Workbook wb = service.generateExcelForQuestionnaire(Long.valueOf(version));
-							wb.write(new FileOutputStream(file));
-							//Filedownload.save(new FileInputStream(file), contentType, null);
-							Filedownload.save(file.toURL(), null);
+							Workbook wb = service.generateExcelForQuestionnaire(fileName);
+							wb.write(out);
+							out.close();
+							
+							Filedownload.save(in, contentType, fileName + ".xls");
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}

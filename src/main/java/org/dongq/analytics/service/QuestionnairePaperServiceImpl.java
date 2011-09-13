@@ -38,6 +38,22 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 
 	final static Log logger = LogFactory.getLog(QuestionnairePaperServiceImpl.class);
 	
+	@Override
+	public boolean hasAnswered(long responderId) {
+		boolean answered = true;
+		
+		try {
+			QueryRunner query = new QueryRunner();
+			String sql = "select count(1) from questionnaire a where a.responder_id = " + responderId;
+			List<Object> list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+			if(list.isEmpty()) answered = false;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return answered;
+	}
+	
 	public Questionnaire getQuestionnaire(long id) {
 		Questionnaire blankPaper = new Questionnaire();
 		Connection conn = DbHelper.getConnection();
@@ -554,15 +570,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				sql = "select a.question_id, a.option_key from questionnaire a where a.type = "+Question.TYPE_NORMAL+" and a.responder_id = " + responderId;
 				logger.debug(sql);
 				Map<Object, Map<String, Object>> map = query.query(conn, sql, new KeyedHandler());
-				logger.debug(map);
 				if(map.isEmpty()) continue;
 				data[rowIndex][0] = responderId;
 				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
 					Question ref = (Question)data[0][columnIndex];
-					logger.debug(ref);
 					long key = ref.getId();
 					Map<String, Object> value = map.get(key);
-					logger.debug(key + ":" + value);
 					data[rowIndex][columnIndex] = value.get("OPTION_KEY");
 				}
 			}
@@ -580,7 +593,6 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		try {
 			
 			List<Responder> people = getRespondersOfVersion(version);
-			
 			
 			List<Question> matrixQuestion = getQuestionsOfVersion(version);
 			for(Question question : matrixQuestion) {
@@ -609,23 +621,39 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			data[0][index] = people.get(index - 1);
 		}
 
+		//第一列赋值
 		for(int index = 1; index < columnSize; index++) {
-			//第一列赋值
 			Responder responder = people.get(index - 1);
 			data[index][0] = responder;
+		}
+		
+		for(int rowIndex = 1; rowIndex < columnSize; rowIndex++) {
+			Responder responder = people.get(rowIndex - 1);
+			
 			final String sql = "select a.option_key from questionnaire a where a.type = " + Question.TYPE_MATRIX + " and a.question_id = " + question.getId() + " and a.responder_id = " + responder.getId();
 			List<Object> list = query.query(conn, sql, new ColumnListHandler());
 			logger.debug(sql);
 			logger.debug(list);
-			for(Object object : list) {
-				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
-					Responder person = (Responder)data[0][columnIndex];
-					if(person.getId() == (Long)object) {
-						data[index][columnIndex] = 1;
-					} else {
-						data[index][columnIndex] = "";
+			for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
+				Responder person = (Responder)data[0][columnIndex];
+				for(Object object : list) {
+					if(object.equals(person.getId())) {
+						data[rowIndex][columnIndex] = 1;
 					}
+					logger.debug("pId:"+person.getId()+","+object+"["+rowIndex+"]["+columnIndex+"]="+data[rowIndex][columnIndex]);
 				}
+			}
+		}
+		
+		if(logger.isDebugEnabled()) {
+			int i = 0;
+			for(Object[] o : data) {
+				int j = 0;
+				for(Object e : o) {
+					System.out.println("matrix_data["+i+"]["+j+"] : " + e);
+					j++;
+				}
+				i++;
 			}
 		}
 		
@@ -733,6 +761,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					System.out.println("data["+i+"]["+j+"] : " + data[i][j]);
 				}
 			}
+			System.out.println("\n\n\n\n\n\n\n");
 		}
 		
 		FileOutputStream fileOut = new FileOutputStream("workbook.xls");

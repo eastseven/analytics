@@ -10,6 +10,8 @@ import org.dongq.analytics.model.Responder;
 
 public interface QuestionnairePaperService {
 
+	public boolean hasAnswered(long responderId);
+	
 	public Questionnaire getQuestionnaire(long responderId);
 	
 	public Questionnaire getBlankQuestionnaire(long version);

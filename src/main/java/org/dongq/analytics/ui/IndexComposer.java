@@ -46,7 +46,7 @@ public class IndexComposer extends GenericForwardComposer {
 			} catch (SuspendNotAllowedException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

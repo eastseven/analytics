@@ -1,6 +1,5 @@
 <?page title="Questionnaire Grid" contentType="text/html;charset=UTF-8"?>
 <zk>
-	<!-- <fileupload id="file"/> -->
 	<grid id="grid" apply="org.dongq.analytics.ui.QuestionnaireComposer" mold="paging">
 		<columns>
 			<column width="40px" />

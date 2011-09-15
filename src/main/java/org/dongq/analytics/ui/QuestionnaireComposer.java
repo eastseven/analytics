@@ -172,8 +172,13 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 						return list;
 					}
 				});
-				String content = "<table align='center'>";
-				content += "<thead><tr><th width='25%'>编号</th><th width='25%'>姓名</th><th width='25%'>操作</th><th width='25%'>时间</th></tr></thead>";
+				String content = "<table align='center' style='border-collapse:collapse;border: 1px solid black;'>";
+				content += "<thead><tr>"; 
+				content += "<th width='25%' style='border: 1px solid black;'>编号</th>" +
+						"<th width='25%' style='border: 1px solid black;'>姓名</th>" +
+						"<th width='25%' style='border: 1px solid black;'>操作</th>" +
+						"<th width='25%' style='border: 1px solid black;'>时间</th>"; 
+				content += "</tr></thead>";
 				content += "<tbody>";
 				for(Map<String, String> e : list) {
 					String id = e.get("responder_id");
@@ -181,9 +186,9 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
 					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
 					
-					String _row = "<tr><td>"+id+"</td><td>"+name+"</td><td>";
+					String _row = "<tr><td align='center' style='border: 1px solid black;'>"+id+"</td><td align='center' style='border: 1px solid black;'>"+name+"</td><td align='center' style='border: 1px solid black;'>";
 					_row += StringUtils.isBlank(time) ? link : "答题完毕";
-					_row += "</td><td>"+time+"</td></tr>";
+					_row += "</td><td align='center' style='border: 1px solid black;'>"+time+"</td></tr>";
 					
 					content += _row;
 				}

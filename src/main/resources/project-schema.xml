@@ -48,11 +48,11 @@
 		<column name="version" type="BIGINT" />
 		<column name="finish_time" type="BIGINT"/>
 	</table>
+	<!-- 
 	<table name="questionnaire_data">
 		<column name="version" type="BIGINT" />
 		<column name="excel_file" type="BLOB"/>
 	</table>
-	<!-- 
 	<table name="questionnaire_paper">
 		<column name="paper_id" type="BIGINT" primaryKey="true" />
 		<column name="title" type="VARCHAR" size="4000" />

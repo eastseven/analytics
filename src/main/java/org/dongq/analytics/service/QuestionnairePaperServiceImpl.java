@@ -356,6 +356,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	
 	void parseResponderProperty(Sheet responderProperty, long version) throws SQLException {
 		int index = 0;
+		QueryRunner query = new QueryRunner();
+		Connection conn = DbHelper.getConnection();
 		for(Iterator<Row> rowIter = responderProperty.iterator(); rowIter.hasNext();) {
 			Row row = rowIter.next();
 			if(row.getCell(0) != null && index > 0) {
@@ -366,19 +368,24 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					//选项值
 					int value = 1;
 					int columnIndex = 1;
-					QueryRunner query = new QueryRunner();
 					for(Iterator<Cell> cellIter = row.cellIterator(); cellIter.hasNext();) {
 						Cell cell = cellIter.next();
-						if(!StringUtils.isBlank(cell.getStringCellValue()) && columnIndex > 1) {
+						String textValue = toConvert(cell);
+						if(!StringUtils.isBlank(textValue) && columnIndex > 1) {
 							ResponderProperty p = new ResponderProperty();
-							p.setId(System.currentTimeMillis() + columnIndex * Math.round(System.currentTimeMillis()) * 1000);
-							p.setDisplay(cell.getStringCellValue());
+							p.setId(System.currentTimeMillis());
+							try {
+								Thread.sleep(1);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							p.setDisplay(textValue);
 							p.setName(name);
 							p.setValue(value);
 							p.setVersion(version);
 							
 							final String sql = "insert into responder_property values(?,?,?,?,?)";
-							int record = query.update(DbHelper.getConnection(), sql, p.getId(), p.getName(), p.getDisplay(), p.getValue(), p.getVersion());
+							int record = query.update(conn, sql, p.getId(), p.getName(), p.getDisplay(), p.getValue(), p.getVersion());
 							logger.debug(record);
 							value++;
 						}
@@ -394,6 +401,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	void parseResponders(Sheet responders, long version) throws Exception {
+		Connection conn = DbHelper.getConnection();
 		QueryRunner query = new QueryRunner();
 		String sql = "select * from responder_property where version = " + version;
 		List<ResponderProperty> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<ResponderProperty>>() {
@@ -406,7 +414,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				return list;
 			}
 		});
-		logger.info(list.size());
+		logger.debug(list.size());
 		//取表头属性名
 		int attributeIndex = 0;
 		for(Iterator<Cell> iter = responders.getRow(0).cellIterator(); iter.hasNext(); ) {
@@ -422,7 +430,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				int _index = 1;
 				for(Iterator<Cell> iter = row.cellIterator(); iter.hasNext();) {
 					Cell c = iter.next();
-					logger.info(_index + "." + c);
+					logger.debug(_index + "." + c);
 					_index++;
 				}
 			} else {
@@ -432,19 +440,21 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					Responder responder = new Responder();
 					for(int columnIndex = 0; columnIndex < attributeIndex; columnIndex++) {
 						Cell column = row.getCell(columnIndex);
+						String textValue = toConvert(column);
 						switch (columnIndex) {
 						case 0:
-							logger.info(columnIndex+"-"+column.getStringCellValue());
-							responder.setName(column.getStringCellValue());
+							logger.info(columnIndex+"-"+textValue);
+							responder.setName(textValue);
 							break;
 						default:
-							logger.info(columnIndex+"="+column.getStringCellValue());
+							logger.info(columnIndex+"="+textValue);
 							break;
 						}
 					}
 					sql = "insert into responder(responder_id,responder_name,version) values(?,?,?)";
-					long id = System.currentTimeMillis() + index * Math.round(System.currentTimeMillis()) * 1000;
-					query.update(DbHelper.getConnection(), sql, id, responder.getName(), version);
+					long id = System.currentTimeMillis();
+					Thread.sleep(1);
+					query.update(conn, sql, id, responder.getName(), version);
 				}
 			}
 			index++;
@@ -453,15 +463,15 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	
 	void parseRequestions(Sheet requestions, long version) throws Exception {
 		int index = 0;
+		QueryRunner query = new QueryRunner();
 		for(Iterator<Row> rowIter = requestions.iterator(); rowIter.hasNext();) {
 			Row row = rowIter.next();
 			if(row.getCell(0) != null && !StringUtils.isBlank(row.getCell(0).getStringCellValue()) && index > 0) {
-				logger.info(index + " : " + row.getCell(0));
+				logger.debug(index + " : " + row.getCell(0));
 				String title = row.getCell(0).getStringCellValue();
 				String optionString = row.getCell(1).getStringCellValue();
 				long optionGroupId = parseOptions(optionString, version).get(0).getId();
 				
-				QueryRunner query = new QueryRunner();
 				//迭代小题
 				int columnIndex = 0;
 				for(Iterator<Cell> iter = row.cellIterator(); iter.hasNext();) {
@@ -472,7 +482,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					
 					if(columnIndex > 1) {
 						Question q = new Question();
-						q.setId(System.currentTimeMillis() + columnIndex * Math.round(1000) * 1000);
+						q.setId(System.currentTimeMillis());
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						q.setContent(cell.getStringCellValue());
 						q.setOptionId(optionGroupId);
 						q.setTitle(title);
@@ -494,7 +509,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			Row row = rowIter.next();
 			if(row.getCell(0) != null && !StringUtils.isBlank(row.getCell(0).getStringCellValue()) && index > 0) {
 				Question q = new Question();
-				q.setId(System.currentTimeMillis() + index * Math.round(1000) * 1000);
+				q.setId(System.currentTimeMillis());
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				q.setTitle(row.getCell(0).getStringCellValue());
 				q.setVersion(version);
 				q.setType(Question.TYPE_MATRIX);
@@ -506,11 +526,29 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		}
 	}
 	
+	String toConvert(Cell cell) {
+		String value = "";
+		
+		switch (cell.getCellType()) {
+			case Cell.CELL_TYPE_NUMERIC :
+				value = String.valueOf((int)cell.getNumericCellValue());
+				break;
+			case Cell.CELL_TYPE_STRING :
+				value = cell.getStringCellValue();
+				break;
+			default:
+				value = "";
+				break;
+		}
+		
+		return value;
+	}
+	
 	List<Option> parseOptions(String optionString, long version) throws Exception {
 		long optionGroupId = System.currentTimeMillis();
 		List<Option> list = new ArrayList<Option>();
 		
-		logger.info(optionString);
+		logger.debug(optionString);
 		QueryRunner query = new QueryRunner();
 		String insert = "insert into question_option values(?,?,?,?)";
 		String[] array = optionString.split(",");
@@ -523,7 +561,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			o.setValue(opt[1]);
 			list.add(o);
 			
-			logger.info(o);
+			logger.debug(o);
 			query.update(DbHelper.getConnection(), insert, o.getId(), o.getKey(), o.getValue(), o.getVersion());
 		}
 		

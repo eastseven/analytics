@@ -20,6 +20,10 @@ public class ResponderProperty {
 	public ResponderProperty() {
 	}
 
+	public ResponderProperty(long id) {
+		this.id = id;
+	}
+
 	public ResponderProperty(long id, String name, String display, int value,
 			long version) {
 		super();
@@ -68,6 +72,12 @@ public class ResponderProperty {
 
 	public void setVersion(long version) {
 		this.version = version;
+	}
+
+	@Override
+	public String toString() {
+		return "ResponderProperty [id=" + id + ", name=" + name + ", display="
+				+ display + ", value=" + value + ", version=" + version + "]";
 	}
 
 }

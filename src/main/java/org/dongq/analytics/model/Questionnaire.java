@@ -18,7 +18,7 @@ public class Questionnaire {
 
 	private List<Responder> people;
 
-	private List<ResponderProperty> properties;
+	private List<OptionGroup> optionGroups;
 
 	public Questionnaire() {
 
@@ -56,12 +56,12 @@ public class Questionnaire {
 		this.people = people;
 	}
 
-	public List<ResponderProperty> getProperties() {
-		return properties;
+	public List<OptionGroup> getOptionGroups() {
+		return optionGroups;
 	}
 
-	public void setProperties(List<ResponderProperty> properties) {
-		this.properties = properties;
+	public void setOptionGroups(List<OptionGroup> optionGroups) {
+		this.optionGroups = optionGroups;
 	}
 
 }

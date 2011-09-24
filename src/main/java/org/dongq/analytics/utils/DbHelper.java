@@ -19,7 +19,7 @@ public class DbHelper {
 	final static Log logger = LogFactory.getLog(DbHelper.class);
 	
 	public static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
-	public static String url = "jdbc:derby:database;create=true";
+	public static String url = "jdbc:derby:database";
 	
 	static {
 		/*

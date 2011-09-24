@@ -3,6 +3,7 @@
  */
 package org.dongq.analytics.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ public class Responder {
 
 	private long version;
 
-	private Set<ResponderProperty> properties;
+	private Set<ResponderProperty> properties = new HashSet<ResponderProperty>();
 
 	public Responder() {
 		super();

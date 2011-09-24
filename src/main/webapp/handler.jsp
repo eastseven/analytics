@@ -18,7 +18,6 @@
 		for(int index = 0; index < value.length; index++) {
 			text += "," + value[index];
 		}
-		out.print(key+" : "+text+"<br />");
 		
 		if(key.startsWith(prefix_question)) {
 			answer.put(key, value[0]);
@@ -27,6 +26,13 @@
 		if(key.startsWith(prefix_matrix)) {
 			answer.put(key, text);
 		}
+		
+		if(key.startsWith(prefix_property)) {
+			text = text.replace(",", "");
+			//out.print(key+" : "+text+"<br />");
+			answer.put(prefix_property+text, text);
+		}
+		
 	}
 	
 	String responderId = request.getParameter("responderId");
@@ -36,7 +42,11 @@
 	responder.setVersion(Long.valueOf(version));
 	
 	boolean bln = new QuestionnairePaperServiceImpl().saveQuestionnairePaper(responder, answer);
-	out.print("<h1>"+bln+"</h1>");
+	if(bln) {
+		out.print("<h1>thanks</h1>");
+	} else {
+		out.print("<h1>ops! exception, oh no!!! please try again</h1>");
+	}
 	/*
 	if(!answers.isEmpty()) {
 		QuestionnairePaper paper = new QuestionnairePaper();

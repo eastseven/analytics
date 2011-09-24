@@ -59,6 +59,7 @@
 			<input type="hidden" name="responderId" value="<%=responderId %>"/>
 			<input type="hidden" name="version" value="<%=version %>" />
 		</p>
+		<!-- matrix -->
 		<%
 			List matrix = paper.getMatrix();
 			List people = paper.getPeople();
@@ -74,6 +75,7 @@
 				out.print(content + "<br />");
 			}
 		%>
+		<!-- normal -->
 		<%
 			List list = paper.getGroup();
 			for (int index = 0; index < list.size(); index++) {
@@ -85,6 +87,31 @@
 					Question question = (Question) questions.get(questionIndex);
 					out.print("<p>" + (questionIndex + 1) + "." + question.getContent() + " : " + question.getSelect() + "</p>");
 				}
+			}
+		%>
+		<!-- people property -->
+		<%
+			out.print("<br/>");
+			List optionGroups = paper.getOptionGroups();
+			for(int index = 0; index < optionGroups.size(); index++) {
+				OptionGroup optionGroup = (OptionGroup)optionGroups.get(index);
+				String title = optionGroup.getName();
+				out.print("<p>" + (index+1) + "." + title + "</p>");
+				List options = optionGroup.getOptions();
+				
+				String html = "";
+				for(int optionIndex = 0; optionIndex < options.size(); optionIndex++) {
+					Option option = (Option)options.get(optionIndex);
+					String checked = "";
+					if(option.isSelected()) {
+						checked += " checked='checked' ";
+					} else {
+						checked += " readonly='readonly' ";
+					}
+					html += "<input type='radio' name='property_"+index+"' value='"+option.getId()+"' "+checked+"/>" + option.getDisplay();
+					//out.print(option+"<br/>");
+				}
+				out.print("<p>"+html+"</p>");
 			}
 		%>
 		<p>

@@ -8,10 +8,18 @@ package org.dongq.analytics.model;
  * 
  */
 public class Option {
+
 	private long id;
+
 	private int key;
+
+	private String display;
+
 	private String value;
+
 	private long version;
+
+	private boolean selected;
 
 	public long getId() {
 		return id;
@@ -45,10 +53,27 @@ public class Option {
 		this.version = version;
 	}
 
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public String getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(String display) {
+		this.display = display;
+	}
+
 	@Override
 	public String toString() {
-		return "Option [id=" + id + ", key=" + key + ", value=" + value
-				+ ", version=" + version + "]";
+		return "Option [id=" + id + ", key=" + key + ", display=" + display
+				+ ", value=" + value + ", version=" + version + ", selected="
+				+ selected + "]";
 	}
 
 }

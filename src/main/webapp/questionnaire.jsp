@@ -11,6 +11,7 @@
 <link type="text/css" href="js/jquery/css/smoothness/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
 <script type="text/javascript" src="js/jquery/js/jquery-1.6.2.min.js"></script>
 <script type="text/javascript" src="js/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>
+
 <style>
 	#feedback { font-size: 1.4em; }
 	#selectable .ui-selecting { background: #FECA40; }
@@ -18,9 +19,54 @@
 	#selectable { list-style-type: none; margin: 0; padding: 0; }
 	#selectable li { margin: 3px; padding: 1px; float: left; width: 20px; height: 20px; font-size: 1em; text-align: center; }
 </style>
+
+<style>
+	label { float: left; font-family: Arial, Helvetica, sans-serif; font-size: small; }
+	/* br { clear: both; } */
+	input { border: 1px solid black; margin-bottom: .5em;  }
+	/* label.error {
+		display:none;
+		background: url('http://dev.jquery.com/view/trunk/plugins/validate/demo/images/unchecked.gif') no-repeat;
+		padding-left: 16px;
+		margin-left: .3em;
+	}
+	label.valid {
+		background: url('http://dev.jquery.com/view/trunk/plugins/validate/demo/images/checked.gif') no-repeat;
+		display: block;
+		width: 16px;
+		height: 16px;
+	} */
+</style>
+
 <script>
 	$(function() {
 		//$( "#selectable" ).selectable();
+		
+		$('#questionnaire').submit(function() {
+			var length = $('span').length;
+			var canSubmit = true;
+			for(var index = 0; index < length; index++) {
+				var bln = false;
+				var size = $('input[name=property_'+index+']').length;
+				for(var i = 0; i < size; i++) {
+					var checked = $('#property_'+index+'_'+i).attr('checked');
+					if(checked == 'checked') {
+						bln = true;
+						break;
+					}
+				}
+				if(!bln) {
+					var label = $('#property_'+index);
+					alert(label.html());
+					canSubmit = canSubmit && false;
+					break;
+				} else {
+					canSubmit = canSubmit && true;
+				}
+			}
+			return canSubmit;
+		});
+		
 	});
 </script>
 </head>
@@ -53,7 +99,8 @@
 		Questionnaire paper = service.getQuestionnaire(responderId);
 	%>
 	<br /><strong> <h1><%=responderId%></h1> </strong>
-	<form action="handler.jsp" method="post">
+	
+	<form id="questionnaire" action="handler.jsp" method="post">
 		<p>
 			<input type="submit" value="提交" />
 			<input type="hidden" name="responderId" value="<%=responderId %>"/>
@@ -105,13 +152,14 @@
 					String checked = "";
 					if(option.isSelected()) {
 						checked += " checked='checked' ";
-					} else {
-						checked += " readonly='readonly' ";
+						//html += "<input type='hidden' name='oldproperty_"+index+"' value='"+option.getId()+"' checked='checked'/>";
 					}
-					html += "<input type='radio' name='property_"+index+"' value='"+option.getId()+"' "+checked+"/>" + option.getDisplay();
-					//out.print(option+"<br/>");
+					html += "<label for='"+option.getId()+"'>";
+					html += "<input type='radio' name='property_"+index+"' id='property_"+index+"_"+optionIndex+"' value='"+option.getId()+"' "+checked+"/>" + option.getDisplay();
+					html += "</label>";
 				}
-				out.print("<p>"+html+"</p>");
+				html += "<div id='property_"+index+"' style='display:none;'>请选择"+title+"</div>";
+				out.print("<p><span>"+html+"</span></p><br/>");
 			}
 		%>
 		<p>

@@ -1,6 +1,7 @@
 package org.dongq.analytics.service;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -337,19 +338,6 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				logger.debug(prefix_property);
 			}
 			
-			if(logger.isDebugEnabled()) {
-				String sql = "select responder_id, count(responder_property_id) from responder_properties group by responder_id";
-				List<Object[]> count = query.query(DbHelper.getConnection(), sql, new ArrayListHandler());
-				for(Object[] e : count) {
-					System.out.println("before responder_properties:"+e[0]+"="+e[1]);
-				}
-				sql = "select responder_id, count(version) from questionnaire group by responder_id";
-				count = query.query(DbHelper.getConnection(), sql, new ArrayListHandler());
-				for(Object[] e : count) {
-					System.out.println("before questionnaire:"+e[0]+"="+e[1]);
-				}
-			}
-			
 			long responderId = responder.getId();
 			long version = responder.getVersion();
 			Set<String> keySet = answer.keySet();
@@ -413,24 +401,26 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			
 			//responder property
 			if(!properties.isEmpty()) {
+				Connection conn = DbHelper.getConnection();
+				conn.setAutoCommit(false);
+				final String delete = "delete from responder_properties where responder_id = "+responderId+" and version = " + version;
+				int deleteRecord = query.update(DbHelper.getConnection(), delete);
+				logger.debug(deleteRecord+":"+delete);
+				
+				int index = 0;
+				Object[][] p = new Object[properties.size()][3];
+				final String insert = "insert into responder_properties(responder_id,responder_property_id,version) values(?,?,?)";
 				for(ResponderProperty e : properties) {
-					final String insert = "insert into responder_properties(responder_id,responder_property_id,version) values(?,?,?)";
-					int record = query.update(DbHelper.getConnection(), insert, responderId, e.getId(), version);
-					logger.debug("responder property records : "+record+":responderId="+responderId+",propertyId="+e.getId()+",version="+version);
+					p[index][0] = responderId;
+					p[index][1] = e.getId();
+					p[index][2] = version;
+					logger.debug("responder property records insert : responderId="+responderId+",propertyId="+e.getId()+",version="+version);
+					index++;
 				}
-			}
-			
-			if(logger.isDebugEnabled()) {
-				String sql = "select responder_id, count(responder_property_id) from responder_properties group by responder_id";
-				List<Object[]> count = query.query(DbHelper.getConnection(), sql, new ArrayListHandler());
-				for(Object[] e : count) {
-					System.out.println("responder_properties:"+e[0]+"="+e[1]);
-				}
-				sql = "select responder_id, count(version) from questionnaire group by responder_id";
-				count = query.query(DbHelper.getConnection(), sql, new ArrayListHandler());
-				for(Object[] e : count) {
-					System.out.println("questionnaire:"+e[0]+"="+e[1]);
-				}
+				int[] records = query.batch(conn, insert, p);
+				logger.debug(records.length);
+				conn.commit();
+				conn.close();
 			}
 			
 			bln = true;
@@ -592,6 +582,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				Cell cell = row.getCell(colIndex);
 				String value = toConvert(cell);
 				matrix[rowIndex][colIndex] = value;
+				logger.debug("["+rowIndex+"]["+colIndex+"]="+value);
 			}
 		}
 		logger.debug("parseResponders matrix complete");
@@ -706,7 +697,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	
 	String toConvert(Cell cell) {
 		String value = "";
-		
+		if(cell == null) return value;
 		switch (cell.getCellType()) {
 			case Cell.CELL_TYPE_NUMERIC :
 				value = String.valueOf((int)cell.getNumericCellValue());
@@ -788,7 +779,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			
 			//get responder of question
 			String sql = "select a.responder_id from questionnaire a where a.type = " + Question.TYPE_NORMAL + " and a.version = " + version + " group by a.responder_id";
-			List<Object> list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+			List<Object> _list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+			String ids = "";
+			for(Object e : _list) ids += "," + e;
+			ids = ids.replaceFirst(",", "");
+			sql = "select a.responder_id, a.responder_name from responder a where a.responder_id in ("+ids+") order by a.responder_id asc";
+			List<Object[]> list = query.query(DbHelper.getConnection(), sql, new ArrayListHandler());
 			logger.debug(list.size()+":"+sql);
 
 			//get property of responder
@@ -813,12 +809,14 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			}
 			
 			for(int rowIndex = 1; rowIndex < rowSize; rowIndex++) {
-				Long responderId = (Long)list.get(rowIndex-1);
+				Object[] responderAttr = (Object[])list.get(rowIndex-1);
+				Long responderId = (Long)responderAttr[0];
+				String responderName = (String)responderAttr[1];
 				sql = "select a.question_id, a.option_key from questionnaire a where a.type = "+Question.TYPE_NORMAL+" and a.responder_id = " + responderId;
 				logger.debug(sql);
 				Map<Object, Map<String, Object>> map = query.query(DbHelper.getConnection(), sql, new KeyedHandler());
 				if(map.isEmpty()) continue;
-				data[rowIndex][0] = responderId;
+				data[rowIndex][0] = responderName;
 				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
 					Question ref = (Question)data[0][columnIndex];
 					long key = ref.getId();
@@ -828,7 +826,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			}
 			
 			for(int rowIndex = 1; rowIndex < rowSize; rowIndex++) {
-				Long responderId = (Long)list.get(rowIndex-1);
+				Object[] responderAttr = (Object[])list.get(rowIndex-1);
+				Long responderId = (Long)responderAttr[0];
 				
 				for(int columnIndex = 0; columnIndex < columnSizeOfProperty; columnIndex++) {
 					OptionGroup ref = (OptionGroup)data[0][columnSize + columnIndex];
@@ -1009,40 +1008,41 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		QueryRunner query = new QueryRunner();
 		String sql = "";
 		
-		final String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
+		String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
+		name = "/Users/eastseven/Desktop/template(1).xls";
 		System.out.println(name);
 		InputStream excel = new FileInputStream(name);
-		service.parseQuestionnaireTemplate(excel);
+		//service.parseQuestionnaireTemplate(excel);
 		
 //		sql = "select a.version from question a";
 //		@SuppressWarnings("rawtypes")
 //		Map map = query.query(conn, sql, new KeyedHandler());
 //		Long version = (Long)map.keySet().iterator().next();
-//		version = 1316878327528L;
-//		System.out.println(version);
-//		Object[][] result = service.calculate(version);
-//		for(int i = 0; i < result.length; i++) {
-//			String row = "";
-//			for(int j = 0; j < result[i].length; j++) {
-//				row += result[i][j] + ",";
-//			}
-//			System.out.println(row);
-//		}
-//		
-//		Map<Object, Object[][]> matrix = service.calculateForMatrix(version);
-//		for(Object[][] data : matrix.values()) {
-//			for(int i = 0; i < data.length; i++) {
-//				for(int j = 0; j < data.length; j++) {
-//					System.out.println("data["+i+"]["+j+"] : " + data[i][j]);
-//				}
-//			}
-//			System.out.println("\n\n\n\n\n\n\n");
-//		}
-//		
-//		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-//		Workbook wb = service.generateExcelForQuestionnaire(result, matrix);
-//		wb.write(fileOut);
-//	    fileOut.close();
+		long version = 1316957340854l;
+		System.out.println(version);
+		Object[][] result = service.calculate(version);
+		for(int i = 0; i < result.length; i++) {
+			String row = "";
+			for(int j = 0; j < result[i].length; j++) {
+				row += result[i][j] + ",";
+			}
+			System.out.println(row);
+		}
+		
+		Map<Object, Object[][]> matrix = service.calculateForMatrix(version);
+		for(Object[][] data : matrix.values()) {
+			for(int i = 0; i < data.length; i++) {
+				for(int j = 0; j < data.length; j++) {
+					System.out.println("data["+i+"]["+j+"] : " + data[i][j]);
+				}
+			}
+			System.out.println("\n\n\n\n\n\n\n");
+		}
+		
+		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
+		Workbook wb = service.generateExcelForQuestionnaire(result, matrix);
+		wb.write(fileOut);
+	    fileOut.close();
 	    System.out.println("done...");
 	}
 }

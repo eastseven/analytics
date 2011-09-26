@@ -6,8 +6,6 @@
 	<menubar>
 		<menuitem label="上传问卷" id="upload" />
 		<menuitem label="下载问卷模板" id="download"/>
-		<menuitem label="问卷" id="open" disabled="true"/>
-		<menuitem label="答题" id="answer"/>
 		<menuitem label="关于" id="about" />
 	</menubar>
 	<div id="mainDiv">

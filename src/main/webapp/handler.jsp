@@ -29,8 +29,8 @@
 		
 		if(key.startsWith(prefix_property)) {
 			text = text.replace(",", "");
-			//out.print(key+" : "+text+"<br />");
 			answer.put(prefix_property+text, text);
+			//out.print(key+":"+text+"<br/>");
 		}
 		
 	}

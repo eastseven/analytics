@@ -495,16 +495,18 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		QueryRunner query = new QueryRunner();
 		for(Iterator<Row> rowIter = responderProperty.iterator(); rowIter.hasNext();) {
 			Row row = rowIter.next();
-			if(row.getCell(0) != null && index > 0) {
+			Cell cell = row.getCell(0);
+			if(cell != null && !StringUtils.isBlank(toConvert(cell)) && index > 0) {
 				logger.debug(index + " : " + row.getCell(0));
 				//属性名称
-				if(row.getCell(1) != null && !StringUtils.isBlank(row.getCell(1).toString())) {
-					String name = row.getCell(0).getStringCellValue();
+				
+				if(row.getCell(1) != null && !StringUtils.isBlank(toConvert(row.getCell(1)))) {
+					String name = toConvert(row.getCell(0));
 					//选项值
 					int value = 1;
 					int columnIndex = 1;
 					for(Iterator<Cell> cellIter = row.cellIterator(); cellIter.hasNext();) {
-						Cell cell = cellIter.next();
+						cell = cellIter.next();
 						String textValue = toConvert(cell);
 						if(!StringUtils.isBlank(textValue) && columnIndex > 1) {
 							ResponderProperty p = new ResponderProperty();
@@ -635,10 +637,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		QueryRunner query = new QueryRunner();
 		for(Iterator<Row> rowIter = requestions.iterator(); rowIter.hasNext();) {
 			Row row = rowIter.next();
-			if(row.getCell(0) != null && !StringUtils.isBlank(row.getCell(0).getStringCellValue()) && index > 0) {
+			if(row.getCell(0) != null && !StringUtils.isBlank(toConvert(row.getCell(0))) && index > 0) {
 				logger.debug(index + " : " + row.getCell(0));
-				String title = row.getCell(0).getStringCellValue();
-				String optionString = row.getCell(1).getStringCellValue();
+				String title = toConvert(row.getCell(0));
+				String optionString = toConvert(row.getCell(1));
 				long optionGroupId = parseOptions(optionString, version).get(0).getId();
 				
 				//迭代小题
@@ -647,8 +649,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					Cell cell = iter.next();
 					
 					if(cell == null) continue;
-					if(StringUtils.isBlank(cell.getStringCellValue())) continue;
-					
+					if(StringUtils.isBlank(toConvert(cell))) continue;
+					String content = toConvert(cell);
 					if(columnIndex > 1) {
 						Question q = new Question();
 						q.setId(System.currentTimeMillis());
@@ -657,7 +659,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						q.setContent(cell.getStringCellValue());
+						q.setContent(content);
 						q.setOptionId(optionGroupId);
 						q.setTitle(title);
 						q.setVersion(version);
@@ -676,7 +678,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		int index = 0;
 		for(Iterator<Row> rowIter = matrix.iterator(); rowIter.hasNext();) {
 			Row row = rowIter.next();
-			if(row.getCell(0) != null && !StringUtils.isBlank(row.getCell(0).getStringCellValue()) && index > 0) {
+			if(row.getCell(0) != null && !StringUtils.isBlank(toConvert(row.getCell(0))) && index > 0) {
 				Question q = new Question();
 				q.setId(System.currentTimeMillis());
 				try {
@@ -684,7 +686,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				q.setTitle(row.getCell(0).getStringCellValue());
+				q.setTitle(toConvert(row.getCell(0)));
 				q.setVersion(version);
 				q.setType(Question.TYPE_MATRIX);
 				saveQuestion(q, new QueryRunner());
@@ -1009,40 +1011,40 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		String sql = "";
 		
 		String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
-		name = "/Users/eastseven/Desktop/template(1).xls";
+		name = "/Users/eastseven/Desktop/template_1.xls";
 		System.out.println(name);
 		InputStream excel = new FileInputStream(name);
-		//service.parseQuestionnaireTemplate(excel);
+		service.parseQuestionnaireTemplate(excel);
 		
 //		sql = "select a.version from question a";
 //		@SuppressWarnings("rawtypes")
 //		Map map = query.query(conn, sql, new KeyedHandler());
 //		Long version = (Long)map.keySet().iterator().next();
-		long version = 1316957340854l;
-		System.out.println(version);
-		Object[][] result = service.calculate(version);
-		for(int i = 0; i < result.length; i++) {
-			String row = "";
-			for(int j = 0; j < result[i].length; j++) {
-				row += result[i][j] + ",";
-			}
-			System.out.println(row);
-		}
-		
-		Map<Object, Object[][]> matrix = service.calculateForMatrix(version);
-		for(Object[][] data : matrix.values()) {
-			for(int i = 0; i < data.length; i++) {
-				for(int j = 0; j < data.length; j++) {
-					System.out.println("data["+i+"]["+j+"] : " + data[i][j]);
-				}
-			}
-			System.out.println("\n\n\n\n\n\n\n");
-		}
-		
-		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-		Workbook wb = service.generateExcelForQuestionnaire(result, matrix);
-		wb.write(fileOut);
-	    fileOut.close();
+//		long version = 1316957340854l;
+//		System.out.println(version);
+//		Object[][] result = service.calculate(version);
+//		for(int i = 0; i < result.length; i++) {
+//			String row = "";
+//			for(int j = 0; j < result[i].length; j++) {
+//				row += result[i][j] + ",";
+//			}
+//			System.out.println(row);
+//		}
+//		
+//		Map<Object, Object[][]> matrix = service.calculateForMatrix(version);
+//		for(Object[][] data : matrix.values()) {
+//			for(int i = 0; i < data.length; i++) {
+//				for(int j = 0; j < data.length; j++) {
+//					System.out.println("data["+i+"]["+j+"] : " + data[i][j]);
+//				}
+//			}
+//			System.out.println("\n\n\n\n\n\n\n");
+//		}
+//		
+//		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
+//		Workbook wb = service.generateExcelForQuestionnaire(result, matrix);
+//		wb.write(fileOut);
+//	    fileOut.close();
 	    System.out.println("done...");
 	}
 }

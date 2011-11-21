@@ -1,7 +1,6 @@
 package org.dongq.analytics.service;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -85,6 +84,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			blankPaper.setGroup(getQuestionGroupOfVersion(version));
 			//Matrix
 			blankPaper.setMatrix(getQuestionsOfVersion(version));
+			//MatrixNet
+			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET));
 			//People
 			blankPaper.setPeople(getRespondersOfVersion(version));
 			//OptionGroup
@@ -105,6 +106,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			blankPaper.setGroup(getQuestionGroupOfVersion(version));
 			//Matrix
 			blankPaper.setMatrix(getQuestionsOfVersion(version));
+			//MatrixNet
+			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET));
 			//People
 			blankPaper.setPeople(getRespondersOfVersion(version));
 			//Property
@@ -191,24 +194,28 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return optionGroups;
 	}
 	
-	List<Responder> getRespondersOfVersion(long version) throws SQLException {
+	public List<Responder> getRespondersOfVersion(long version) {
 		List<Responder> list = new ArrayList<Responder>();
 		String sql = "select * from responder a where a.version = " + version;
 		logger.debug(sql);
-		list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Responder>>() {
-			@Override
-			public List<Responder> handle(ResultSet rs) throws SQLException {
-				List<Responder> list = new ArrayList<Responder>();
-				while(rs.next()) {
-					Responder e = new Responder();
-					e.setId(rs.getLong("responder_id"));
-					e.setName(rs.getString("responder_name"));
-					e.setVersion(rs.getLong("version"));
-					list.add(e);
+		try {
+			list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Responder>>() {
+				@Override
+				public List<Responder> handle(ResultSet rs) throws SQLException {
+					List<Responder> list = new ArrayList<Responder>();
+					while(rs.next()) {
+						Responder e = new Responder();
+						e.setId(rs.getLong("responder_id"));
+						e.setName(rs.getString("responder_name"));
+						e.setVersion(rs.getLong("version"));
+						list.add(e);
+					}
+					return list;
 				}
-				return list;
-			}
-		});
+			});
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return list;
 	}
 	
@@ -237,8 +244,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	List<Question> getQuestionsOfVersion(long version) throws SQLException {
+		return getQuestionsOfVersion(version, Question.TYPE_MATRIX);
+	}
+	
+	List<Question> getQuestionsOfVersion(long version, int type) throws SQLException {
 		List<Question> list = new ArrayList<Question>();
-		String sql = "select * from question a where a.version = " + version + " and a.type = " + Question.TYPE_MATRIX;
+		String sql = "select * from question a where a.version = " + version + " and a.type = " + type;
 		logger.debug(sql);
 		list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Question>>() {
 			@Override
@@ -250,6 +261,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					e.setTitle(rs.getString("title"));
 					e.setContent(rs.getString("content"));
 					e.setOptionId(rs.getLong("option_group_id"));
+					e.setOptions(getOptionsForQuestion(e.getOptionId()));
 					e.setVersion(rs.getLong("version"));
 					e.setType(rs.getInt("type"));
 					logger.debug(e);
@@ -329,6 +341,9 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		final String prefix_question = "question_";
 		final String prefix_matrix   = "matrix_";
 		final String prefix_property = "property_";
+		
+		final String prefix_matrixNet = "matrixNet_";
+		
 		final long finishTime = System.currentTimeMillis();
 		QueryRunner query = new QueryRunner();
 		try {
@@ -462,6 +477,11 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			Sheet matrix = workbook.getSheetAt(3);
 			logger.info(matrix.getSheetName());
 			parseRequestionsOfMatrix(matrix, version);
+			
+			//{网络题}
+			Sheet matrixNet = workbook.getSheetAt(4);
+			logger.info(matrixNet.getSheetName());
+			parseRequestonsOfMatrixNet(matrixNet, version);
 			
 			bln = true;
 		} catch (Exception e) {
@@ -632,7 +652,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		}
 	}
 	
-	void parseRequestions(Sheet requestions, final long version) throws Exception {
+	void parseRequestions(Sheet requestions, final long version, int type) throws Exception {
+
 		int index = 0;
 		QueryRunner query = new QueryRunner();
 		for(Iterator<Row> rowIter = requestions.iterator(); rowIter.hasNext();) {
@@ -663,7 +684,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						q.setOptionId(optionGroupId);
 						q.setTitle(title);
 						q.setVersion(version);
-						q.setType(Question.TYPE_NORMAL);
+						q.setType(type);
 						saveQuestion(q, query);
 						logger.info(q);
 					}
@@ -672,6 +693,11 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			}
 			index++;
 		}
+	
+	}
+	
+	void parseRequestions(Sheet requestions, final long version) throws Exception {
+		parseRequestions(requestions, version, Question.TYPE_NORMAL);
 	}
 	
 	void parseRequestionsOfMatrix(Sheet matrix, final long version) throws Exception {
@@ -695,6 +721,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			
 			index++;
 		}
+	}
+	
+	void parseRequestonsOfMatrixNet(Sheet matrixNet, final long version) throws Exception {
+		parseRequestions(matrixNet, version, Question.TYPE_MATRIX_NET);
 	}
 	
 	String toConvert(Cell cell) {

@@ -22,25 +22,11 @@
 
 <style>
 	label { float: left; font-family: Arial, Helvetica, sans-serif; font-size: small; }
-	/* br { clear: both; } */
 	input { border: 1px solid black; margin-bottom: .5em;  }
-	/* label.error {
-		display:none;
-		background: url('http://dev.jquery.com/view/trunk/plugins/validate/demo/images/unchecked.gif') no-repeat;
-		padding-left: 16px;
-		margin-left: .3em;
-	}
-	label.valid {
-		background: url('http://dev.jquery.com/view/trunk/plugins/validate/demo/images/checked.gif') no-repeat;
-		display: block;
-		width: 16px;
-		height: 16px;
-	} */
 </style>
 
 <script>
 	$(function() {
-		//$( "#selectable" ).selectable();
 		
 		$('#questionnaire').submit(function() {
 			var length = $('span').length;
@@ -71,26 +57,6 @@
 </script>
 </head>
 <body>
-<!-- 
-<div class="demo">
-
-<ol id="selectable">
-	<li class="ui-state-default">1</li>
-	<li class="ui-state-default">2</li>
-	<li class="ui-state-default">3</li>
-	<li class="ui-state-default">4</li>
-	<li class="ui-state-default">5</li>
-	<li class="ui-state-default">6</li>
-	<li class="ui-state-default">7</li>
-	<li class="ui-state-default">8</li>
-	<li class="ui-state-default">9</li>
-	<li class="ui-state-default">10</li>
-	<li class="ui-state-default">11</li>
-	<li class="ui-state-default">12</li>
-</ol>
-
-</div>
- -->
 	<%
 		String _id = request.getParameter("id");
 		String version = request.getParameter("v");
@@ -122,6 +88,8 @@
 				out.print(content + "<br />");
 			}
 		%>
+		<!-- relationship question -->
+		
 		<!-- normal -->
 		<%
 			List list = paper.getGroup();

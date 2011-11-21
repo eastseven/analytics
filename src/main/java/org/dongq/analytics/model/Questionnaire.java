@@ -16,6 +16,8 @@ public class Questionnaire {
 
 	private List<Question> matrix;
 
+	private List<Question> matrixNet;
+
 	private List<Responder> people;
 
 	private List<OptionGroup> optionGroups;
@@ -46,6 +48,14 @@ public class Questionnaire {
 
 	public void setMatrix(List<Question> matrix) {
 		this.matrix = matrix;
+	}
+
+	public List<Question> getMatrixNet() {
+		return matrixNet;
+	}
+
+	public void setMatrixNet(List<Question> matrixNet) {
+		this.matrixNet = matrixNet;
 	}
 
 	public List<Responder> getPeople() {

@@ -184,8 +184,8 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					String id = e.get("responder_id");
 					String name = e.get("responder_name");
 					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
-					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
-					
+					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>old</a> | ";
+					link += "<a href='paper.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
 					String _row = "<tr><td align='center' style='border: 1px solid black;'>"+id+"</td><td align='center' style='border: 1px solid black;'>"+name+"</td><td align='center' style='border: 1px solid black;'>";
 					_row += StringUtils.isBlank(time) ? link : "答题完毕";
 					_row += "</td><td align='center' style='border: 1px solid black;'>"+time+"</td></tr>";

@@ -53,10 +53,18 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>Controller</servlet-name>
+		<servlet-class>org.dongq.analytics.utils.ControllerServlet</servlet-class>
+	</servlet>
 	
 	<servlet-mapping>
 		<servlet-name>Init</servlet-name>
 		<url-pattern>/eastseven</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Controller</servlet-name>
+		<url-pattern>/controller</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>

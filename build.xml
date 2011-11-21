@@ -12,8 +12,8 @@
             问卷调查软件
     </description>
 
-	<property file="src/main/resources/jdbc.properties"/>
-	
+	<property file="src/main/resources/jdbc.properties" />
+
 	<!-- ================================= 
           target: default              
          ================================= -->
@@ -30,18 +30,19 @@
 	<path id="runtime-classpath">
 		<fileset dir="${user.home}/.m2/repository">
 			<include name="**/*.jar" />
-			<include name="/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar"/>
+			<include name="/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" />
 			<include name="/org/apache/ddlutils/ddlutils/1.0/*.jar" />
+			<include name="/Users/eastseven/.m2/repository/com/oracle/ojdbc14/*.jar"/>
 		</fileset>
 	</path>
 	<target name="clean">
-		<delete dir="${db.path}" verbose="true"/>
+		<delete dir="${db.path}" verbose="true" />
 	</target>
 	<target name="database-setup" depends="clean" description="Creates the database structure and inserts data into the database">
 		<taskdef name="ddlToDatabase" classname="org.apache.ddlutils.task.DdlToDatabaseTask">
 			<classpath refid="runtime-classpath" />
 		</taskdef>
-		
+
 		<ddlToDatabase>
 			<database url="${db.url}" driverClassName="${db.driver}" username="" password="" />
 			<fileset dir="src/main/resources">
@@ -56,4 +57,5 @@
 			-->
 		</ddlToDatabase>
 	</target>
+
 </project>

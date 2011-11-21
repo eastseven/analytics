@@ -1,6 +1,7 @@
 package org.dongq.analytics.service;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -11,6 +12,8 @@ import org.dongq.analytics.model.Responder;
 public interface QuestionnairePaperService {
 
 	public boolean hasAnswered(long responderId);
+	
+	public List<Responder> getRespondersOfVersion(long version);
 	
 	public Questionnaire getQuestionnaire(long responderId);
 	

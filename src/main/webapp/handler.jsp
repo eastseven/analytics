@@ -5,6 +5,7 @@
 <%
 	final String prefix_question = "question_";
 	final String prefix_matrix   = "matrix_";
+	final String prefix_matrix_net   = "matrixNet_";
 	final String prefix_property = "property_";
 	Map params = request.getParameterMap();
 	Set keys = params.keySet();
@@ -21,16 +22,23 @@
 		
 		if(key.startsWith(prefix_question)) {
 			answer.put(key, value[0]);
+			out.print(prefix_question+"="+key + ":" + value[0] + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix)) {
 			answer.put(key, text);
+			out.print(prefix_matrix+"="+key + ":" + text + "<br/>");
+		}
+		
+		if(key.startsWith(prefix_matrix_net)) {
+			answer.put(key, text);
+			out.print(prefix_matrix_net+"="+key + ":" + text + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_property)) {
 			text = text.replace(",", "");
 			answer.put(prefix_property+text, text);
-			//out.print(key+":"+text+"<br/>");
+			out.print(prefix_property+"="+key+":"+text+"<br/>");
 		}
 		
 	}
@@ -41,7 +49,7 @@
 	responder.setId(Long.valueOf(responderId));
 	responder.setVersion(Long.valueOf(version));
 	
-	boolean bln = new QuestionnairePaperServiceImpl().saveQuestionnairePaper(responder, answer);
+	boolean bln = true;// new QuestionnairePaperServiceImpl().saveQuestionnairePaper(responder, answer);
 	if(bln) {
 		out.print("<h1>thanks</h1>");
 	} else {

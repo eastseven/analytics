@@ -27,7 +27,7 @@ $(function() {
 		var method = $('input[name=m]').val();
 		$.post('./eastseven', {id : id, m : method}, function(result) {
 			if(result.bln) {
-				self.location = 'questionnaire.jsp?id='+id+'&v=' + result.version;
+				self.location = 'paper.jsp?id='+id+'&v=' + result.version;
 			} else {
 				alert(result.msg);
 			}

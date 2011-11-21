@@ -11,8 +11,9 @@ import java.util.List;
  */
 public class Question {
 
-	public static final int TYPE_NORMAL = 1;
-	public static final int TYPE_MATRIX = 2;
+	public static final int TYPE_NORMAL     = 1;
+	public static final int TYPE_MATRIX     = 2;
+	public static final int TYPE_MATRIX_NET = 3;
 
 	private long id;
 
@@ -92,7 +93,12 @@ public class Question {
 	public String getSelect() {
 		String html = "";
 		if (this.options != null && !this.options.isEmpty()) {
-			html = "<select name='question_" + this.id + "'>";
+			if(this.type == TYPE_MATRIX_NET) {
+				html = "<select name='matrixNet_" + this.id + "'>";
+				html += "<option value='-1'>请选择</option>";
+			} else {
+				html = "<select name='question_" + this.id + "'>";
+			}
 			for (Option o : this.options) {
 				html += "<option value='" + o.getKey() + "'>" + o.getValue() + "</option>";
 			}
@@ -101,6 +107,16 @@ public class Question {
 		return html;
 	}
 
+	public String getRadio() {
+		String html = "";
+		if (this.options != null && !this.options.isEmpty() && this.type == TYPE_NORMAL) {
+			for(Option o : this.options) {
+				html += "<input type='radio' name='question_"+this.id+"' value='"+o.getKey()+"' />" + o.getValue() + "  ";
+			}
+		}
+		return html;
+	}
+	
 	@Override
 	public String toString() {
 		return "Question [id=" + id + ", title=" + title + ", content="

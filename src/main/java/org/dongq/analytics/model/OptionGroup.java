@@ -45,6 +45,16 @@ public class OptionGroup {
 		this.version = version;
 	}
 
+	public String getRadio() {
+		String html = "";
+		if (this.options != null && !this.options.isEmpty()) {
+			for(Option o : this.options) {
+				html += "<input type='radio' name='property_"+this.id+"' value='"+o.getId()+"' />" + o.getDisplay() + "  ";
+			}
+		}
+		return html;
+	}
+	
 	@Override
 	public String toString() {
 		return "OptionGroup [id=" + id + ", name=" + name + ", options="

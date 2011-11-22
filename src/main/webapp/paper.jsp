@@ -23,6 +23,7 @@
 		var prefix_matrix = 'matrix_';
 		var prefix_matrix_net = 'matrixNet_';
 		var globalArray = [];
+		var radios = 0;
 		$(function() {
 			var url4paper = 'controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
 			$.getJSON(url4paper, function(result) {
@@ -31,6 +32,7 @@
 				var titleNo = 1;
 				var people = result.people;
 				
+				//1
 				var matrix = result.matrix;
 				if (matrix.length > 0) {
 					
@@ -51,6 +53,7 @@
 					});
 				}
 
+				//2
 				var matrixNet = result.matrixNet;
 				if (matrixNet.length > 0) {
 					$('#matrixNet').before(titleNo + '.请选择您所填写的这些人的相关信息<br/>');
@@ -76,16 +79,17 @@
 					titleNo++;
 				}
 
+				//3
 				var group = result.group;
 				if (group.length > 0) {
 					var html = '';
 					$.each(group, function(i, item) {
-						
 						html += '<div><p>' + titleNo + '.' + item.title + '</p>';
 						var questions = item.questions;
 						$.each(questions, function(i, item) {
 							html += '<p>' + titleNo + '.' + ++i + item.content +'</p>';
 							html += '<p>' + item.radio + '</p>';
+							radios++;
 						});
 						html += '</div>';
 						titleNo++;
@@ -93,6 +97,7 @@
 					$('#normalQuestion').append(html);
 				}
 
+				//4
 				var selfInfo = result.optionGroups;
 				if (selfInfo.length > 0) {
 					var html = '';
@@ -108,6 +113,7 @@
 						}
 						html +='</p>';
 						html += '</div>';
+						radios++;
 					});
 					
 					$('#selfInfo').append(html);
@@ -125,14 +131,36 @@
 				$.each($('tr:hidden > td > select'), function(i, item) {
 					$(this).removeAttr('name');
 				});
+				var selectedOk = true;
 				$.each($('tr:visible > td'), function(i, item) {
 					var peopleId = $(this).attr('id');
-					console.debug(peopleId);
-					console.debug($(this).children('select'));
+					if(peopleId != undefined) {
+						var selected = $(this).children('select');
+						selected = $(selected[0]).children('option[selected]');
+						var value = $(selected).attr('value');
+						console.debug(value);
+						if(value == -1) {
+							selectedOk = selectedOk & false;
+							//break;
+						}
+						value = value + '_' + peopleId;
+						selected.attr('value', value);
+						console.debug(selected);
+					}
 				});
+				var checkedRadios = 0;//$('input[type=radio][checked]').length;
+				$(':radio').each(function() {
+					console.debug($(this).attr('checked'));
+					if($(this).attr('checked') == 'checked') checkedRadios++;
+				});
+				console.debug('checked radio amount : '+checkedRadios + ', radios : ' + radios);
 				
 				//TODO validate
-				//$('#questionnaireForm').submit();
+				if(checkedRadios == radios && selectedOk) {
+					$('#questionnaireForm').submit();
+				} else {
+					alert('问卷未完成，请将所有题目做完，谢谢合作');
+				}
 			});
 		});
 		

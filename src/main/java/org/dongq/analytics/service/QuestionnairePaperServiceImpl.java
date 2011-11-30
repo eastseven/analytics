@@ -1,6 +1,7 @@
 package org.dongq.analytics.service;
 
-import java.io.FileInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,9 +18,12 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.KeyedHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.math.stat.Frequency;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -31,6 +35,7 @@ import org.dongq.analytics.model.OptionGroup;
 import org.dongq.analytics.model.Question;
 import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
+import org.dongq.analytics.model.QuestionnaireMatrixNet;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
 import org.dongq.analytics.model.ResponderProperty;
@@ -87,7 +92,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			//MatrixNet
 			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET));
 			//People
-			blankPaper.setPeople(getRespondersOfVersion(version));
+			blankPaper.setPeople(getRespondersOfVersion(version, responder.getId()));
 			//OptionGroup
 			blankPaper.setOptionGroups(getResponderPropertyOfVersion(version, responder.getId()));
 			
@@ -194,9 +199,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return optionGroups;
 	}
 	
-	public List<Responder> getRespondersOfVersion(long version) {
+	public List<Responder> getRespondersOfVersion(long version, Long exceptSelf) {
 		List<Responder> list = new ArrayList<Responder>();
 		String sql = "select * from responder a where a.version = " + version;
+		if(exceptSelf != null) sql += " and a.responder_id <> " + exceptSelf;
 		logger.debug(sql);
 		try {
 			list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Responder>>() {
@@ -217,6 +223,25 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			e.printStackTrace();
 		}
 		return list;
+	}
+	
+	public List<Responder> getRespondersOfVersion(long version) {
+		return getRespondersOfVersion(version, null);
+	}
+	
+	Responder getResponder(long responderId) throws SQLException {
+		Responder r = null;
+		
+		String sql = "select * from responder where responder_id = " + responderId;
+		Map<String, Object> map = new QueryRunner().query(DbHelper.getConnection(), sql, new MapHandler());
+		if(map != null && !map.isEmpty()) {
+			r = new Responder();
+			r.setId((Long)map.get("responder_id".toUpperCase()));
+			r.setName((String)map.get("responder_name".toUpperCase()));
+			r.setVersion((Long)map.get("version".toUpperCase()));
+		}
+		
+		return r;
 	}
 	
 	List<QuestionGroup> getQuestionGroupOfVersion(long version) throws SQLException {
@@ -273,6 +298,23 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		});
 		
 		return list;
+	}
+	
+	Question getQuestion(long questionId) throws SQLException {
+		Question q = null;
+		String sql = "select * from question a where a.question_id = " + questionId;
+		Map<String, Object> map = new QueryRunner().query(DbHelper.getConnection(), sql, new MapHandler());
+		if(map != null && !map.isEmpty()) {
+			q = new Question();
+			q.setContent((String)map.get("content"));
+			q.setId((Long)map.get("question_id"));
+			q.setOptionId((Long)map.get("option_group_id"));
+			q.setOptions(getOptionsForQuestion(q.getOptionId()));
+			q.setTitle((String)map.get("title"));
+			q.setVersion((Long)map.get("version"));
+			q.setType((Integer)map.get("type"));
+		}
+		return q;
 	}
 	
 	List<Question> getQuestionsOfOptionGroupId(long optionGroupId) throws SQLException {
@@ -358,6 +400,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			Set<String> keySet = answer.keySet();
 			List<QuestionnairePaper> list = new ArrayList<QuestionnairePaper>();
 			List<ResponderProperty> properties = new ArrayList<ResponderProperty>();
+			List<QuestionnaireMatrixNet> matrixNets = new ArrayList<QuestionnaireMatrixNet>();
 			for(String key : keySet) {
 				String value = (String)answer.get(key);
 				if(key.startsWith(prefix_question)) {
@@ -390,6 +433,29 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						list.add(row);
 					}
 				}
+				
+				//单独处理
+				if(key.startsWith(prefix_matrixNet)) {
+					//matrixNet_1322055619288 : ,1_1322055619124_0,1_1322055619139_0,2_1322055619131_0
+					String[] values = value.split(",");
+					long questionId = Long.valueOf(key.replaceAll(prefix_matrixNet, replacement));
+					for(String _value : values) {
+						if(StringUtils.isBlank(_value)) continue;
+						String[] _values = _value.split("_");
+						long optionKey = Long.valueOf(_values[0]);
+						long peopleId = Long.valueOf(_values[1]);
+						
+						QuestionnaireMatrixNet e = new QuestionnaireMatrixNet();
+						e.setResponderId(responderId);
+						e.setQuestionId(questionId);
+						e.setOptionKey(optionKey);
+						e.setRelationPersonId(peopleId);
+						e.setFinishTime(finishTime);
+						e.setVersion(version);
+						matrixNets.add(e);
+					}
+				}
+				
 				if(key.startsWith(prefix_property)) {
 					long responderPropertyId = Long.valueOf(value);
 					ResponderProperty e = new ResponderProperty(responderPropertyId);
@@ -412,6 +478,23 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				final String insert = "insert into questionnaire values(?,?,?,?,?,?)";
 				int[] records = query.batch(DbHelper.getConnection(), insert, params);
 				logger.debug("questionnaire records : "+records.length);
+			}
+			
+			if(!matrixNets.isEmpty()) {
+				Object[][] params = new Object[matrixNets.size()][6];
+				int index = 0;
+				for(QuestionnaireMatrixNet e : matrixNets) {
+					params[index][0] = e.getResponderId();
+					params[index][1] = e.getQuestionId();
+					params[index][2] = e.getRelationPersonId();
+					params[index][3] = e.getOptionKey();
+					params[index][4] = e.getVersion();
+					params[index][5] = e.getFinishTime();
+					index++;
+				}
+				final String insert = "insert into questionnaire_matrixnet values(?,?,?,?,?,?)";
+				int[] records = query.batch(DbHelper.getConnection(), insert, params);
+				logger.debug("questionnaire matrix net records : "+records.length);
 			}
 			
 			//responder property
@@ -497,7 +580,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		Connection conn = DbHelper.getConnection();
 		QueryRunner query = new QueryRunner();
 		try {
-			final String[] sqls = {"questionnaire", "question", "question_option", "responder_properties", "responder", "responder_property"};
+			final String[] sqls = {"questionnaire_matrixnet", "questionnaire", "question", "question_option", "responder_properties", "responder", "responder_property"};
 			for(String sql : sqls) {
 				String delete = "delete from "+sql+" where version = " + version;
 				int count = query.update(conn, delete);
@@ -962,6 +1045,99 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	@Override
+	public Workbook generateExcelForQuestionnaireMatrixNet(long version) {
+		Workbook workbook = new HSSFWorkbook();
+		
+		//每个答题人一个sheet
+		QueryRunner query = new QueryRunner();
+		String sql = "select a.responder_id from questionnaire_matrixnet a where a.version = " + version + " group by a.responder_id";
+		try {
+			List<Object> list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+			if(list != null && !list.isEmpty()) {
+				
+				//总人数
+				int n = 0;//getRespondersOfVersion(version).size();
+				
+				for(int sheetIndex = 0; sheetIndex < list.size(); sheetIndex++) {
+					Responder responder = getResponder((Long)list.get(sheetIndex));
+					String sheetname = responder.getName();
+					Sheet sheet = workbook.createSheet(sheetname);
+					
+					sql = "select question_id from questionnaire_matrixnet where responder_id = " + responder.getId() + " group by question_id";
+					List<Object> questionIds = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+					
+					String _sql = "select relation_person_id from questionnaire_matrixnet where responder_id = " + responder.getId() + " group by relation_person_id ";
+					List<Map<String, Object>> relationPersons = query.query(DbHelper.getConnection(), _sql, new MapListHandler());
+					n = relationPersons.size();
+					logger.debug(relationPersons);
+					Row first = sheet.createRow(0);
+					for(int column = 0; column < relationPersons.size(); column++) {
+						Cell cell = first.createCell(column + 1);
+						Map<String, Object> relationPerson = relationPersons.get(column);
+						Responder person = getResponder((Long)relationPerson.get("relation_person_id".toUpperCase()));
+						cell.setCellValue(person.getName());
+					}
+					first.createCell(first.getLastCellNum()).setCellValue("异质性指标");
+					first.createCell(first.getLastCellNum()).setCellValue("平均值");
+
+					for(int rownum = 1; rownum <= questionIds.size(); rownum++) {
+						Question question = getQuestion((Long)questionIds.get(rownum-1));
+						
+						int columns = relationPersons.size();
+						int values = 0;
+						
+						Row row = sheet.createRow(rownum);
+						Cell firstCell = row.createCell(0);
+						firstCell.setCellValue(question.getDescription());
+
+						Frequency frequency = new Frequency();
+						for(int column = 1; column <= columns; column++) {
+							Cell cell = row.createCell(column);
+							Map<String, Object> relationPerson = query.query(DbHelper.getConnection(), "select * from questionnaire_matrixnet where responder_id = ? and question_id = ? and relation_person_id = ?",new MapHandler(), responder.getId(), question.getId(), relationPersons.get(column-1).get("relation_person_id"));
+							long value = (Long)relationPerson.get("option_key".toUpperCase());
+							cell.setCellValue(value);
+							values += value;
+							frequency.addValue(value);
+						}
+						
+						//异质性指标
+						//k(n2-Σf2)/n2(k-1) 2是平方的意思
+						//其中n为全部个案数目(totality)，k为变项的类别数目，f为每个类别的实际次数。
+						Cell formulaCell = row.createCell(row.getLastCellNum());
+						String formula = "";
+						double k = question.getOptions().size();
+						double f = 0;
+						for(Option o : question.getOptions()) {
+							long count = frequency.getCount(o.getKey());
+							f += Math.pow(count, 2);
+							formula += "+ (" + count + "*" + count + ")";
+							logger.debug("f : " + f + " key : " + o.getKey() + " count : " + count);
+						}
+						double n2 = Math.pow(n, 2);
+						double different = k * (n2 - f) / (n2 * (k - 1));
+						formulaCell.setCellValue(different);
+						logger.debug("异质性指标:" + different + " f = " + f + " n2 = " + n2 + " k = " + k);
+						
+						formula = k + "*(" + n2 + "-" + formula.replaceFirst("\\+", "") + ") / " + n2 + "*" + (k-1);
+						logger.debug(formula);
+						
+						//平均值
+						Cell mediumValueCell =  row.createCell(row.getLastCellNum());
+						double a = (double)(new Double(values) / columns);
+						logger.debug("平均值:" + values + " / " + columns + " = " + a);
+						mediumValueCell.setCellValue(a);
+						
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return workbook;
+	}
+	
+	@Override
 	public Workbook generateExcelForQuestionnaire(Object[][] normalQuestion, Map<Object, Object[][]> matrixQuestion) {
 		Workbook excel = null;
 		try {
@@ -1040,18 +1216,19 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		QueryRunner query = new QueryRunner();
 		String sql = "";
 		
-		String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
-		name = "/Users/eastseven/Desktop/template_1.xls";
-		System.out.println(name);
-		InputStream excel = new FileInputStream(name);
-		service.parseQuestionnaireTemplate(excel);
+//		String name = System.getProperty("user.dir") + "/src/main/webapp/template.xls";
+//		name = "/Users/eastseven/Desktop/template_1.xls";
+//		System.out.println(name);
+//		InputStream excel = new FileInputStream(name);
+//		service.parseQuestionnaireTemplate(excel);
 		
-//		sql = "select a.version from question a";
-//		@SuppressWarnings("rawtypes")
-//		Map map = query.query(conn, sql, new KeyedHandler());
-//		Long version = (Long)map.keySet().iterator().next();
-//		long version = 1316957340854l;
-//		System.out.println(version);
+		sql = "select a.version from question a order by a.version desc";
+		@SuppressWarnings("rawtypes")
+		Map map = query.query(conn, sql, new KeyedHandler());
+		Long version = (Long)map.keySet().iterator().next();
+		version = 1322211909948L;
+		System.out.println(version);
+		
 //		Object[][] result = service.calculate(version);
 //		for(int i = 0; i < result.length; i++) {
 //			String row = "";
@@ -1071,10 +1248,13 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 //			System.out.println("\n\n\n\n\n\n\n");
 //		}
 //		
-//		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-//		Workbook wb = service.generateExcelForQuestionnaire(result, matrix);
-//		wb.write(fileOut);
-//	    fileOut.close();
+		File file = new File("workbook.xls");
+		if(file.exists()) file.delete();
+		
+		FileOutputStream fileOut = new FileOutputStream("workbook.xls");
+		Workbook wb = service.generateExcelForQuestionnaireMatrixNet(version);//service.generateExcelForQuestionnaire(result, matrix);
+		wb.write(fileOut);
+	    fileOut.close();
 	    System.out.println("done...");
 	}
 }

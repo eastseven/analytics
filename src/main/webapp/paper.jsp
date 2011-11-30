@@ -24,21 +24,23 @@
 		var prefix_matrix_net = 'matrixNet_';
 		var globalArray = [];
 		var radios = 0;
+		var peopleAmount = 0;
 		$(function() {
 			var url4paper = 'controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
+			
 			$.getJSON(url4paper, function(result) {
 				console.debug(result);
 
 				var titleNo = 1;
 				var people = result.people;
-				
+				peopleAmount = people.length;
 				//1
 				var matrix = result.matrix;
 				if (matrix.length > 0) {
 					
 					$.each(matrix, function(i, item) {
 						var questionNo = prefix_matrix + item.id;
-						//随机排列其他人
+						//随机排列其他人，把自己过滤掉
 						for(var i = 0; i < people.length; i++) {
 							var index = Math.floor(Math.random() * people.length);
 							var tmp = people[i];
@@ -50,6 +52,7 @@
 							html += '<input type="checkbox" name='+questionNo+' value='+item.id+' title='+item.id+' onClick=add(this) />' + item.name + '  ';
 						});
 						$('#matrix').append('<div><p>' + titleNo++ + '.' + item.title + '</p>'+html+'</div>');
+						radios++;
 					});
 				}
 
@@ -124,7 +127,6 @@
 			
 			//form submit event
 			$('#submitBtn').bind('click', function() {
-				console.debug($('form'));
 				$('#questionnaireForm').attr('action', 'handler.jsp');
 
 				//移出display为none的tr中的下拉框的name属性
@@ -138,21 +140,27 @@
 						var selected = $(this).children('select');
 						selected = $(selected[0]).children('option[selected]');
 						var value = $(selected).attr('value');
-						console.debug(value);
+						//console.debug(value);
 						if(value == -1) {
 							selectedOk = selectedOk & false;
-							//break;
 						}
 						value = value + '_' + peopleId;
 						selected.attr('value', value);
-						console.debug(selected);
+						//console.debug(selected);
 					}
 				});
 				var checkedRadios = 0;//$('input[type=radio][checked]').length;
 				$(':radio').each(function() {
-					console.debug($(this).attr('checked'));
+					//console.debug($(this).attr('checked'));
 					if($(this).attr('checked') == 'checked') checkedRadios++;
 				});
+				
+				$('#matrix').children('div').each(function(i, item) {
+					var checked = $(item).children(':checkbox[checked]').length;
+					console.debug(checked);
+					if(checked >= 1) checkedRadios++;
+				});
+				
 				console.debug('checked radio amount : '+checkedRadios + ', radios : ' + radios);
 				
 				//TODO validate

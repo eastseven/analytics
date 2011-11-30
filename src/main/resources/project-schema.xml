@@ -48,6 +48,14 @@
 		<column name="version" type="BIGINT" />
 		<column name="finish_time" type="BIGINT"/>
 	</table>
+	<table name="questionnaire_matrixnet">
+		<column name="responder_id" type="BIGINT" />
+		<column name="question_id" type="BIGINT" />
+		<column name="relation_person_id" type="BIGINT" />
+		<column name="option_key" type="BIGINT"/>
+		<column name="version" type="BIGINT" />
+		<column name="finish_time" type="BIGINT"/>
+	</table>
 	<!-- 
 	<table name="questionnaire_data">
 		<column name="version" type="BIGINT" />

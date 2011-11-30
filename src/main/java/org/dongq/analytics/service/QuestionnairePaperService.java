@@ -31,5 +31,7 @@ public interface QuestionnairePaperService {
 	
 	public Workbook generateExcelForQuestionnaire(long version);
 	
+	public Workbook generateExcelForQuestionnaireMatrixNet(long version);
+	
 	public Workbook generateExcelForQuestionnaire(Object[][] normalQuestion, Map<Object, Object[][]> matrixQuestion);
 }

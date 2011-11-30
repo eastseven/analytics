@@ -35,6 +35,7 @@ import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Detail;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Html;
@@ -184,8 +185,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					String id = e.get("responder_id");
 					String name = e.get("responder_name");
 					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
-					String link = "<a href='questionnaire.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>old</a> | ";
-					link += "<a href='paper.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
+					String link = "<a href='paper.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
 					String _row = "<tr><td align='center' style='border: 1px solid black;'>"+id+"</td><td align='center' style='border: 1px solid black;'>"+name+"</td><td align='center' style='border: 1px solid black;'>";
 					_row += StringUtils.isBlank(time) ? link : "答题完毕";
 					_row += "</td><td align='center' style='border: 1px solid black;'>"+time+"</td></tr>";
@@ -202,6 +202,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				row.appendChild(new Label(version));
 				row.appendChild(new Label(map.get("questions").toString()));
 				//按钮
+				
 				Button btn = new Button("生成Excel数据");
 				btn.addEventListener("onClick", new EventListener() {
 					
@@ -231,13 +232,42 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 							wb.write(out);
 							out.close();
 							
-							Filedownload.save(in, contentType, fileName + ".xls");
+							Filedownload.save(in, contentType, fileName + "-1.xls");
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
 					}
 				});
-				row.appendChild(btn);
+				//row.appendChild(btn);
+				
+				Button btn2 = new Button("生成网络数据");
+				btn2.addEventListener("onClick", new EventListener() {
+					@Override
+					public void onEvent(Event event) throws Exception {
+						try {
+							File file = new File(fileName + ".xls");
+							logger.debug(file.getAbsolutePath());
+							FileOutputStream out = FileUtils.openOutputStream(file);
+							FileInputStream in = FileUtils.openInputStream(file);
+							String contentType = "application/vnd.ms-excel";
+							QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
+							Workbook wb = service.generateExcelForQuestionnaireMatrixNet(fileName);
+							wb.write(out);
+							out.close();
+							
+							Filedownload.save(in, contentType, fileName + "-2.xls");
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
+				//row.appendChild(btn2);
+				
+				Div div = new Div();
+				div.appendChild(btn);
+				div.appendChild(btn2);
+				row.appendChild(div);
 			}
 			
 		}

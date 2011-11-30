@@ -117,6 +117,17 @@ public class Question {
 		return html;
 	}
 	
+	public String getDescription() {
+		String html = "" + this.content + "(";
+		if (this.options != null && !this.options.isEmpty()) {
+			for(Option o : this.options) {
+				html += "" + o.getKey() + "=" + o.getValue() + "  ";
+			}
+		}
+		html += ")";
+		return html;
+	}
+	
 	@Override
 	public String toString() {
 		return "Question [id=" + id + ", title=" + title + ", content="

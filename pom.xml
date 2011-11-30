@@ -7,7 +7,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>analytics Maven Webapp</name>
 	<url>http://maven.apache.org</url>
-
 	<repositories>
 		<repository>
 			<id>taobao</id>
@@ -16,12 +15,14 @@
 		</repository>
 		<repository>
 			<id>MirrorRepository</id>
-			<name>Mirror Repository in justinmobile's LAN</name>
+			<name>Mirror Repository 
+		in justinmobile's LAN</name>
 			<url>http://118.122.114.104:8085/maven2</url>
 		</repository>
 		<repository>
 			<id>justinmobileRepository</id>
-			<name>justinmobile's repository</name>
+			<name>justinmobile's 
+		repository</name>
 			<url>http://118.122.114.104:8085/JMRepos</url>
 		</repository>
 		<repository>
@@ -30,7 +31,6 @@
 			<url>http://118.122.114.104:9999/repository</url>
 		</repository>
 	</repositories>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<zk.version>3.6.3</zk.version>
@@ -57,6 +57,12 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
 		</dependency>
 
 		<dependency>

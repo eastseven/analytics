@@ -14,6 +14,10 @@
 <link rel="stylesheet" href="js/jquery/css/smoothness/jquery-ui-1.8.16.custom.css" />
 <script type="text/javascript" src="js/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>
 
+<style type="text/css">
+	.separtor { border-top:#666666 1px dashed; margin-bottom: 15px; }
+</style>
+
 </head>
 <body>
 
@@ -22,6 +26,7 @@
 		var version = <%=request.getParameter("v") %>;
 		var prefix_matrix = 'matrix_';
 		var prefix_matrix_net = 'matrixNet_';
+		var prefix_matrix_plus = 'matrixPlus_';
 		var globalArray = [];
 		var radios = 0;
 		var peopleAmount = 0;
@@ -29,7 +34,7 @@
 			var url4paper = 'controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
 			
 			$.getJSON(url4paper, function(result) {
-				console.debug(result);
+				//console.debug(result);
 
 				var titleNo = 1;
 				var people = result.people;
@@ -51,7 +56,7 @@
 						$.each(people, function(i, item) {
 							html += '<input type="checkbox" name='+questionNo+' value='+item.id+' title='+item.id+' onClick=add(this) />' + item.name + '  ';
 						});
-						$('#matrix').append('<div><p>' + titleNo++ + '.' + item.title + '</p>'+html+'</div>');
+						$('#matrix').append('<div class=separtor ><p>' + titleNo++ + '.' + item.title + '</p>'+html+'</div>');
 						radios++;
 					});
 				}
@@ -82,6 +87,46 @@
 					titleNo++;
 				}
 
+				//2.1
+				if (matrixNet.length > 0) {
+					$('#matrixNetPlus').before(titleNo + '.请选择您所填写的这些人的相关信息<br/>');
+					
+					var th = '';
+					$.each(people, function(i, item) {
+						var id = prefix_matrix_net + item.id;
+						th += '<th>' + item.name + '</th>';
+					});
+					$('#matrixNetPlusTh').after(th);
+					
+					var html = '';
+					for(var rowIndex = 0; rowIndex < people.length; rowIndex++) {
+						var tr = '<tr>';
+						var rowPerson = people[rowIndex];
+						tr += '<td>'+rowPerson.name+'</td>';
+						for(var colIndex = 0; colIndex < people.length; colIndex++) {
+							var colPerson = people[colIndex];
+							var _id = prefix_matrix_plus + rowPerson.id + '_' + colPerson.id;
+							if(rowIndex >= colIndex) {
+								tr += '<td id='+_id+'></td>';
+							} else {
+								tr += '<td><select id="'+_id+'" name="'+_id+'" disabled=disabled>';
+								tr += '<option value=-1>请选择</option>';
+								tr += '<option value=0>1</option>';
+								tr += '<option value=0>2</option>';
+								tr += '<option value=1>3</option>';
+								tr += '<option value=1>4</option>';
+								tr += '<option value=1>5</option>';
+								tr += '</select></td>';
+							}
+						}
+						tr += '</tr>';
+						html += tr;
+					}
+					$('#matrixNetPlusTBody').append(html);
+					
+					titleNo++;
+				}
+				
 				//3
 				var group = result.group;
 				if (group.length > 0) {
@@ -90,7 +135,7 @@
 						html += '<div><p>' + titleNo + '.' + item.title + '</p>';
 						var questions = item.questions;
 						$.each(questions, function(i, item) {
-							html += '<p>' + titleNo + '.' + ++i + item.content +'</p>';
+							html += '<p class=separtor >' + titleNo + '.' + ++i + item.content +'</p>';
 							html += '<p>' + item.radio + '</p>';
 							radios++;
 						});
@@ -105,7 +150,7 @@
 				if (selfInfo.length > 0) {
 					var html = '';
 					$.each(selfInfo, function(i, item) {
-						html += '<div>';
+						html += '<div class=separtor >';
 						html += '<p>' + titleNo++ + '.' + item.name + '</p>';
 						html += '<p>';
 						for(var index = 0; index < item.options.length; index++) {
@@ -133,6 +178,7 @@
 				$.each($('tr:hidden > td > select'), function(i, item) {
 					$(this).removeAttr('name');
 				});
+				
 				var selectedOk = true;
 				$.each($('tr:visible > td'), function(i, item) {
 					var peopleId = $(this).attr('id');
@@ -149,7 +195,18 @@
 						//console.debug(selected);
 					}
 				});
-				var checkedRadios = 0;//$('input[type=radio][checked]').length;
+				
+				$.each($('select[id^='+prefix_matrix_plus+']'), function(i, item) {
+					var selected = $(this).children('option[selected]');
+					var value = $(selected).attr('value');
+					if($(this).attr('disabled') != 'disabled' && value == -1) {
+						//console.debug($(this));
+						selectedOk = selectedOk & false;
+					}
+				});
+				console.debug(selectedOk);
+				
+				var checkedRadios = 0;
 				$(':radio').each(function() {
 					//console.debug($(this).attr('checked'));
 					if($(this).attr('checked') == 'checked') checkedRadios++;
@@ -157,7 +214,7 @@
 				
 				$('#matrix').children('div').each(function(i, item) {
 					var checked = $(item).children(':checkbox[checked]').length;
-					console.debug(checked);
+					//console.debug(checked);
 					if(checked >= 1) checkedRadios++;
 				});
 				
@@ -167,6 +224,7 @@
 				if(checkedRadios == radios && selectedOk) {
 					$('#questionnaireForm').submit();
 				} else {
+					//$('#questionnaireForm').submit();
 					alert('问卷未完成，请将所有题目做完，谢谢合作');
 				}
 			});
@@ -186,17 +244,42 @@
 				if(index != -1) globalArray.splice(index, 1);
 				
 				var amount = $.grep(globalArray, function(n,i) {return n == responderId;});
-				if(amount == 0) $('#'+responderId).hide();
+				if(amount == 0) {
+					$('#'+responderId).hide();
+					
+					$('select[id*='+responderId+']').each(function() {
+						var select = $(this);
+						if(select.attr('disabled') === undefined) {
+							select.children('option').first().attr('selected', 'selected');
+							select.attr('disabled', 'disabled');
+						}
+					});
+				}
 			}
-			console.debug(globalArray);
+			
+			//console.debug(globalArray);
+			
+			if(globalArray.length >= 2) {
+				for(var rowIndex = 0; rowIndex < globalArray.length; rowIndex++) {
+					var row = globalArray[rowIndex];
+					for(var colIndex = 0; colIndex < globalArray.length; colIndex++) {
+						var col = globalArray[colIndex];
+						var _id = prefix_matrix_plus + row + '_' + col;
+						var select = $('#'+_id);
+						if(select) select.removeAttr('disabled');
+					}
+				}
+			}
 		}
 	</script>
 
 	<div id="questionnaire">
 		<input type="hidden" name="responderId" value="<%=request.getParameter("id") %>"/>
 		<input type="hidden" name="version" value="<%=request.getParameter("v") %>" />
+		
 		<div id="matrix"></div>
-		<div id="matrixNet">
+		
+		<div id="matrixNet" class="separtor">
 			<table id="matrixNetTable" border="1">
 				<thead id="matrixNetTHead">
 					<tr id="matrixNetTr">
@@ -206,7 +289,20 @@
 				<tbody id="matrixNetTBody" ></tbody>
 			</table>
 		</div>
+		
+		<div id="matrixNetPlus" class="separtor">
+			<table id="matrixNetPlusTable" border="1">
+				<thead>
+					<tr>
+						<th id="matrixNetPlusTh"></th>
+					</tr>
+				</thead>
+				<tbody id="matrixNetPlusTBody" ></tbody>
+			</table>
+		</div>
+		
 		<div id="normalQuestion"></div>
+		
 		<div id="selfInfo"></div>
 		
 		<!-- <input type="checkbox" title="aaa"> -->

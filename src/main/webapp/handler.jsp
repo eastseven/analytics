@@ -3,10 +3,11 @@
 <%@page import="java.util.*"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-	final String prefix_question = "question_";
-	final String prefix_matrix   = "matrix_";
+	final String prefix_question     = "question_";
+	final String prefix_matrix       = "matrix_";
 	final String prefix_matrix_net   = "matrixNet_";
-	final String prefix_property = "property_";
+	final String prefix_matrix_plus  = "matrixPlus_";
+	final String prefix_property     = "property_";
 	Map params = request.getParameterMap();
 	Set keys = params.keySet();
 
@@ -33,6 +34,11 @@
 		if(key.startsWith(prefix_matrix_net)) {
 			answer.put(key, text);
 			//out.print(prefix_matrix_net+"="+key + ":" + text + "<br/>");
+		}
+		
+		if(key.startsWith(prefix_matrix_plus)) {
+			answer.put(key, value[0]);
+			out.print(prefix_matrix_plus+"="+key + ":" + value[0] + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_property)) {

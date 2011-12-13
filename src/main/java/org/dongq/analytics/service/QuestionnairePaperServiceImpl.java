@@ -385,6 +385,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		final String prefix_property = "property_";
 		
 		final String prefix_matrixNet = "matrixNet_";
+		final String prefix_matrixPlus = "matrixPlus_";
 		
 		final long finishTime = System.currentTimeMillis();
 		QueryRunner query = new QueryRunner();
@@ -416,6 +417,23 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					logger.debug("Normal: "+row);
 					list.add(row);
 				}
+				
+				if(key.startsWith(prefix_matrixPlus)) {
+					String[] persons = key.replaceAll(prefix_matrixPlus, replacement).split("_");
+					long personRow = Long.valueOf(persons[0]);
+					long personCol = Long.valueOf(persons[1]);
+					long optionKey = Long.valueOf(value);
+					QuestionnairePaper row = new QuestionnairePaper();
+					row.setResponderId(responderId);
+					row.setOptionKey(optionKey);
+					row.setType(Question.TYPE_MATRIX_PLUS);
+					row.setVersion(version);
+					row.setQuestionId(personRow);
+					row.setFinishTime(personCol);
+					logger.debug("MatrixPlus: "+row);
+					list.add(row);
+				}
+				
 				if(key.startsWith(prefix_matrix)) {
 					long questionId = Long.valueOf(key.replaceAll(prefix_matrix, replacement));
 					String[] values = value.split(",");
@@ -1056,7 +1074,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			if(list != null && !list.isEmpty()) {
 				
 				//总人数
-				int n = 0;//getRespondersOfVersion(version).size();
+				int n = 0;
 				
 				for(int sheetIndex = 0; sheetIndex < list.size(); sheetIndex++) {
 					Responder responder = getResponder((Long)list.get(sheetIndex));
@@ -1071,6 +1089,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					n = relationPersons.size();
 					logger.debug(relationPersons);
 					Row first = sheet.createRow(0);
+					int globalRownum = 1;
 					for(int column = 0; column < relationPersons.size(); column++) {
 						Cell cell = first.createCell(column + 1);
 						Map<String, Object> relationPerson = relationPersons.get(column);
@@ -1080,7 +1099,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					first.createCell(first.getLastCellNum()).setCellValue("异质性指标");
 					first.createCell(first.getLastCellNum()).setCellValue("平均值");
 
-					for(int rownum = 1; rownum <= questionIds.size(); rownum++) {
+					for(int rownum = 1; rownum <= questionIds.size(); rownum++,globalRownum++) {
 						Question question = getQuestion((Long)questionIds.get(rownum-1));
 						
 						int columns = relationPersons.size();
@@ -1128,6 +1147,53 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						mediumValueCell.setCellValue(a);
 						
 					}
+					
+					//关系程度
+					int lastRowNum = globalRownum + 1;
+					
+					int r = relationPersons.size() + 1;
+					int c = relationPersons.size() + 1;
+					for(int rownum = 0; rownum < r; rownum++) {
+						Row row = sheet.createRow(lastRowNum + rownum);
+						
+						for(int column = 0; column  < c; column++) {
+							Cell cell = row.createCell(column);
+							if(rownum == 0 && column == 0) {
+								cell.setCellValue("");
+								String SQL = "select sum(option_key) sumvalue from questionnaire where version = " + version + " and responder_id = " + responder.getId() + " and type = " + Question.TYPE_MATRIX_PLUS ;
+								Map<String, Object> map = query.query(DbHelper.getConnection(), SQL, new MapHandler());
+								if(map != null && !map.isEmpty()) {
+									double sumvalue = (Long)map.get("sumvalue".toUpperCase());
+									double personSize = relationPersons.size();
+									personSize = personSize * (personSize - 1);
+									cell.setCellValue(sumvalue / personSize);
+								}
+							} else if(rownum == 0 && column > 0) {
+								Map<String, Object> relationPerson = relationPersons.get(column - 1);
+								Responder person = getResponder((Long)relationPerson.get("relation_person_id".toUpperCase()));
+								cell.setCellValue(person.getName());
+							} else if(rownum > 0 && column == 0) {
+								Map<String, Object> relationPerson = relationPersons.get(rownum - 1);
+								Responder person = getResponder((Long)relationPerson.get("relation_person_id".toUpperCase()));
+								cell.setCellValue(person.getName());
+							} else if(rownum > 0 && column > 0) {
+								Map<String, Object> relationPersonRow = relationPersons.get(rownum - 1);
+								Map<String, Object> relationPersonCol = relationPersons.get(column - 1);
+								Responder personRow = getResponder((Long)relationPersonRow.get("relation_person_id".toUpperCase()));
+								Responder personCol = getResponder((Long)relationPersonCol.get("relation_person_id".toUpperCase()));
+								
+								String SQL = "select * from questionnaire where version = " + version + " and responder_id = " + responder.getId() + " and type = " + Question.TYPE_MATRIX_PLUS + " and question_id = " + personRow.getId() + " and finish_time = " + personCol.getId();
+								Map<String, Object> map = query.query(DbHelper.getConnection(), SQL, new MapHandler());
+								logger.debug(SQL);
+								logger.debug(map);
+								if(map == null || map.isEmpty()) continue;
+								Long value = (Long)map.get("option_key".toUpperCase());
+								
+								cell.setCellValue(value.toString());
+							}
+						}
+					}
+					
 				}
 			}
 		} catch (SQLException e) {

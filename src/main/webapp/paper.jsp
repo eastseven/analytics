@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -8,305 +7,81 @@
 
 <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
 
-<link rel="stylesheet" href="css/colorbox.css" />
-<script type="text/javascript" src="js/jquery.colorbox-min.js"></script>
-
 <link rel="stylesheet" href="js/jquery/css/smoothness/jquery-ui-1.8.16.custom.css" />
 <script type="text/javascript" src="js/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>
 
-<style type="text/css">
-	.separtor { border-top:#666666 1px dashed; margin-bottom: 15px; }
-</style>
+<link rel="stylesheet" href="./a_files/default.css" type="text/css">
+<link rel="stylesheet" href="./a_files/default(1).css" type="text/css">
 
 </head>
 <body>
 
-	<script type="text/javascript">
-		var responderId = <%=request.getParameter("id") %>
-		var version = <%=request.getParameter("v") %>;
-		var prefix_matrix = 'matrix_';
-		var prefix_matrix_net = 'matrixNet_';
-		var prefix_matrix_plus = 'matrixPlus_';
-		var globalArray = [];
-		var radios = 0;
-		var peopleAmount = 0;
-		$(function() {
-			var url4paper = 'controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
-			
-			$.getJSON(url4paper, function(result) {
-				//console.debug(result);
-
-				var titleNo = 1;
-				var people = result.people;
-				peopleAmount = people.length;
-				//1
-				var matrix = result.matrix;
-				if (matrix.length > 0) {
-					
-					$.each(matrix, function(i, item) {
-						var questionNo = prefix_matrix + item.id;
-						//随机排列其他人，把自己过滤掉
-						for(var i = 0; i < people.length; i++) {
-							var index = Math.floor(Math.random() * people.length);
-							var tmp = people[i];
-							people[i] = people[index];
-							people[index] = tmp;
-						}
-						var html = '';
-						$.each(people, function(i, item) {
-							html += '<input type="checkbox" name='+questionNo+' value='+item.id+' title='+item.id+' onClick=add(this) />' + item.name + '  ';
-						});
-						$('#matrix').append('<div class=separtor ><p>' + titleNo++ + '.' + item.title + '</p>'+html+'</div>');
-						radios++;
-					});
-				}
-
-				//2
-				var matrixNet = result.matrixNet;
-				if (matrixNet.length > 0) {
-					$('#matrixNet').before(titleNo + '.请选择您所填写的这些人的相关信息<br/>');
-					var th = '';
-					$.each(matrixNet, function(i, item) {
-						var id = prefix_matrix_net + item.id;
-						th += '<th>' + ++i + '.' + item.content + '</th>';
-					});
-					$('#matrixNetTh').after(th);
-					
-					var html = '';
-					$.each(people, function(i, item) {
-						var tr = '<tr id='+item.id+' style="display:none;"><td>'+item.name+'</td>';
-						for(var index = 0; index < matrixNet.length; index++) {
-							var options = matrixNet[index];
-							tr += '<td id='+item.id+'_'+index+' >'+options.select+'</td>';
-						}
-						tr += '</tr>';
-						html += tr;
-					});
-					$('#matrixNetTBody').append(html);
-					
-					titleNo++;
-				}
-
-				//2.1
-				if (matrixNet.length > 0) {
-					$('#matrixNetPlus').before(titleNo + '.请选择您所填写的这些人的相关信息<br/>');
-					
-					var th = '';
-					$.each(people, function(i, item) {
-						var id = prefix_matrix_net + item.id;
-						th += '<th>' + item.name + '</th>';
-					});
-					$('#matrixNetPlusTh').after(th);
-					
-					var html = '';
-					for(var rowIndex = 0; rowIndex < people.length; rowIndex++) {
-						var tr = '<tr>';
-						var rowPerson = people[rowIndex];
-						tr += '<td>'+rowPerson.name+'</td>';
-						for(var colIndex = 0; colIndex < people.length; colIndex++) {
-							var colPerson = people[colIndex];
-							var _id = prefix_matrix_plus + rowPerson.id + '_' + colPerson.id;
-							if(rowIndex >= colIndex) {
-								tr += '<td id='+_id+'></td>';
-							} else {
-								tr += '<td><select id="'+_id+'" name="'+_id+'" disabled=disabled>';
-								tr += '<option value=-1>请选择</option>';
-								tr += '<option value=0>1</option>';
-								tr += '<option value=0>2</option>';
-								tr += '<option value=1>3</option>';
-								tr += '<option value=1>4</option>';
-								tr += '<option value=1>5</option>';
-								tr += '</select></td>';
-							}
-						}
-						tr += '</tr>';
-						html += tr;
-					}
-					$('#matrixNetPlusTBody').append(html);
-					
-					titleNo++;
-				}
-				
-				//3
-				var group = result.group;
-				if (group.length > 0) {
-					var html = '';
-					$.each(group, function(i, item) {
-						html += '<div><p>' + titleNo + '.' + item.title + '</p>';
-						var questions = item.questions;
-						$.each(questions, function(i, item) {
-							html += '<p class=separtor >' + titleNo + '.' + ++i + item.content +'</p>';
-							html += '<p>' + item.radio + '</p>';
-							radios++;
-						});
-						html += '</div>';
-						titleNo++;
-					});
-					$('#normalQuestion').append(html);
-				}
-
-				//4
-				var selfInfo = result.optionGroups;
-				if (selfInfo.length > 0) {
-					var html = '';
-					$.each(selfInfo, function(i, item) {
-						html += '<div class=separtor >';
-						html += '<p>' + titleNo++ + '.' + item.name + '</p>';
-						html += '<p>';
-						for(var index = 0; index < item.options.length; index++) {
-							var option = item.options[index];
-							var checked = '';
-							if(option.selected) checked += ' checked=checked ';
-							html += '<input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '  ';
-						}
-						html +='</p>';
-						html += '</div>';
-						radios++;
-					});
-					
-					$('#selfInfo').append(html);
-				}
-			});
-
-			$('#questionnaire').wrap('<form id=questionnaireForm method="post" action=""></form>');
-			
-			//form submit event
-			$('#submitBtn').bind('click', function() {
-				$('#questionnaireForm').attr('action', 'handler.jsp');
-
-				//移出display为none的tr中的下拉框的name属性
-				$.each($('tr:hidden > td > select'), function(i, item) {
-					$(this).removeAttr('name');
-				});
-				
-				var selectedOk = true;
-				$.each($('tr:visible > td'), function(i, item) {
-					var peopleId = $(this).attr('id');
-					if(peopleId != undefined) {
-						var selected = $(this).children('select');
-						selected = $(selected[0]).children('option[selected]');
-						var value = $(selected).attr('value');
-						//console.debug(value);
-						if(value == -1) {
-							selectedOk = selectedOk & false;
-						}
-						value = value + '_' + peopleId;
-						selected.attr('value', value);
-						//console.debug(selected);
-					}
-				});
-				
-				$.each($('select[id^='+prefix_matrix_plus+']'), function(i, item) {
-					var selected = $(this).children('option[selected]');
-					var value = $(selected).attr('value');
-					if($(this).attr('disabled') != 'disabled' && value == -1) {
-						//console.debug($(this));
-						selectedOk = selectedOk & false;
-					}
-				});
-				console.debug(selectedOk);
-				
-				var checkedRadios = 0;
-				$(':radio').each(function() {
-					//console.debug($(this).attr('checked'));
-					if($(this).attr('checked') == 'checked') checkedRadios++;
-				});
-				
-				$('#matrix').children('div').each(function(i, item) {
-					var checked = $(item).children(':checkbox[checked]').length;
-					//console.debug(checked);
-					if(checked >= 1) checkedRadios++;
-				});
-				
-				console.debug('checked radio amount : '+checkedRadios + ', radios : ' + radios);
-				
-				//TODO validate
-				if(checkedRadios == radios && selectedOk) {
-					$('#questionnaireForm').submit();
-				} else {
-					//$('#questionnaireForm').submit();
-					alert('问卷未完成，请将所有题目做完，谢谢合作');
-				}
-			});
-		});
-		
-		function add(checkbox) {
-			var e = $(checkbox);
-			var checked = e.attr('checked');
-			var responderId = e.attr('title');
-			if(checked) {
-				//add td
-				globalArray.push(responderId);
-				$('#'+responderId).show();
-			} else {
-				//remove td
-				var index = jQuery.inArray(responderId, globalArray);
-				if(index != -1) globalArray.splice(index, 1);
-				
-				var amount = $.grep(globalArray, function(n,i) {return n == responderId;});
-				if(amount == 0) {
-					$('#'+responderId).hide();
-					
-					$('select[id*='+responderId+']').each(function() {
-						var select = $(this);
-						if(select.attr('disabled') === undefined) {
-							select.children('option').first().attr('selected', 'selected');
-							select.attr('disabled', 'disabled');
-						}
-					});
-				}
-			}
-			
-			//console.debug(globalArray);
-			
-			if(globalArray.length >= 2) {
-				for(var rowIndex = 0; rowIndex < globalArray.length; rowIndex++) {
-					var row = globalArray[rowIndex];
-					for(var colIndex = 0; colIndex < globalArray.length; colIndex++) {
-						var col = globalArray[colIndex];
-						var _id = prefix_matrix_plus + row + '_' + col;
-						var select = $('#'+_id);
-						if(select) select.removeAttr('disabled');
-					}
-				}
-			}
-		}
+	<script type="text/javascript" src="js/paper.js">
 	</script>
+
+	<div id="main">
+		<form method="post" id="survey">
+			<div class="survey_body">
+				<link rel="stylesheet" href="./a_files/default(1).css" type="text/css">
+				<div class="page">
+					<div class="page-header">
+						<h1 class="survey-title">调查表</h1>
+					</div>
+					<ol class="content">
+						<!-- <li class="part select" name="aaa" id="aaa">
+								<h4 class="title">
+									<span class="subject">您的问题是</span> <span class="require">*</span>
+									<label class="error"></label>
+								</h4>
+								<table class="options">
+									<tbody>
+										<tr class="odd">
+											<td><input type="radio"
+												id="f0bf5c05-e4db-4ff8-95a0-0ab1e97c7790"
+												name="88850302-4534-4dce-902d-73e0990b4e68[]"
+												value="f0bf5c05-e4db-4ff8-95a0-0ab1e97c7790"><label
+												for="f0bf5c05-e4db-4ff8-95a0-0ab1e97c7790">A. BUG</label></td>
+											<td><input type="radio"
+												id="21cdac11-f92a-4b10-96d6-fbf44b414f07"
+												name="88850302-4534-4dce-902d-73e0990b4e68[]"
+												value="21cdac11-f92a-4b10-96d6-fbf44b414f07"><label
+												for="21cdac11-f92a-4b10-96d6-fbf44b414f07">B. 网站内容</label></td>
+										</tr>
+										<tr class="even">
+											<td><input type="radio"
+												id="406635c6-a3cf-49b3-b08c-458cd5ee5765"
+												name="88850302-4534-4dce-902d-73e0990b4e68[]"
+												value="406635c6-a3cf-49b3-b08c-458cd5ee5765"><label
+												for="406635c6-a3cf-49b3-b08c-458cd5ee5765">C. 建议与意见</label></td>
+											<td><input type="radio"
+												id="a989ce53-a664-41f2-ad61-01a7a4ce3222"
+												name="88850302-4534-4dce-902d-73e0990b4e68[]"
+												value="a989ce53-a664-41f2-ad61-01a7a4ce3222"><label
+												for="a989ce53-a664-41f2-ad61-01a7a4ce3222">D. 不满</label></td>
+										</tr>
+										<tr class="odd">
+											<td><input type="radio"
+												id="b7a08697-0231-4e6f-81ba-cf4213170e5f"
+												name="88850302-4534-4dce-902d-73e0990b4e68[]"
+												value="b7a08697-0231-4e6f-81ba-cf4213170e5f"><label
+												for="b7a08697-0231-4e6f-81ba-cf4213170e5f">E. 其他问题</label></td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</li> -->
+					</ol>
+				</div>
+			</div>
+		</form>
+	</div>
 
 	<div id="questionnaire">
 		<input type="hidden" name="responderId" value="<%=request.getParameter("id") %>"/>
 		<input type="hidden" name="version" value="<%=request.getParameter("v") %>" />
-		
-		<div id="matrix"></div>
-		
-		<div id="matrixNet" class="separtor">
-			<table id="matrixNetTable" border="1">
-				<thead id="matrixNetTHead">
-					<tr id="matrixNetTr">
-						<th id="matrixNetTh">姓名</th>
-					</tr>
-				</thead>
-				<tbody id="matrixNetTBody" ></tbody>
-			</table>
-		</div>
-		
-		<div id="matrixNetPlus" class="separtor">
-			<table id="matrixNetPlusTable" border="1">
-				<thead>
-					<tr>
-						<th id="matrixNetPlusTh"></th>
-					</tr>
-				</thead>
-				<tbody id="matrixNetPlusTBody" ></tbody>
-			</table>
-		</div>
-		
-		<div id="normalQuestion"></div>
-		
-		<div id="selfInfo"></div>
-		
-		<!-- <input type="checkbox" title="aaa"> -->
+		<input type="hidden" name="ctx" value="<%="http://"+request.getLocalAddr()+":"+request.getLocalPort()+""+request.getContextPath() %>"/>
 	</div>
-	<button id="submitBtn">提交</button>
+	<!-- <button id="submitBtn">提交</button> -->
+	<a id="submitBtn" style="cursor: pointer;">提交</a>
 </body>
 </html>

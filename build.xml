@@ -42,7 +42,7 @@
 		<taskdef name="ddlToDatabase" classname="org.apache.ddlutils.task.DdlToDatabaseTask">
 			<classpath refid="runtime-classpath" />
 		</taskdef>
-
+		
 		<ddlToDatabase>
 			<database url="${db.url}" driverClassName="${db.driver}" username="" password="" />
 			<fileset dir="src/main/resources">

@@ -20,6 +20,7 @@ import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.KeyedHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -668,7 +669,6 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				while(rs.next()) {
 					ResponderProperty e = new ResponderProperty(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getLong(5));
 					list.add(e);
-					//logger.debug("parseResponders:"+e);
 				}
 				return list;
 			}
@@ -877,10 +877,25 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	void saveResponder(Responder r, QueryRunner query, Connection conn) throws Exception {
-		final String insertResponder = "insert into responder values(?,?,?)";
+		final String insertResponder = "insert into responder values(?,?,?,?,?)";
 		final String insertResponderProperty = "insert into responder_properties(responder_id,responder_property_id,version) values(?,?,?)";
 		
-		int responderRecord = query.update(DbHelper.getConnection(), insertResponder, r.getId(), r.getName(), r.getVersion());
+		boolean bln = true;
+		final int count = 6;
+		String no = RandomStringUtils.randomNumeric(count);
+		while(bln) {
+			Map<String, Object> map = query.query(DbHelper.getConnection(), "select count(1) a from responder where responder_no = ?", new MapHandler(), no);
+			int noInResponder = (Integer)map.get("A");
+			if(noInResponder == 0) {
+				bln = false;
+			} else {
+				no = RandomStringUtils.randomNumeric(count);
+			}
+		}
+		r.setNo(no);
+		String pwd = RandomStringUtils.random(count, true, false);
+		r.setPwd(pwd);
+		int responderRecord = query.update(DbHelper.getConnection(), insertResponder, r.getId(), r.getName(), r.getVersion(), r.getNo(), r.getPwd());
 		logger.debug(responderRecord+":"+r);
 		if(responderRecord != 0) {
 			Set<ResponderProperty> p = r.getProperties();

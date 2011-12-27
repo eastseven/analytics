@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -152,43 +153,39 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				final String version = DateFormatUtils.format((Long)map.get("version"), pattern);
 
 				QueryRunner query = new QueryRunner();
-				String sql = "select a.responder_id, a.responder_name, a.version, (select min(b.finish_time) from questionnaire b where a.responder_id = b.responder_id) finish_time from responder a where a.version = " + map.get("version");
+				String sql = "select a.responder_id, a.responder_name, a.responder_no, a.responder_pwd, a.version, (select min(b.finish_time) from questionnaire b where a.responder_id = b.responder_id) finish_time from responder a where a.version = " + map.get("version");
 				logger.debug(sql);
-				List<Map<String, String>> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Map<String, String>>>() {
-					@Override
-					public List<Map<String, String>> handle(ResultSet rs) throws SQLException {
-						List<Map<String, String>> list = new ArrayList<Map<String,String>>();
-						while(rs.next()) {
-							Map<String, String> map = new HashMap<String, String>();
-							map.put("responder_id", rs.getObject("responder_id").toString());
-							map.put("responder_name", rs.getObject("responder_name").toString());
-							map.put("version", rs.getObject("version").toString());
-							Object time = rs.getObject("finish_time");
-							if(time != null) {
-								map.put("finish_time", rs.getObject("finish_time").toString());
-							}
-							logger.debug(map);
-							list.add(map);
-						}
-						return list;
-					}
-				});
+				List<Map<String, Object>> list = query.query(DbHelper.getConnection(), sql, new MapListHandler());
+				
 				String content = "<table align='center' style='border-collapse:collapse;border: 1px solid black;'>";
 				content += "<thead><tr>"; 
-				content += "<th width='25%' style='border: 1px solid black;'>编号</th>" +
-						"<th width='25%' style='border: 1px solid black;'>姓名</th>" +
-						"<th width='25%' style='border: 1px solid black;'>操作</th>" +
-						"<th width='25%' style='border: 1px solid black;'>时间</th>"; 
+				content += "<th width='20%' style='border: 1px solid black;'>编号</th>";
+				content += "<th width='20%' style='border: 1px solid black;'>密码</th>";
+				content += "<th width='' style='border: 1px solid black;'>姓名</th>";
+				content += "<th width='' style='border: 1px solid black;'>操作</th>";
+				content += "<th width='' style='border: 1px solid black;'>时间</th>"; 
 				content += "</tr></thead>";
 				content += "<tbody>";
-				for(Map<String, String> e : list) {
-					String id = e.get("responder_id");
-					String name = e.get("responder_name");
-					String time = e.containsKey("finish_time") ? DateFormatUtils.format(Long.valueOf(e.get("finish_time")), pattern) : "";
-					String link = "<a href='paper.jsp?id="+id+"&v="+e.get("version")+"' target='_blank'>开始答题</a>";
-					String _row = "<tr><td align='center' style='border: 1px solid black;'>"+id+"</td><td align='center' style='border: 1px solid black;'>"+name+"</td><td align='center' style='border: 1px solid black;'>";
+				for(Map<String, Object> e : list) {
+					String id = e.get("responder_id".toUpperCase()).toString();
+					String no = e.get("responder_no".toUpperCase()).toString();
+					String pwd = e.get("responder_pwd".toUpperCase()).toString();
+					String name = e.get("responder_name".toUpperCase()).toString();
+					Object v = e.get("version".toUpperCase());
+					Object finishTime = e.get("FINISH_TIME");
+					String time = finishTime != null ? DateFormatUtils.format((Long)finishTime, pattern) : "";
+					
+					String link = "<a href='paper.jsp?id="+id+"&v="+v+"' target='_blank'>开始答题</a>";
+					
+					String _row = "<tr>";
+					_row += "<td align='center' style='border: 1px solid black;'>"+no+"</td>";
+					_row += "<td align='center' style='border: 1px solid black;'>"+pwd+"</td>";
+					_row += "<td align='center' style='border: 1px solid black;'>"+name+"</td>";
+					_row += "<td align='center' style='border: 1px solid black;'>";
 					_row += StringUtils.isBlank(time) ? link : "答题完毕";
-					_row += "</td><td align='center' style='border: 1px solid black;'>"+time+"</td></tr>";
+					_row += "</td>";
+					_row += "<td align='center' style='border: 1px solid black;'>"+time+"</td>";
+					_row += "</tr>";
 					
 					content += _row;
 				}
@@ -241,6 +238,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				//row.appendChild(btn);
 				
 				Button btn2 = new Button("生成网络数据");
+				btn2.setDisabled(true);
 				btn2.addEventListener("onClick", new EventListener() {
 					@Override
 					public void onEvent(Event event) throws Exception {

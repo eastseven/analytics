@@ -38,7 +38,7 @@
 		
 		if(key.startsWith(prefix_matrix_plus)) {
 			answer.put(key, value[0]);
-			out.print(prefix_matrix_plus+"="+key + ":" + value[0] + "<br/>");
+			//out.print(prefix_matrix_plus+"="+key + ":" + value[0] + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_property)) {

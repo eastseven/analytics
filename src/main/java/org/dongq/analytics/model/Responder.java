@@ -18,14 +18,17 @@ public class Responder {
 
 	private long version;
 
+	private String no;
+
+	private String pwd;
+
 	private Set<ResponderProperty> properties = new HashSet<ResponderProperty>();
 
 	public Responder() {
 		super();
 	}
 
-	public Responder(long id, String name, long version,
-			Set<ResponderProperty> properties) {
+	public Responder(long id, String name, long version, Set<ResponderProperty> properties) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -65,10 +68,27 @@ public class Responder {
 		this.properties = properties;
 	}
 
+	public String getNo() {
+		return no;
+	}
+
+	public void setNo(String no) {
+		this.no = no;
+	}
+
+	public String getPwd() {
+		return pwd;
+	}
+
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
+
 	@Override
 	public String toString() {
 		return "Responder [id=" + id + ", name=" + name + ", version="
-				+ version + ", properties=" + properties + "]";
+				+ version + ", no=" + no + ", pwd=" + pwd + ", properties="
+				+ properties + "]";
 	}
 
 	@Override

@@ -96,8 +96,9 @@ public class InitServlet extends HttpServlet {
 	}
 	
 	void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String responderId = req.getParameter("id");
-		if(StringUtils.isBlank(responderId)) responderId = "0";
+		String responderNo = req.getParameter("no");
+		String responderPwd = req.getParameter("pwd");
+		if(StringUtils.isBlank(responderNo)) responderNo = "0";
 		QueryRunner query = new QueryRunner();
 		Connection conn = DbHelper.getConnection();
 		final String check = "select a.version from responder a where a.responder_id = ?";
@@ -105,12 +106,12 @@ public class InitServlet extends HttpServlet {
 		logger.debug(sql);
 		try {
 			Map<String, Object> result = new HashMap<String, Object>();
-			List<Object> list = query.query(conn, check, new ColumnListHandler(), responderId);
+			List<Object> list = query.query(conn, check, new ColumnListHandler(), responderNo);
 			if(!list.isEmpty()) {
 				long version = (Long)list.get(0);
 				
 				// check finish questionnaire
-				list = query.query(conn, sql, new ColumnListHandler(), responderId);
+				list = query.query(conn, sql, new ColumnListHandler(), responderNo);
 				logger.debug(list);
 				if(list.isEmpty()) {
 					result.put("bln", Boolean.TRUE);

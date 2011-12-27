@@ -93,50 +93,50 @@ $(function() {
 		}
 		
 		//2.1
-		if (matrixNet.length > 0) {
-			var html = '<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>';
-			
-			var table = '<table class=options id=matrixNetPlus>';
-			var thead = '<thead><th>姓名</th>';
-			var tbody = '<tbody>';
-			
-			$.each(people, function(i, item) {
-				var id = prefix_matrix_net + item.id;
-				thead += '<th>' + item.name + '</th>';
-			});
-			
-			var tds = '';
-			for(var rowIndex = 0; rowIndex < people.length; rowIndex++) {
-				var tr = '<tr >';
-				var rowPerson = people[rowIndex];
-				tr += '<td>'+rowPerson.name+'</td>';
-				for(var colIndex = 0; colIndex < people.length; colIndex++) {
-					var colPerson = people[colIndex];
-					var _id = prefix_matrix_plus + rowPerson.id + '_' + colPerson.id;
-					if(rowIndex >= colIndex) {
-						tr += '<td id='+_id+'></td>';
-					} else {
-						tr += '<td><select id="'+_id+'" name="'+_id+'" disabled=disabled>';
-						tr += '<option value=-1>请选择</option>';
-						tr += '<option value=0>1</option>';
-						tr += '<option value=0>2</option>';
-						tr += '<option value=1>3</option>';
-						tr += '<option value=1>4</option>';
-						tr += '<option value=1>5</option>';
-						tr += '</select></td>';
-					}
-				}
-				tr += '</tr>';
-				tds += tr;
-			}
-			
-			thead += '</thead>';
-			tbody += '</tbody>';
-			table += tds + thead + tbody + '</table>';
-			html += table + '</li>';
-			$('.content').append(html);
-			
-		}
+//		if (matrixNet.length > 0) {
+//			var html = '<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>';
+//			
+//			var table = '<table class=options id=matrixNetPlus>';
+//			var thead = '<thead><th>姓名</th>';
+//			var tbody = '<tbody>';
+//			
+//			$.each(people, function(i, item) {
+//				var id = prefix_matrix_net + item.id;
+//				thead += '<th>' + item.name + '</th>';
+//			});
+//			
+//			var tds = '';
+//			for(var rowIndex = 0; rowIndex < people.length; rowIndex++) {
+//				var tr = '<tr >';
+//				var rowPerson = people[rowIndex];
+//				tr += '<td>'+rowPerson.name+'</td>';
+//				for(var colIndex = 0; colIndex < people.length; colIndex++) {
+//					var colPerson = people[colIndex];
+//					var _id = prefix_matrix_plus + rowPerson.id + '_' + colPerson.id;
+//					if(rowIndex >= colIndex) {
+//						tr += '<td id='+_id+'></td>';
+//					} else {
+//						tr += '<td><select id="'+_id+'" name="'+_id+'" disabled=disabled>';
+//						tr += '<option value=-1>请选择</option>';
+//						tr += '<option value=0>1</option>';
+//						tr += '<option value=0>2</option>';
+//						tr += '<option value=1>3</option>';
+//						tr += '<option value=1>4</option>';
+//						tr += '<option value=1>5</option>';
+//						tr += '</select></td>';
+//					}
+//				}
+//				tr += '</tr>';
+//				tds += tr;
+//			}
+//			
+//			thead += '</thead>';
+//			tbody += '</tbody>';
+//			table += tds + thead + tbody + '</table>';
+//			html += table + '</li>';
+//			$('.content').append(html);
+//			
+//		}
 		
 		//3
 		var group = result.group;
@@ -178,7 +178,7 @@ $(function() {
 				for(var index = 0; index < item.options.length; index++) {
 					var option = item.options[index];
 					var checked = '';
-					if(option.selected) checked += ' checked=checked ';
+					if(option.selected) checked += ' checked=checked readonly=readonly ';
 					tds += '<tr><td><input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '</td></tr>';
 				}
 				tbody += '</tbody>';
@@ -221,21 +221,6 @@ $(function() {
 				for(var _index = 0; _index < options.length; _index++) {
 					var option = options[_index];
 					if($(option).val() == -1) {
-						this.href = '#' + $(li).attr('id');
-						alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
-						bln = true;
-						break;
-					}
-				}
-			} else if(globalArray.length >= 2 && globalArray[0] != globalArray[1]) {
-				
-				var selects = $('#matrixNetPlus').find('select');
-				for(var index = 0; index < selects.length; index++) {
-					var select = selects[index];
-					var val = $(select).find('option:selected').val();
-					var disabled = $(select).attr('disabled');
-					//console.debug(index + '.' + val + ':' + disabled);
-					if(disabled == undefined && val == -1) {
 						this.href = '#' + $(li).attr('id');
 						alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
 						bln = true;

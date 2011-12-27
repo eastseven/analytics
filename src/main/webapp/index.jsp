@@ -23,11 +23,12 @@ table,th, td
 $(function() {
 	$('button#submit').click(function() {
 		//alert($('table').html());
-		var id = $('input[name=id]').val();
+		var no = $('input[name=no]').val();
+		var pwd = $('input[name=pwd]').val();
 		var method = $('input[name=m]').val();
-		$.post('./eastseven', {id : id, m : method}, function(result) {
+		$.post('./eastseven', {no : no, pwd : pwd, m : method}, function(result) {
 			if(result.bln) {
-				self.location = 'paper.jsp?id='+id+'&v=' + result.version;
+				self.location = 'paper.jsp?id='+result.id+'&v=' + result.version;
 			} else {
 				alert(result.msg);
 			}
@@ -51,7 +52,11 @@ $(function() {
 			<table align="center">
 				<tr>
 					<td>受访者编号：</td>
-					<td><input type="text" name="id" value=""/></td>
+					<td><input type="text" name="no" value=""/></td>
+				</tr>
+				<tr>
+					<td>受访者密码：</td>
+					<td><input type="text" name="pwd" value=""/></td>
 				</tr>
 				<tr>
 					<td colspan="2" align="center">

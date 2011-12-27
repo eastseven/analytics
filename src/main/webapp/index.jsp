@@ -26,13 +26,26 @@ $(function() {
 		var no = $('input[name=no]').val();
 		var pwd = $('input[name=pwd]').val();
 		var method = $('input[name=m]').val();
-		$.post('./eastseven', {no : no, pwd : pwd, m : method}, function(result) {
-			if(result.bln) {
-				self.location = 'paper.jsp?id='+result.id+'&v=' + result.version;
-			} else {
-				alert(result.msg);
-			}
-		}, 'json');
+		var bln = true;
+		if(no == "") {
+			bln = false;
+			alert('编号不能为空');
+		} else if(pwd == "") {
+			bln = false;
+			alert('密码不能为空');
+		}
+		
+		if(bln) {
+			$.post('./eastseven', {no : no, pwd : pwd, m : method}, function(result) {
+				if(result.bln) {
+					//self.location = 'paper.jsp?id='+result.id+'&v=' + result.version;
+					//console.debug(result);
+					//$.post('paper.jsp', {id : result.id, v : result.version},'json');
+				} else {
+					alert(result.msg);
+				}
+			}, 'json');
+		}
 	});
 });
 </script>

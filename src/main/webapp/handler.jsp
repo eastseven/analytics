@@ -23,17 +23,17 @@
 		
 		if(key.startsWith(prefix_question)) {
 			answer.put(key, value[0]);
-			//out.print(prefix_question+"="+key + ":" + value[0] + "<br/>");
+			out.print(prefix_question+"="+key + ":" + value[0] + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix)) {
 			answer.put(key, text);
-			//out.print(prefix_matrix+"="+key + ":" + text + "<br/>");
+			out.print(prefix_matrix+"="+key + ":" + text + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix_net)) {
 			answer.put(key, text);
-			//out.print(prefix_matrix_net+"="+key + ":" + text + "<br/>");
+			out.print(prefix_matrix_net+"="+key + ":" + text + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix_plus)) {
@@ -44,7 +44,7 @@
 		if(key.startsWith(prefix_property)) {
 			text = text.replace(",", "");
 			answer.put(prefix_property+text, text);
-			//out.print(prefix_property+"="+key+":"+text+"<br/>");
+			out.print(prefix_property+"="+key+":"+text+"<br/>");
 		}
 		
 	}

@@ -176,13 +176,14 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 					String time = finishTime != null ? DateFormatUtils.format((Long)finishTime, pattern) : "";
 					
 					String link = "<a href='paper.jsp?id="+id+"&v="+v+"' target='_blank'>开始答题</a>";
+					link = "<a href='login.jsp' target='_blank'>开始答题</a>";
 					
 					String _row = "<tr>";
 					_row += "<td align='center' style='border: 1px solid black;'>"+no+"</td>";
 					_row += "<td align='center' style='border: 1px solid black;'>"+pwd+"</td>";
 					_row += "<td align='center' style='border: 1px solid black;'>"+name+"</td>";
 					_row += "<td align='center' style='border: 1px solid black;'>";
-					_row += StringUtils.isBlank(time) ? link : "答题完毕";
+					_row += StringUtils.isBlank(time) ? link : "<a href='questionnaire.jsp?id="+id+"&v="+v+"&name="+name+"' target='_blank' >答题完毕</a>";
 					_row += "</td>";
 					_row += "<td align='center' style='border: 1px solid black;'>"+time+"</td>";
 					_row += "</tr>";

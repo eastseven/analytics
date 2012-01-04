@@ -7,12 +7,119 @@ var columnNum = 10;
 
 var globalArray = [];
 var globalCounter = 1;
-
+var ctx = '';
 $(function() {
 	var responderId = $('input[name=responderId]').val();
+	var paperType = $('input[name=paperType]').val();
 	var version = $('input[name=version]').val();
-	var ctx = $('input[name=ctx]').val();
+	var name = $('input[name=name]').val();
+	ctx = $('input[name=ctx]').val();
 	
+	loadPaper(version, responderId);
+	
+	var title = '';
+	if(paperType == 'check') {
+		title = '<p width="100%">姓名：'+name+'</p>';
+		$('a').hide();
+		loadAnswerPape(responderId);
+	} else {
+		title = '<p width="100%">姓名：'+name+' | <a style="right" href="login.jsp">退出</a> | <a style="cursor: pointer;">提交</a></p>';
+	}
+	$('#info').wrap(title);
+	
+	
+	//提交按钮
+	$('a').bind('click', function() {
+		var lis = $('li');
+		var cssSelector = 'table > tbody > tr > td > ';
+		var checkbox = cssSelector + ':checkbox';
+		var selectTr = 'table > tbody > tr:visible';
+		var bln = false;
+		
+		//移出display为none的tr中的下拉框的name属性
+		$.each($('tr:hidden > td > select'), function(i, item) {
+			$(this).removeAttr('name');
+		});
+		
+		//逐行检查
+		for(var index = 0; index < lis.length; index++) {
+			var li = lis[index];
+			if($(li).find(checkbox).length > 0) {//1
+				if($(li).find(cssSelector + 'input:checked').length == 0) {
+					this.href = '#' + $(li).attr('id');
+					alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
+					break;
+				}
+			} else if($(li).find(selectTr).length > 0 && $(li).find(selectTr + ' > td > select[id=""]').length > 0) {//2
+				var options = $(li).find(selectTr).find('option:selected');
+				for(var _index = 0; _index < options.length; _index++) {
+					var option = options[_index];
+					if($(option).val() == -1) {
+						this.href = '#' + $(li).attr('id');
+						alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
+						bln = true;
+						break;
+					}
+				}
+			}
+			
+			//console.debug($(li).find('table > tbody > tr > td > :radio'));
+			
+			if(bln) {
+				break;
+			}
+		}
+		
+		var selectedOk = true;
+		$.each($('tr:visible > td'), function(i, item) {
+			var peopleId = $(this).attr('id');
+			if(peopleId != undefined) {
+				var selected = $(this).children('select');
+				selected = $(selected[0]).children('option[selected]');
+				var value = $(selected).attr('value');
+				//console.debug(value);
+				if(value == -1) {
+					selectedOk = selectedOk & false;
+				}
+				value = value + '_' + peopleId;
+				selected.attr('value', value);
+				//console.debug(selected);
+			}
+		});
+		
+		var checkedRadios = 0;
+		$(':radio').each(function() {
+			if($(this).attr('checked') == 'checked') checkedRadios++;
+		});
+		
+		//console.debug('checked radio amount : '+checkedRadios + ', radios : ' + radios);
+		if(checkedRadios == radios) {
+			$('form').attr('method', 'post');
+			$('form').attr('action', 'handler.jsp');
+			$('form').submit();
+		}
+	});
+});
+
+function loadAnswerPape(responderId) {
+	var url4paper = ctx + '/controller?action=getQuestionnaireByResponderId&responderId=' + responderId;
+	$.getJSON(url4paper, function(result) {
+		for(var index = 0; index < result.length; index++) {
+			var data = result[index];
+			console.debug(data);
+		}
+	});
+	
+	var url4matrixnet = ctx + '/controller?action=getQuestionnaireMatrixNetByResponderId&responderId=' + responderId;
+	$.getJSON(url4matrixnet, function(result) {
+		for(var index = 0; index < result.length; index++) {
+			var data = result[index];
+			console.debug(data);
+		}
+	});
+}
+
+function loadPaper(version, responderId) {
 	//读取后台问卷数据
 	var url4paper = ctx + '/controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
 	$.getJSON(url4paper, function(result) {
@@ -175,14 +282,20 @@ $(function() {
 				var table = '<table class=options>';
 				var tbody = '<tbody>';
 				var tds = '';
+				var td = '';
+				var selected = false;
 				for(var index = 0; index < item.options.length; index++) {
 					var option = item.options[index];
 					var checked = '';
-					if(option.selected) checked += ' checked=checked readonly=readonly ';
+					if(option.selected) {
+						selected = option.selected;
+						checked += ' checked=checked readonly=readonly ';
+						td = '<tr><td><input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '</td></tr>';
+					}
 					tds += '<tr><td><input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '</td></tr>';
 				}
 				tbody += '</tbody>';
-				table += tds + tbody + '</table>';
+				table += (selected == true ? td : tds) + tbody + '</table>';
 				html += table + '</li>';
 				radios++;
 			});
@@ -198,52 +311,7 @@ $(function() {
 			$(this).attr('name', 'li'+id);
 		});
 	});
-	
-	//提交按钮
-	$('#submitBtn').bind('click', function() {
-		var lis = $('li');
-		var cssSelector = 'table > tbody > tr > td > ';
-		var checkbox = cssSelector + ':checkbox';
-		var selectTr = 'table > tbody > tr:visible';
-		var bln = false;
-		
-		//逐行检查
-		for(var index = 0; index < lis.length; index++) {
-			var li = lis[index];
-			if($(li).find(checkbox).length > 0) {//1
-				if($(li).find(cssSelector + 'input:checked').length == 0) {
-					this.href = '#' + $(li).attr('id');
-					alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
-					break;
-				}
-			} else if($(li).find(selectTr).length > 0 && $(li).find(selectTr + ' > td > select[id=""]').length > 0) {//2
-				var options = $(li).find(selectTr).find('option:selected');
-				for(var _index = 0; _index < options.length; _index++) {
-					var option = options[_index];
-					if($(option).val() == -1) {
-						this.href = '#' + $(li).attr('id');
-						alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
-						bln = true;
-						break;
-					}
-				}
-			}
-			
-			console.debug($(li).find('table > tbody > tr > td > :radio'));
-			
-			if(bln) {
-				break;
-			}
-		}
-		
-		var checkedRadios = 0;
-		$(':radio').each(function() {
-			if($(this).attr('checked') == 'checked') checkedRadios++;
-		});
-		
-		console.debug('checked radio amount : '+checkedRadios + ', radios : ' + radios);
-	});
-});
+}
 
 function add(checkbox) {
 	var e = $(checkbox);

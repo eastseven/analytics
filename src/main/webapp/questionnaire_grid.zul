@@ -1,6 +1,6 @@
 <?page title="Questionnaire Grid" contentType="text/html;charset=UTF-8"?>
 <zk>
-	<grid id="grid" apply="org.dongq.analytics.ui.QuestionnaireComposer" mold="paging" pageSize="10">
+	<grid id="grid" apply="org.dongq.analytics.ui.QuestionnaireComposer" mold="paging" pageSize="10" width="100%">
 		<columns>
 			<column width="40px" />
 			<column label="问卷编号" />

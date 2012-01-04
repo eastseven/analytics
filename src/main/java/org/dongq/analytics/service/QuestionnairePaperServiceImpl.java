@@ -62,6 +62,35 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return answered;
 	}
 	
+	@Override
+	public Responder login(String no, String pwd) {
+		Responder responder = null;
+		try {
+			QueryRunner query = new QueryRunner();
+			String sql = "select responder_id,responder_name,responder_no,responder_pwd,version from responder where responder_no = '"+no+"' and responder_pwd = '"+pwd+"'";
+			logger.debug(sql);
+			responder = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<Responder>() {
+
+				@Override
+				public Responder handle(ResultSet rs) throws SQLException {
+					if(rs.next()) {
+						Responder r = new Responder();
+						r.setId(rs.getLong("responder_id"));
+						r.setName(rs.getString("responder_name"));
+						r.setNo(rs.getString("responder_no"));
+						r.setPwd(rs.getString("responder_pwd"));
+						r.setVersion(rs.getLong("version"));
+						return r;
+					}
+					return null;
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return responder;
+	}
+	
 	public Questionnaire getQuestionnaire(long id) {
 		Questionnaire blankPaper = new Questionnaire();
 		QueryRunner query = new QueryRunner();
@@ -455,7 +484,6 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				
 				//单独处理
 				if(key.startsWith(prefix_matrixNet)) {
-					//matrixNet_1322055619288 : ,1_1322055619124_0,1_1322055619139_0,2_1322055619131_0
 					String[] values = value.split(",");
 					long questionId = Long.valueOf(key.replaceAll(prefix_matrixNet, replacement));
 					for(String _value : values) {

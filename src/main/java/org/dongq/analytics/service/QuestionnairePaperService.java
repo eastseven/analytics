@@ -13,6 +13,8 @@ public interface QuestionnairePaperService {
 
 	public boolean hasAnswered(long responderId);
 	
+	public Responder login(String no, String pwd);
+	
 	public List<Responder> getRespondersOfVersion(long version);
 	
 	public Questionnaire getQuestionnaire(long responderId);

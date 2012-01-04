@@ -1,3 +1,5 @@
+<%@page import="java.util.Iterator"%>
+<%@page import="java.util.Map"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -21,36 +23,19 @@ table,th, td
 </style>
 <script type="text/javascript">
 $(function() {
-	$('button#submit').click(function() {
-		//alert($('table').html());
-		var no = $('input[name=no]').val();
-		var pwd = $('input[name=pwd]').val();
-		var method = $('input[name=m]').val();
-		var bln = true;
-		if(no == "") {
-			bln = false;
-			alert('编号不能为空');
-		} else if(pwd == "") {
-			bln = false;
-			alert('密码不能为空');
-		}
-		
-		if(bln) {
-			$.post('./eastseven', {no : no, pwd : pwd, m : method}, function(result) {
-				if(result.bln) {
-					//self.location = 'paper.jsp?id='+result.id+'&v=' + result.version;
-					//console.debug(result);
-					//$.post('paper.jsp', {id : result.id, v : result.version},'json');
-				} else {
-					alert(result.msg);
-				}
-			}, 'json');
-		}
-	});
+	
 });
 </script>
 </head>
 <body>
+
+<%
+	Map map = request.getParameterMap();
+	for(Iterator iter = map.keySet().iterator(); iter.hasNext();) {
+		Object key = iter.next();
+		out.print(key + " : " + map.get(key) + "<br/>");
+	}
+%>
 
 <!-- Layout 3 -->
 <div class="ez-wr">
@@ -65,11 +50,11 @@ $(function() {
 			<table align="center">
 				<tr>
 					<td>受访者编号：</td>
-					<td><input type="text" name="no" value=""/></td>
+					<td><input type="text" name="no" value="<%=request.getParameter("no")%>"/></td>
 				</tr>
 				<tr>
 					<td>受访者密码：</td>
-					<td><input type="text" name="pwd" value=""/></td>
+					<td><input type="text" name="pwd" value="<%=request.getParameter("pwd")%>"/></td>
 				</tr>
 				<tr>
 					<td colspan="2" align="center">

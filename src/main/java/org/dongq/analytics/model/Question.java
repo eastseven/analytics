@@ -23,6 +23,7 @@ public class Question {
 	private long optionId;
 	private long version;
 	private int type;
+	private String answer;
 
 	private List<Option> options;
 	private List<Responder> people;
@@ -91,6 +92,14 @@ public class Question {
 		this.people = people;
 	}
 
+	public String getAnswer() {
+		return answer;
+	}
+
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
+
 	public String getSelect() {
 		String html = "";
 		if (this.options != null && !this.options.isEmpty()) {
@@ -128,12 +137,13 @@ public class Question {
 		html += ")";
 		return html;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Question [id=" + id + ", title=" + title + ", content="
 				+ content + ", optionId=" + optionId + ", version=" + version
-				+ ", type=" + type + "]";
+				+ ", type=" + type + ", answer=" + answer + "]";
 	}
+	
 
 }

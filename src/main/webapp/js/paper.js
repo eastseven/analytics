@@ -14,19 +14,21 @@ $(function() {
 	var version = $('input[name=version]').val();
 	var name = $('input[name=name]').val();
 	ctx = $('input[name=ctx]').val();
-	
-	loadPaper(version, responderId);
-	
-	var title = '';
+
 	if(paperType == 'check') {
-		title = '<p width="100%">姓名：'+name+'</p>';
-		$('a').hide();
-		loadAnswerPape(responderId);
+		prepareAnswerPaper(responderId, version, name);
 	} else {
-		title = '<p width="100%">姓名：'+name+' | <a style="right" href="login.jsp">退出</a> | <a style="cursor: pointer;">提交</a></p>';
+		prepareBlankPaper(responderId, version, name);
 	}
+	
+});
+
+function prepareBlankPaper(responderId, version, name) {
+	
+	title = '<p width="100%">姓名：'+name+' | <a style="right" href="login.jsp">退出</a> | <a style="cursor: pointer;">提交</a></p>';
 	$('#info').wrap(title);
 	
+	loadPaper(version, responderId);
 	
 	//提交按钮
 	$('a').bind('click', function() {
@@ -99,24 +101,207 @@ $(function() {
 			$('form').submit();
 		}
 	});
-});
+}
 
-function loadAnswerPape(responderId) {
+function prepareAnswerPaper(responderId, version, name) {
+	title = '<p width="100%">姓名：'+name+'</p>';
+	$('a').hide();
+	$('#info').wrap(title);
+	
+	loadAnswerPape(responderId, version);
+}
+
+function loadAnswerPape(responderId, version) {
+	var matrixAnswers = [];
+	var normalAnswers = [];
+	var matrixPlusAnswers = [];
 	var url4paper = ctx + '/controller?action=getQuestionnaireByResponderId&responderId=' + responderId;
 	$.getJSON(url4paper, function(result) {
 		for(var index = 0; index < result.length; index++) {
 			var data = result[index];
-			console.debug(data);
+			if(data.type == 2) {
+				matrixAnswers.push(data);
+			} else if( data.type == 1) {
+				normalAnswers.push(data);
+			}
 		}
+	});
+
+	var url4matrixnet = ctx + '/controller?action=getQuestionnaireMatrixNetByResponderId&version='+version+'&responderId=' + responderId;
+	$.getJSON(url4matrixnet, function(result) {
+		matrixPlusAnswers = result;
+		//console.debug(result);
 	});
 	
-	var url4matrixnet = ctx + '/controller?action=getQuestionnaireMatrixNetByResponderId&responderId=' + responderId;
-	$.getJSON(url4matrixnet, function(result) {
-		for(var index = 0; index < result.length; index++) {
-			var data = result[index];
-			console.debug(data);
+	var url4paper = ctx + '/controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
+	$.getJSON(url4paper, function(result) {
+		
+		var people = result.people;
+		peopleAmount = people.length;
+		//1
+		var matrix = result.matrix;
+		if (matrix.length > 0) {
+			
+			$.each(matrix, function(i, item) {
+				var questionNo = prefix_matrix + item.id;
+				//随机排列其他人，把自己过滤掉
+				for(var i = 0; i < people.length; i++) {
+					var index = Math.floor(Math.random() * people.length);
+					var tmp = people[i];
+					people[i] = people[index];
+					people[index] = tmp;
+				}
+				var html = '<li class="part select" ><h4 class=title ><span class=subject >' + item.title + '</span></h4>';
+				
+				var table = '<table class=options><tbody>';
+				var tds = '';
+				var rownum = (people.length % columnNum  == 0) ? people.length / columnNum : Math.floor(people.length / columnNum) + 1 ;
+				var counter = 0;
+				
+				var peopleNames = [];
+				for(var index = 0; index < matrixAnswers.length; index++) {
+					var data = matrixAnswers[index];
+					if(item.id == data.questionId) {
+						$.each(people, function(i, item) {
+							if(item.id == data.optionKey) peopleNames.push(item.name);
+						});
+					}
+				}
+				
+				$.each(peopleNames, function(i, item) {
+					i++;
+					var td = '<td><label>' + item + '</label></td>';
+					if(i % columnNum == 0) {
+						tds += td + '</tr>';
+					} else if(i == 1 + counter * columnNum) {
+						tds += '<tr>' + td;
+						counter++;
+					} else
+						tds += td;
+				});
+				table += tds + '</tbody></table>';
+				html += table + '</li>';
+				$('.content').append(html);
+			});
 		}
+		
+		//2
+		var matrixNet = result.matrixNet;
+		if (matrixNet.length > 0) {
+			
+			var html = '<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>';
+			
+			var table = '<table class=options>';
+			var thead = '<thead><th>姓名</th>';
+			var tbody = '<tbody>';
+			
+			$.each(matrixNet, function(i, item) {
+				var id = prefix_matrix_net + item.id;
+				thead += '<th>' + ++i + '.' + item.content + '</th>';
+			});
+			
+			var tds = '';
+			var peopleSelected = [];
+			$.each(people, function(i, item) {
+				
+				for(var index = 0; index < matrixPlusAnswers.length; index++) {
+					var data = matrixPlusAnswers[index];
+					if(item.id == data.relationPersonId) {
+						tds += '<tr><td>'+item.name+'</td>';
+						for(var i = 0; i < data.questions.length; i++) {
+							var q = data.questions[i];
+							tds += '<td align=center ><label>'+q.answer+'</label></td>';
+						}
+						
+						tds += '</tr>';
+					}
+				}
+				
+			});
+			
+			thead += '</thead>';
+			tbody += tds + '</tbody>';
+			table += thead + tbody + '</table>';
+			html += table + '</li>';
+			$('.content').append(html);
+			
+		}
+		
+		//3
+		var group = result.group;
+		if (group.length > 0) {
+			var html = '';
+			$.each(group, function(i, item) {
+				html += '<div><h3>' + item.title + '</h3></div>';
+				var questions = item.questions;
+				$.each(questions, function(i, item) {
+					html += '<li class="part select" ><h4 class=title ><span class=subject >' + item.content + '</span></h4>';
+					var table = '<table class=options>';
+					var tbody = '<tbody>';
+					var tds = '';
+
+					for(var index = 0; index < normalAnswers.length; index++) {
+						var data = normalAnswers[index];
+
+						if(item.id == data.questionId) {
+							for(var index = 0; index < item.options.length; index++) {
+								var option = item.options[index];
+								var _id = 'question_' + item.id;
+								if(option.key == data.optionKey)
+								tds += '<tr><td><input type=radio name='+_id+' value='+option.key+' checked=checked />'+option.value+'</td></tr>';
+							}
+						}
+					}
+					
+					
+					tbody += '</tbody>';
+					table += tds + tbody + '</table>';
+					html += table + '</li>';
+					radios++;
+				});
+			});
+			$('.content').append(html);
+		}
+		
+		//4
+		var selfInfo = result.optionGroups;
+		if (selfInfo.length > 0) {
+			var html = '';
+			$.each(selfInfo, function(i, item) {
+				html += '<li class="part select" ><h4 class=title ><span class=subject >' + item.name + '</span></h4>';
+				var table = '<table class=options>';
+				var tbody = '<tbody>';
+				var tds = '';
+				var td = '';
+				var selected = false;
+				for(var index = 0; index < item.options.length; index++) {
+					var option = item.options[index];
+					var checked = '';
+					if(option.selected) {
+						selected = option.selected;
+						checked += ' checked=checked readonly=readonly ';
+						td = '<tr><td><input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '</td></tr>';
+					}
+					tds += '<tr><td><input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '</td></tr>';
+				}
+				tbody += '</tbody>';
+				table += (selected == true ? td : tds) + tbody + '</table>';
+				html += table + '</li>';
+				radios++;
+			});
+			
+			$('.content').append(html);
+		}
+		
+		$('tr:odd').addClass('odd');
+		$('tr:even').addClass('even');
+		$('li').each(function(i) {
+			var id = i + 1;
+			$(this).attr('id', 'li'+id);
+			$(this).attr('name', 'li'+id);
+		});
 	});
+	
 }
 
 function loadPaper(version, responderId) {

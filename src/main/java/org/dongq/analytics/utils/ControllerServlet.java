@@ -5,7 +5,9 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,11 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dongq.analytics.model.Option;
 import org.dongq.analytics.model.Question;
 import org.dongq.analytics.model.Questionnaire;
-import org.dongq.analytics.model.QuestionnaireMatrixNet;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
 import org.dongq.analytics.service.QuestionnairePaperService;
@@ -37,6 +41,7 @@ public class ControllerServlet extends HttpServlet {
 	final String GetQuestionnairePaper = "getQuestionnairePaper";
 	final String GetQuestionnaireByResponderId = "getQuestionnaireByResponderId";
 	final String GetQuestionnaireMatrixNetByResponderId = "getQuestionnaireMatrixNetByResponderId";
+	final String GetQuestionnaireMatrixNetAnswer = "getQuestionnaireMatrixNetAnswer";
 
 	private QuestionnairePaperService service;
 
@@ -64,6 +69,8 @@ public class ControllerServlet extends HttpServlet {
 			getQuestionnaireByResponderId(req, resp);
 		} else if(GetQuestionnaireMatrixNetByResponderId.equals(method)) {
 			getQuestionnaireMatrixNetByResponderId(req, resp);
+		} else if(GetQuestionnaireMatrixNetAnswer.equals(method)) {
+			getQuestionnaireMatrixNetAnswer(req, resp);
 		}
 	}
 
@@ -155,29 +162,76 @@ public class ControllerServlet extends HttpServlet {
 	
 	void getQuestionnaireMatrixNetByResponderId(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String responderIdString = req.getParameter("responderId");
-		String sql = "select * from questionnaire_matrixnet where responder_id = " + responderIdString;
+		String versionString = req.getParameter("version");
+		String sql = "select relation_person_id from questionnaire_matrixnet where responder_id = " + responderIdString + " group by relation_person_id";
 		QueryRunner query = new QueryRunner();
 		try {
-			List<QuestionnaireMatrixNet> list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<QuestionnaireMatrixNet>>() {
-				@Override
-				public List<QuestionnaireMatrixNet> handle(ResultSet rs) throws SQLException {
-					List<QuestionnaireMatrixNet> list = new ArrayList<QuestionnaireMatrixNet>();
-					while(rs.next()) {
-						QuestionnaireMatrixNet e = new QuestionnaireMatrixNet();
-						e.setFinishTime(rs.getLong("finish_time"));
-						e.setOptionKey(rs.getLong("option_key"));
-						e.setQuestionId(rs.getLong("question_id"));
-						e.setResponderId(rs.getLong("responder_id"));
-						e.setRelationPersonId(rs.getLong("relation_person_id"));
-						e.setVersion(rs.getLong("version"));
-						list.add(e);
+			List<Object> relationPersonIds = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+			
+			List<Question> questions = service.getQuestionsOfVersion(Long.valueOf(versionString), Question.TYPE_MATRIX_NET, Long.valueOf(responderIdString));
+			logger.debug("questions size : "+questions.size());
+			List<Map<String, Object>> finalData = new ArrayList<Map<String,Object>>();
+			
+			for(Object relationPersonId : relationPersonIds) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				List<Map<String, Object>> questionList = new ArrayList<Map<String,Object>>();
+				for(Question q : questions) {
+					sql = "select option_key from questionnaire_matrixnet where ";
+					sql += " responder_id = " + responderIdString;
+					sql += " and relation_person_id = " + relationPersonId;
+					sql += " and question_id = " + q.getId();
+					logger.debug("\n\n"+sql+"\n\n");
+					Map<String, Object> mapOptionKey = query.query(DbHelper.getConnection(), sql, new MapHandler());
+					long optionKey = (Long)mapOptionKey.get("OPTION_KEY");
+					for(Option o : q.getOptions()) {
+						if(o.getKey() == optionKey) {
+							q.setAnswer(o.getValue());
+							Map<String, Object> e = new HashMap<String, Object>();
+							e.put("answer", q.getAnswer());
+							e.put("questionId", q.getId());
+							e.put("content", q.getContent());
+							questionList.add(e);
+							logger.debug("\n\n"+q+"\n\n");
+							continue;
+						}
 					}
-					return list;
 				}
 				
-			});
+				map.put("relationPersonId", relationPersonId);
+				map.put("questions", questionList);
+				finalData.add(map);
+			}
 			
-			Object data = list;
+			for(Map<String, Object> map : finalData) {
+				System.out.println("relationPersonId: "+map.get("relationPersonId"));
+				System.out.println(map);
+			}
+			
+			Object data = finalData;
+			String result = JSON.toJSONString(data);
+			PrintWriter out = resp.getWriter();
+			logger.debug("\ngetQuestionnaireMatrixNetByResponderId:\n" + result);
+			out.write(result);
+			out.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	void getQuestionnaireMatrixNetAnswer(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String questionIdString = req.getParameter("questionId");
+		String responderIdString = req.getParameter("responderId");
+		String relationPersonIdString = req.getParameter("relationPersonId");
+		
+		String sql = "select option_key from questionnaire_matrixnet where ";
+		sql += " responder_id = " + responderIdString;
+		sql += " and relation_person_id = " + relationPersonIdString;
+		sql += " and question_id = " + questionIdString;
+		QueryRunner query = new QueryRunner();
+		try {
+			Map<String, Object> optionKey = query.query(DbHelper.getConnection(), sql, new MapHandler());
+			
+			Object data = optionKey;
 			String result = JSON.toJSONString(data);
 			PrintWriter out = resp.getWriter();
 			logger.debug("\ngetQuestionnaireMatrixNetByResponderId:\n" + result);

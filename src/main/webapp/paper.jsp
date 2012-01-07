@@ -16,8 +16,7 @@
 </head>
 <body>
 
-	<script type="text/javascript" src="js/paper.js">
-	</script>
+	<script type="text/javascript" src="js/paper.js"></script>
 
 	<div id="main">
 		<div id="info"/>

@@ -120,7 +120,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			//Matrix
 			blankPaper.setMatrix(getQuestionsOfVersion(version));
 			//MatrixNet
-			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET));
+			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET, id));
+			
 			//People
 			blankPaper.setPeople(getRespondersOfVersion(version, responder.getId()));
 			//OptionGroup
@@ -142,7 +143,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			//Matrix
 			blankPaper.setMatrix(getQuestionsOfVersion(version));
 			//MatrixNet
-			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET));
+			blankPaper.setMatrixNet(getQuestionsOfVersion(version, Question.TYPE_MATRIX_NET, null));
 			//People
 			blankPaper.setPeople(getRespondersOfVersion(version));
 			//Property
@@ -299,14 +300,15 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	List<Question> getQuestionsOfVersion(long version) throws SQLException {
-		return getQuestionsOfVersion(version, Question.TYPE_MATRIX);
+		return getQuestionsOfVersion(version, Question.TYPE_MATRIX, null);
 	}
 	
-	List<Question> getQuestionsOfVersion(long version, int type) throws SQLException {
+	public List<Question> getQuestionsOfVersion(long version, int type, Long responderId) throws SQLException {
 		List<Question> list = new ArrayList<Question>();
+		QueryRunner query = new QueryRunner();
 		String sql = "select * from question a where a.version = " + version + " and a.type = " + type;
 		logger.debug(sql);
-		list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Question>>() {
+		list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Question>>() {
 			@Override
 			public List<Question> handle(ResultSet rs) throws SQLException {
 				List<Question> list = new ArrayList<Question>();

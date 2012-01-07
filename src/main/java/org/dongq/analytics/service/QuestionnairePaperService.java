@@ -1,10 +1,12 @@
 package org.dongq.analytics.service;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.dongq.analytics.model.Question;
 import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
@@ -20,6 +22,8 @@ public interface QuestionnairePaperService {
 	public Questionnaire getQuestionnaire(long responderId);
 	
 	public Questionnaire getBlankQuestionnaire(long version);
+	
+	public List<Question> getQuestionsOfVersion(long version, int type, Long responderId) throws SQLException;
 	
 	public boolean saveQuestionnairePaper(QuestionnairePaper paper);
 	

@@ -34,6 +34,16 @@ public class IndexComposer extends GenericForwardComposer {
 		super.doAfterCompose(comp);
 		logger.debug(comp + ":" + comp.getId());
 		logger.debug(mainDiv + ":" + mainDiv.getId());
+		
+		//check login account
+		Object user = session.getAttribute("no");
+		if(user == null) {
+			Window loginWin = (Window)execution.createComponents("login.zul", comp, null);
+			loginWin.setMode("modal");
+			main.appendChild(loginWin);
+		} else {
+			
+		}
 	}
 	
 	public void onClick$upload() {

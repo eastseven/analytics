@@ -28,6 +28,10 @@ $(function() {
 			$('table').wrap('<form method=post action="./eastseven"></form>');
 		}
 	});
+	
+	$('#admin').click(function() {
+		self.location = 'login.zul';
+	});
 });
 </script>
 <title>登录</title>
@@ -56,6 +60,7 @@ $(function() {
 					<td colspan="2" align="center">
 						<input type="hidden" name="m" value="login"/>
 						<button id="submit">开始答题</button>
+						<button id="admin">管理后台</button>
 					</td>
 				</tr>
 			</table>

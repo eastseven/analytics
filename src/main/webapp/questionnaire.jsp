@@ -35,7 +35,7 @@
 				<input type="hidden" name="responderId" value="<%=request.getParameter("id") %>"/>
 				<input type="hidden" name="version" value="<%=request.getParameter("v") %>" />
 				<input type="hidden" name="name" value="<%=new String(request.getParameter("name").getBytes("ISO-8859-1"), "UTF-8") %>" />
-				<input type="hidden" name="ctx" value="<%="http://"+request.getLocalAddr()+":"+request.getLocalPort()+""+request.getContextPath() %>"/>
+				<input type="hidden" name="ctx" value="<%="http://"+request.getServerName()+":"+request.getServerPort()+""+request.getContextPath() %>"/>
 			</div>
 		</form>
 	</div>

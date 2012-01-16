@@ -93,19 +93,15 @@ public class InitServlet extends HttpServlet {
 		String pwd = req.getParameter("pwd");
 		String path = "paper.jsp";
 		
-		if("admin".equals(no) && "000000".equals(pwd)) {
-			resp.sendRedirect("index.zul");
+		QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
+		Responder responder = service.login(no, pwd);
+		if(responder != null && StringUtils.isNotBlank(responder.getNo())) {
+			req.setAttribute("v", responder.getVersion());
+			req.setAttribute("id", responder.getId());
+			req.setAttribute("name", responder.getName());
+			req.getRequestDispatcher(path).forward(req, resp);
 		} else {
-			QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
-			Responder responder = service.login(no, pwd);
-			if(responder != null && StringUtils.isNotBlank(responder.getNo())) {
-				req.setAttribute("v", responder.getVersion());
-				req.setAttribute("id", responder.getId());
-				req.setAttribute("name", responder.getName());
-				req.getRequestDispatcher(path).forward(req, resp);
-			} else {
-				resp.sendRedirect("login.jsp?msg=loginfail");
-			}
+			resp.sendRedirect("login.jsp?msg=loginfail");
 		}
 		
 		

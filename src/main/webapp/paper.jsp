@@ -13,6 +13,10 @@
 <link rel="stylesheet" href="./a_files/default.css" type="text/css">
 <link rel="stylesheet" href="./a_files/default(1).css" type="text/css">
 
+<style type="text/css">
+.subutton{ background:url(./images/button_bg3.gif); width:100px; height:34px; border:none;}
+</style>
+
 </head>
 <body>
 
@@ -34,12 +38,11 @@
 				<input type="hidden" name="responderId" value="<%=request.getAttribute("id") %>"/>
 				<input type="hidden" name="version" value="<%=request.getAttribute("v") %>" />
 				<input type="hidden" name="name" value="<%=request.getAttribute("name") %>" />
-				<input type="hidden" name="ctx" value="<%="http://"+request.getLocalAddr()+":"+request.getLocalPort()+""+request.getContextPath() %>"/>
+				<input type="hidden" name="ctx" value="<%="http://"+request.getServerName()+":"+request.getServerPort()+""+request.getContextPath() %>"/>
 			</div>
 		</form>
 	</div>
 
-	<!-- <button id="submitBtn">提交</button> -->
-	<a style="cursor: pointer;">提交</a>
+	<a style="cursor: pointer;"><button class="subutton">提交</button></a>
 </body>
 </html>

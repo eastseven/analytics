@@ -3,15 +3,8 @@
  */
 package org.dongq.analytics.ui;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
-
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dongq.analytics.utils.DbHelper;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Textbox;
@@ -44,28 +37,11 @@ public class QuestionnaireLoginComposer extends GenericForwardComposer {
 		String no = responderNo.getValue();
 		String pwd = responderPwd.getValue();
 		
-		QueryRunner query = new QueryRunner();
-		Connection conn = DbHelper.getConnection();
-		final String check = "select a.version v, a.responder_pwd pwd, a.responder_id id from responder a where a.responder_no = ? and a.responder_pwd = ?";
-		
-		logger.debug(check);
-		try {
-			Map<String, Object> map = query.query(conn, check, new MapHandler(), no, pwd);
-			if(map != null && !map.isEmpty()) {
-				logger.debug(map);
-
-				
-				String uri = "/eastseven?m=login";
-				uri = "demo.zul";
-				
-				this.execution.setAttribute("no", no);
-				this.execution.setAttribute("pwd", pwd);
-				this.execution.sendRedirect(uri);
-			} else {
-				this.alert("编号或密码错误");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if("admin".equals(no) && "000000".equals(pwd)) {
+			session.setAttribute("no", no);
+			execution.sendRedirect("index.zul");
+		} else {
+			alert("账号或密码错误");
 		}
 		
 		

@@ -96,10 +96,15 @@ public class InitServlet extends HttpServlet {
 		QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
 		Responder responder = service.login(no, pwd);
 		if(responder != null && StringUtils.isNotBlank(responder.getNo())) {
-			req.setAttribute("v", responder.getVersion());
-			req.setAttribute("id", responder.getId());
-			req.setAttribute("name", responder.getName());
-			req.getRequestDispatcher(path).forward(req, resp);
+			boolean answered = service.hasAnswered(responder.getId());
+			if(answered) {
+				resp.sendRedirect("login.jsp?msg=hasanswered");
+			} else {
+				req.setAttribute("v", responder.getVersion());
+				req.setAttribute("id", responder.getId());
+				req.setAttribute("name", responder.getName());
+				req.getRequestDispatcher(path).forward(req, resp);
+			}
 		} else {
 			resp.sendRedirect("login.jsp?msg=loginfail");
 		}

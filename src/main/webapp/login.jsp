@@ -16,6 +16,7 @@ var msg = '<%=request.getParameter("msg")%>';
 
 $(function() {
 	if(msg == 'loginfail') alert('编号或者密码错误');
+	if(msg == 'hasanswered') alert('您已经参与过了，谢谢');
 	
 	$('#submit').click(function() {
 		var no = $('input[name=no]').val();

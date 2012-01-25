@@ -55,6 +55,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			String sql = "select count(1) from questionnaire a where a.responder_id = " + responderId;
 			List<Object> list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
 			if(list.isEmpty()) answered = false;
+			else if(list.get(0).equals(0)) answered = false;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

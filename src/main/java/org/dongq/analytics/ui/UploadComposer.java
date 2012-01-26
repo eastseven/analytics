@@ -16,6 +16,7 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Window;
 
 /**
  * @author eastseven
@@ -29,13 +30,21 @@ public class UploadComposer extends GenericForwardComposer {
 	
 	private final String FILE_SUFFIX = "xls,xlsx";
 	
-	QuestionnairePaperService service;
+	private QuestionnairePaperService service;
+	private String type;
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		service = new QuestionnairePaperServiceImpl();
 		logger.debug(comp);
+		logger.debug(arg.get("type"));
+		
+		type = (String)arg.get("type");
+		String title = "open".equals(type) ? "开放式问卷上传" : "封闭式问卷上传";
+		
+		Window win = (Window)comp;
+		win.setTitle(title);
 	}
 	
 	/**
@@ -46,10 +55,10 @@ public class UploadComposer extends GenericForwardComposer {
 		Media file = event.getMedia();
 		if(FILE_SUFFIX.contains(file.getFormat().toLowerCase())) {
 			InputStream excel = file.getStreamData();
-			boolean bln = service.parseQuestionnaireTemplate(excel);
+			boolean bln = service.parseQuestionnaireTemplate(excel, type);
 			String msg = bln ? "问卷导入成功" : "问卷导入失败";
 			try {
-				Messagebox.show(msg, "title", Messagebox.OK, "", new EventListener() {
+				Messagebox.show(msg, "导入结果", Messagebox.OK, "", new EventListener() {
 					@Override
 					public void onEvent(Event event) throws Exception {
 						event.getPage().getDesktop().getExecution().sendRedirect("index.zul");

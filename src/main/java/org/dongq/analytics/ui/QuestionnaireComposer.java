@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,12 +26,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.dongq.analytics.service.QuestionnairePaperService;
 import org.dongq.analytics.service.QuestionnairePaperServiceImpl;
 import org.dongq.analytics.utils.DbHelper;
-import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Detail;
@@ -42,7 +39,6 @@ import org.zkoss.zul.Grid;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.RowRenderer;
 
@@ -56,41 +52,9 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 	
 	private static final Log logger = LogFactory.getLog(QuestionnaireComposer.class);
 	
-	private final String FILE_SUFFIX = "xls,xlsx";
-	
 	Grid grid;
 
 	QuestionnairePaperService service;
-	
-	/**
-	 * 上传
-	 * @param event
-	 */
-	public void onUpload$file(UploadEvent event) {
-		Media file = event.getMedia();
-		logger.info(file.getName());
-		logger.info(file.getContentType());
-		logger.info(file.getFormat());
-		if(FILE_SUFFIX.contains(file.getFormat().toLowerCase())) {
-			InputStream excel = file.getStreamData();
-			logger.info(excel);
-			boolean bln = service.parseQuestionnaireTemplate(excel);
-			String msg = bln ? "问卷导入成功" : "问卷导入失败";
-			try {
-				Messagebox.show(msg, "title", Messagebox.OK, "", new EventListener() {
-					
-					@Override
-					public void onEvent(Event event) throws Exception {
-						init();
-					}
-				});
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		} else {
-			alert("非excel格式文件不能上传");
-		}
-	}
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {

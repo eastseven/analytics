@@ -578,7 +578,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	@Override
-	public boolean parseQuestionnaireTemplate(InputStream excel) {
+	public boolean parseQuestionnaireTemplate(InputStream excel, String type) {
 		boolean bln = false;
 		final long version = System.currentTimeMillis();
 		try {
@@ -596,9 +596,11 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			parseResponderProperty(responderProperty, version);
 			
 			//｛参与调查的人员信息｝
-			Sheet responders = workbook.getSheetAt(1);
-			logger.info(responders.getSheetName());
-			parseResponders(responders, version);
+			if(type.equals(QuestionnairePaperService.TYPE_CLOSE)) {
+				Sheet responders = workbook.getSheetAt(1);
+				logger.info(responders.getSheetName());
+				parseResponders(responders, version);
+			}
 			
 			//{问卷题目}
 			Sheet requestions = workbook.getSheetAt(2);

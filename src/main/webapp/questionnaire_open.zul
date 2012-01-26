@@ -1,0 +1,44 @@
+<?page title="" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<borderlayout height="95%">
+		<west size="20%" splittable="true" collapsible="true">
+		<tree>
+			<treecols>
+				<treecol label="" />
+			</treecols>
+			<treechildren>
+				<treeitem>
+					<treerow>
+						<treecell label="b" />
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+						<treecell label="b" />
+					</treerow>
+				</treeitem>
+				<treeitem>
+					<treerow>
+						<treecell label="b" />
+					</treerow>
+				</treeitem>
+			</treechildren>
+		</tree>
+		</west>
+		<center border="normal">
+		<grid>
+			<columns>
+				<column label="a" />
+				<column label="b" />
+				<column label="c" />
+				<column label="d" />
+				<column label="e" />
+				<column label="f" />
+			</columns>
+			<rows>
+				<row></row>
+			</rows>
+		</grid>
+		</center>
+	</borderlayout>
+</zk>

@@ -13,6 +13,9 @@ import org.dongq.analytics.model.Responder;
 
 public interface QuestionnairePaperService {
 
+	public static final String TYPE_OPEN  = "open";
+	public static final String TYPE_CLOSE = "close";
+	
 	public boolean hasAnswered(long responderId);
 	
 	public Responder login(String no, String pwd);
@@ -29,7 +32,7 @@ public interface QuestionnairePaperService {
 	
 	public boolean saveQuestionnairePaper(Responder responder, Map<String, Object> answer);
 	
-	public boolean parseQuestionnaireTemplate(InputStream excel);
+	public boolean parseQuestionnaireTemplate(InputStream excel, final String type);
 	
 	public Object[][] calculate(long version);
 	

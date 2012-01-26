@@ -13,6 +13,7 @@
 			<name>fastjson</name>
 			<url>http://code.alibabatech.com/mvn/releases/</url>
 		</repository>
+		<!-- 
 		<repository>
 			<id>MirrorRepository</id>
 			<name>Mirror Repository 
@@ -30,6 +31,7 @@
 			<name>proxy for maven's repository</name>
 			<url>http://118.122.114.104:9999/repository</url>
 		</repository>
+		 -->
 	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

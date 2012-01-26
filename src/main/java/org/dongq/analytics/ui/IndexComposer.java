@@ -4,6 +4,7 @@
 package org.dongq.analytics.ui;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,15 +47,21 @@ public class IndexComposer extends GenericForwardComposer {
 		}
 	}
 	
-	public void onClick$upload() {
-		Component comp = execution.createComponents("questionnaire_upload.zul", main, null);
+	/**
+	 * 上传封闭式问卷
+	 */
+	@SuppressWarnings("unchecked")
+	public void onClick$uploadClose() {
+		arg = new HashMap<String, String>();
+		arg.put("type", "close");
+		Component comp = execution.createComponents("questionnaire_upload.zul", main, arg);
 		logger.debug(comp);
 		if (comp instanceof Window) {
 			Window win = (Window) comp;
 			try {
 				win.doModal();
 			} catch (SuspendNotAllowedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (InterruptedException e) {
 				//e.printStackTrace();
 			}
@@ -62,9 +69,30 @@ public class IndexComposer extends GenericForwardComposer {
 	}
 	
 	/**
-	 * 下载
+	 * 
 	 */
-	public void onClick$download() {
+	@SuppressWarnings("unchecked")
+	public void onClick$uploadOpen() {
+		arg = new HashMap<String, String>();
+		arg.put("type", "open");
+		Component comp = execution.createComponents("questionnaire_upload.zul", main, arg);
+		logger.debug(comp);
+		if (comp instanceof Window) {
+			Window win = (Window) comp;
+			try {
+				win.doModal();
+			} catch (SuspendNotAllowedException e) {
+				//e.printStackTrace();
+			} catch (InterruptedException e) {
+				//e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * 下载封闭式问卷模板
+	 */
+	public void onClick$downloadClose() {
 		logger.info(application.getRealPath("/"));
 		logger.info(application.getResourcePaths("/"));
 		try {
@@ -74,16 +102,15 @@ public class IndexComposer extends GenericForwardComposer {
 		}
 	}
 	
-	//
+	/**
+	 * 下载开放式问卷模板
+	 */
 	public void onClick$open() {
-		mainDiv.getChildren().clear();
-		logger.debug("opening..." + mainDiv + ":" + mainDiv.getId());
-		Component comp = execution.createComponents("questionnaire_grid.zul", mainDiv, null);
-		logger.debug(comp);
-	}
-
-	public void onClick$answer() {
-		execution.sendRedirect("questionnaire_login.zul", "blank");
+		try {
+			Filedownload.save(this.application.getResource("/templateOpen.xls"), null);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void onClick$about() {

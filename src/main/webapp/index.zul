@@ -2,13 +2,33 @@
 <!-- 
 	录入试题，选择试题，生成问卷，填写问卷，统计并导出
 -->
-<window id="main" title="${desktop.webApp.version}" border="normal" apply="org.dongq.analytics.ui.IndexComposer" height="100%">
+<window id="main" title="${desktop.webApp.version}" border="normal"
+	apply="org.dongq.analytics.ui.IndexComposer" height="100%">
 	<menubar>
-		<menuitem label="上传问卷" id="upload" />
-		<menuitem label="下载问卷模板" id="download"/>
+		<menu label="问卷上传">
+			<menupopup>
+				<menuitem label="封闭式" id="uploadClose" />
+				<menuitem label="开放式" id="uploadOpen" />
+			</menupopup>
+		</menu>
+		<menu label="模板下载">
+			<menupopup>
+				<menuitem label="封闭式" id="downloadClose" />
+				<menuitem label="开放式" id="downloadOpen" />
+			</menupopup>
+		</menu>
 		<menuitem label="关于" id="about" />
 	</menubar>
-	<div id="mainDiv">
-		<include src="questionnaire_grid.zul"/>
+	<div id="mainDiv" height="100%">
+		<tabbox height="100%">
+			<tabs>
+				<tab label="First" />
+				<tab label="Second" />
+			</tabs>
+			<tabpanels>
+				<tabpanel><include src="questionnaire_grid.zul" /></tabpanel>
+				<tabpanel><include src="questionnaire_open.zul" /></tabpanel>
+			</tabpanels>
+		</tabbox>
 	</div>
 </window>

@@ -22,8 +22,8 @@
 	<div id="mainDiv" height="100%">
 		<tabbox height="100%">
 			<tabs>
-				<tab label="First" />
-				<tab label="Second" />
+				<tab label="封闭式" />
+				<tab label="开放式" />
 			</tabs>
 			<tabpanels>
 				<tabpanel><include src="questionnaire_grid.zul" /></tabpanel>

@@ -73,19 +73,18 @@ function prepareBlankPaper(responderId, version, name) {
 		}
 		
 		var selectedOk = true;
+		/*
 		$.each($('tr:visible > td'), function(i, item) {
 			var peopleId = $(this).attr('id');
 			if(peopleId != undefined) {
 				var selected = $(this).children('select');
 				selected = $(selected[0]).children('option[selected]');
 				var value = $(selected).attr('value');
-				//console.debug(value);
 				if(value == -1) {
 					selectedOk = selectedOk & false;
 				}
 				value = value + '_' + peopleId;
 				selected.attr('value', value);
-				//console.debug(selected);
 			}
 		});
 		
@@ -93,9 +92,22 @@ function prepareBlankPaper(responderId, version, name) {
 		$(':radio').each(function() {
 			if($(this).attr('checked') == 'checked') checkedRadios++;
 		});
+		 */
 		
-		//console.debug('checked radio amount : '+checkedRadios + ', radios : ' + radios);
-		if(checkedRadios == radios) {
+		var lis = $('li[name=li_normal]');
+		for(var index = 0; index < lis.length; index++) {
+			var li = lis[index];
+			var id = $(li).attr('id');
+			var content = $(li).find('h4 > span').text();
+			var radio = $(li).find('table > tbody > tr > td > input:checked');
+			if(radio == null || radio.length == 0) {
+				selectedOk = false;
+				this.href = '#' + id;
+				alert('题目："' + content + '"没有填写!');
+				break;
+			}
+		}
+		if(selectedOk) {
 			$('form').attr('method', 'post');
 			$('form').attr('action', 'handler.jsp');
 			$('form').submit();
@@ -368,8 +380,14 @@ function loadPaper(version, responderId) {
 				//var odd = 'odd';
 				var tr = '<tr id='+item.id+' style="display:none;"><td>'+item.name+'</td>';
 				for(var index = 0; index < matrixNet.length; index++) {
-					var options = matrixNet[index];
-					tr += '<td id='+item.id+'_'+index+' >'+options.select+'</td>';
+					var options = matrixNet[index].options;
+					tr += '<td id='+item.id+'_'+index+' >';
+					tr += '<select name=' + prefix_matrix_net + matrixNet[index].id + '><option value=-1 >请选择</option>';
+					for(var i = 0; i < options.length; i++) {
+						var option = options[i];
+						tr += '<option value="' + option.key + '_' + item.id + '">'+option.value+'</option>';
+					}
+					tr += '</select></td>';
 				}
 				tr += '</tr>';
 				tds += tr;
@@ -438,7 +456,7 @@ function loadPaper(version, responderId) {
 				html += '<div><h3>' + item.title + '</h3></div>';
 				var questions = item.questions;
 				$.each(questions, function(i, item) {
-					html += '<li class="part select" ><h4 class=title ><span class=subject >' + item.content + '</span></h4>';
+					html += '<li class="part select" name="li_normal"><h4 class=title ><span class=subject >' + item.content + '</span></h4>';
 					var table = '<table class=options>';
 					var tbody = '<tbody>';
 					var tds = '';
@@ -449,8 +467,8 @@ function loadPaper(version, responderId) {
 						tds += '<tr><td><input type=radio name='+_id+' value='+option.key+' />'+option.value+'</td></tr>';
 					}
 					
-					tbody += '</tbody>';
-					table += tds + tbody + '</table>';
+					tbody +=  tds + '</tbody>';
+					table += tbody + '</table>';
 					html += table + '</li>';
 					radios++;
 				});
@@ -463,7 +481,7 @@ function loadPaper(version, responderId) {
 		if (selfInfo.length > 0) {
 			var html = '';
 			$.each(selfInfo, function(i, item) {
-				html += '<li class="part select" ><h4 class=title ><span class=subject >' + item.name + '</span></h4>';
+				html += '<li class="part select" name="li_normal"><h4 class=title ><span class=subject >' + item.name + '</span></h4>';
 				var table = '<table class=options>';
 				var tbody = '<tbody>';
 				var tds = '';
@@ -479,8 +497,8 @@ function loadPaper(version, responderId) {
 					}
 					tds += '<tr><td><input type=radio name=property_'+ i +' value='+option.id+' '+checked+' />' + option.display + '</td></tr>';
 				}
-				tbody += '</tbody>';
-				table += (selected == true ? td : tds) + tbody + '</table>';
+				tbody += (selected == true ? td : tds) + '</tbody>';
+				table +=  tbody + '</table>';
 				html += table + '</li>';
 				radios++;
 			});
@@ -493,7 +511,7 @@ function loadPaper(version, responderId) {
 		$('li').each(function(i) {
 			var id = i + 1;
 			$(this).attr('id', 'li'+id);
-			$(this).attr('name', 'li'+id);
+			//$(this).attr('name', 'li'+id);
 		});
 	});
 }

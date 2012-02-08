@@ -41,6 +41,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.RowRenderer;
+import org.zkoss.zul.Window;
 
 /**
  * @author eastseven
@@ -165,8 +166,8 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 				row.appendChild(new Label(map.get("questions").toString()));
 				//按钮
 				
-				Button btn = new Button("生成Excel数据");
-				btn.addEventListener("onClick", new EventListener() {
+				Button excelBtn = new Button("生成Excel数据");
+				excelBtn.addEventListener("onClick", new EventListener() {
 					
 					@Override
 					public void onEvent(Event event) throws Exception {
@@ -200,36 +201,13 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 						}
 					}
 				});
-				//row.appendChild(btn);
 				
-				Button btn2 = new Button("生成网络数据");
-				btn2.setDisabled(true);
-				btn2.addEventListener("onClick", new EventListener() {
-					@Override
-					public void onEvent(Event event) throws Exception {
-						try {
-							File file = new File(fileName + ".xls");
-							logger.debug(file.getAbsolutePath());
-							FileOutputStream out = FileUtils.openOutputStream(file);
-							FileInputStream in = FileUtils.openInputStream(file);
-							String contentType = "application/vnd.ms-excel";
-							QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
-							Workbook wb = service.generateExcelForQuestionnaireMatrixNet(fileName);
-							wb.write(out);
-							out.close();
-							
-							Filedownload.save(in, contentType, fileName + "-2.xls");
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-				
-				//row.appendChild(btn2);
+				Button editTitleBtn = new Button("编辑问卷标题");
+				editTitleBtn.addEventListener("onClick", new EditTilteListener(grid.getParent(), map));
 				
 				Div div = new Div();
-				div.appendChild(btn);
-				div.appendChild(btn2);
+				div.appendChild(excelBtn);
+				div.appendChild(editTitleBtn);
 				row.appendChild(div);
 			}
 			
@@ -237,4 +215,21 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 		
 	}
 	
+	class EditTilteListener implements EventListener {
+
+		private Component comp;
+		private Map<Object, Object> map;
+		
+		public EditTilteListener(Component parent, Map<Object, Object> map) {
+			this.comp = parent;
+			this.map = map;
+		}
+		
+		@Override
+		public void onEvent(Event event) throws Exception {
+			Window fckWin = (Window)execution.createComponents("questionnaire_fck.zul", comp, map);
+			fckWin.doModal();
+		}
+		
+	}
 }

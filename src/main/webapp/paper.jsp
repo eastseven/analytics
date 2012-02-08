@@ -1,3 +1,4 @@
+<%@page import="org.dongq.analytics.service.QuestionnairePaperServiceImpl"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -30,6 +31,7 @@
 				<div class="page">
 					<div class="page-header">
 						<h1 class="survey-title">调查表</h1>
+						<div id="title"><%=new QuestionnairePaperServiceImpl().getQuestionnaireTitle(request.getAttribute("v")) %></div>
 					</div>
 					<ol class="content"></ol>
 				</div>

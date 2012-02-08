@@ -47,10 +47,7 @@ public class QuestionnaireLoginComposer extends GenericForwardComposer {
 		
 	}
 	
-	/*
-	public void onClick$resetBtn() {
-		this.responderNo.setValue(null);
-		this.responderPwd.setValue(null);
+	public void onOK$responderPwd() {
+		onClick$submitBtn();
 	}
-	 */
 }

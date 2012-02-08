@@ -1,0 +1,9 @@
+<?page title="FCK editor" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window title="问卷标题编辑" border="normal" width="600px" height="500px"
+		mode="modal" closable="true"
+		apply="org.dongq.analytics.ui.FckEditorComposer">
+		<fckeditor height="440px" id="fckeditor"/>
+		<button label="保存" id="saveBtn"/>
+	</window>
+</zk>

@@ -42,7 +42,8 @@ public class ControllerServlet extends HttpServlet {
 	final String GetQuestionnaireByResponderId = "getQuestionnaireByResponderId";
 	final String GetQuestionnaireMatrixNetByResponderId = "getQuestionnaireMatrixNetByResponderId";
 	final String GetQuestionnaireMatrixNetAnswer = "getQuestionnaireMatrixNetAnswer";
-
+	final String GetQuestionnaireTitle = "getQuestionnaireTitle";
+	
 	private QuestionnairePaperService service;
 
 	public ControllerServlet() {
@@ -71,6 +72,8 @@ public class ControllerServlet extends HttpServlet {
 			getQuestionnaireMatrixNetByResponderId(req, resp);
 		} else if(GetQuestionnaireMatrixNetAnswer.equals(method)) {
 			getQuestionnaireMatrixNetAnswer(req, resp);
+		} else if(GetQuestionnaireTitle.equals("getQuestionnaireTitle")) {
+			getQuestionnaireTitle(req, resp);
 		}
 	}
 
@@ -241,4 +244,22 @@ public class ControllerServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+	
+	void getQuestionnaireTitle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String version = req.getParameter("version");
+		
+		String data = "";
+		try {
+			data = service.getQuestionnaireTitle(version);
+			
+			String result = JSON.toJSONString(data);
+			PrintWriter out = resp.getWriter();
+			logger.debug("\ngetQuestionnaireTitle:\n" + result);
+			out.write(result);
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

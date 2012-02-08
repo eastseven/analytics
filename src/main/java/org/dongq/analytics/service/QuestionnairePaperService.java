@@ -20,6 +20,8 @@ public interface QuestionnairePaperService {
 	
 	public Responder login(String no, String pwd);
 	
+	public String getQuestionnaireTitle(Object version);
+	
 	public List<Responder> getRespondersOfVersion(long version);
 	
 	public Questionnaire getQuestionnaire(long responderId);

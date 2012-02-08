@@ -1,9 +1,14 @@
 package org.dongq.analytics.service;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
@@ -55,6 +61,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			String sql = "select count(1) from questionnaire a where a.responder_id = " + responderId;
 			List<Object> list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
 			if(list.isEmpty()) answered = false;
+			else if(list.get(0).equals(0)) answered = false;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -89,6 +96,40 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			e.printStackTrace();
 		}
 		return responder;
+	}
+	
+	@Override
+	public String getQuestionnaireTitle(Object version) {
+		Connection conn = DbHelper.getConnection();
+		PreparedStatement ps;
+		String data = "";
+		try {
+			ps = conn.prepareStatement("select version, title from questionnaire_title where version = " + version);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {  
+				data = getDerbyClobContent(rs.getClob("title"));
+			}
+			
+			DbUtils.close(rs);
+			DbUtils.close(ps);
+			DbUtils.close(conn);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+	
+	private String getDerbyClobContent(Clob derbyClob) throws Exception {
+		BufferedInputStream in = new BufferedInputStream(derbyClob.getAsciiStream());
+		ByteArrayOutputStream bs = new ByteArrayOutputStream();
+		BufferedOutputStream out = new BufferedOutputStream(bs);
+		byte[] ioBuf = new byte[4096];
+		int bytesRead;
+		while ((bytesRead = in.read(ioBuf)) != -1) out.write(ioBuf, 0, bytesRead);
+		out.close();
+		in.close();
+		return new String(bs.toString());
 	}
 	
 	public Questionnaire getQuestionnaire(long id) {

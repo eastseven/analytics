@@ -58,6 +58,10 @@
 		<column name="version" type="BIGINT" />
 		<column name="finish_time" type="BIGINT"/>
 	</table>
+	<table name="questionnaire_title">
+		<column name="version" type="BIGINT" />
+		<column name="title" type="CLOB"/>
+	</table>
 	<!-- 
 	<table name="questionnaire_data">
 		<column name="version" type="BIGINT" />

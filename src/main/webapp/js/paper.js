@@ -317,6 +317,11 @@ function loadAnswerPape(responderId, version) {
 }
 
 function loadPaper(version, responderId) {
+//	var getQuestionnaireTitle = ctx + '/controller?action=getQuestionnaireTitle&version=' + version;
+//	$.getJSON(getQuestionnaireTitle, function(result) {
+//		$('#title').wrap(result);
+//	});
+	
 	//读取后台问卷数据
 	var url4paper = ctx + '/controller?action=getQuestionnairePaper&version='+version+'&responderId='+responderId;
 	$.getJSON(url4paper, function(result) {

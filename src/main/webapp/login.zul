@@ -13,7 +13,7 @@
 				</row>
 				<row>
 					<label value="管理员密码" />
-					<textbox id="responderPwd" name="pwd" constraint="no empty"/>
+					<textbox id="responderPwd" name="pwd" constraint="no empty" type="password"/>
 				</row>
 				<row spans="2" align="center">
 					<div>

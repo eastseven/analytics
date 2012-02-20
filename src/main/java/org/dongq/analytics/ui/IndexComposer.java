@@ -105,7 +105,7 @@ public class IndexComposer extends GenericForwardComposer {
 	/**
 	 * 下载开放式问卷模板
 	 */
-	public void onClick$open() {
+	public void onClick$downloadOpen() {
 		try {
 			Filedownload.save(this.application.getResource("/templateOpen.xls"), null);
 		} catch (FileNotFoundException e) {

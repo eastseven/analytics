@@ -8,13 +8,13 @@
 		<menu label="问卷上传">
 			<menupopup>
 				<menuitem label="封闭式" id="uploadClose" />
-				<menuitem label="开放式" id="uploadOpen" visible="false"/>
+				<menuitem label="开放式" id="uploadOpen" />
 			</menupopup>
 		</menu>
 		<menu label="模板下载">
 			<menupopup>
 				<menuitem label="封闭式" id="downloadClose" />
-				<menuitem label="开放式" id="downloadOpen" visible="false"/>
+				<menuitem label="开放式" id="downloadOpen" />
 			</menupopup>
 		</menu>
 		<menuitem label="关于" id="about" />

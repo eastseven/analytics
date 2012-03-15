@@ -641,6 +641,9 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				Sheet responders = workbook.getSheetAt(1);
 				logger.info(responders.getSheetName());
 				parseResponders(responders, version);
+			} else {
+				QueryRunner q = new QueryRunner();
+				q.update(DbHelper.getConnection(), "insert into questionnaire_open values("+version+")");
 			}
 			
 			//{问卷题目}

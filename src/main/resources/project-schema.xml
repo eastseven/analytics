@@ -62,29 +62,7 @@
 		<column name="version" type="BIGINT" />
 		<column name="title" type="CLOB"/>
 	</table>
-	<!-- 
-	<table name="questionnaire_data">
+	<table name="questionnaire_open">
 		<column name="version" type="BIGINT" />
-		<column name="excel_file" type="BLOB"/>
-	</table>
-	<table name="questionnaire_paper">
-		<column name="paper_id" type="BIGINT" primaryKey="true" />
-		<column name="title" type="VARCHAR" size="4000" />
-		<column name="responder_id" type="BIGINT" />
-		<column name="questionnaire_id" type="BIGINT" />
-		<column name="sign_date" type="DATE"/>
-		
-		<foreign-key foreignTable="responder">
-			<reference foreign="responder_id" local="responder_id"/>
-		</foreign-key>
-		<foreign-key foreignTable="questionnaire">
-			<reference foreign="questionnaire_id" local="questionnaire_id"/>
-		</foreign-key>
-	</table>
-	<table name="questionnaire_paper_answer">
-		<column name="paper_id" type="BIGINT" />
-		<column name="answer_key" type="SMALLINT" />
-		<column name="answer_value" type="SMALLINT" />
-	</table>
-	 -->
+	</table>	
 </database>

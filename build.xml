@@ -34,6 +34,9 @@
 			<include name="/org/apache/ddlutils/ddlutils/1.0/*.jar" />
 			<include name="/Users/eastseven/.m2/repository/com/oracle/ojdbc14/*.jar"/>
 		</fileset>
+		<fileset dir="${basedir}/src/main/webapp/WEB-INF/lib">
+			<include name="derby*.jar"/>
+		</fileset>
 	</path>
 	<target name="clean">
 		<delete dir="${db.path}" verbose="true" />
@@ -44,7 +47,7 @@
 		</taskdef>
 		
 		<ddlToDatabase>
-			<database url="${db.url}" driverClassName="${db.driver}" username="" password="" />
+			<database url="${db.url}" driverClassName="${db.driver}" username="${db.name}" password="${db.password}" />
 			<fileset dir="src/main/resources">
 				<include name="project-schema.xml" />
 			</fileset>

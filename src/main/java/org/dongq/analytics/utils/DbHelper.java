@@ -18,32 +18,19 @@ public class DbHelper {
 
 	final static Log logger = LogFactory.getLog(DbHelper.class);
 	
-	public static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
-	public static String url = "jdbc:derby:database";
+	static String driver = "org.apache.derby.jdbc.ClientDriver";
+	static String url = "jdbc:derby://localhost:1527/analytics;create=true;upgrade=true";
+	static String user = "analytics";
+	static String password = "analytics";
 	
 	static {
-		/*
-		try {
-			Configuration config = new PropertiesConfiguration(new File("src/main/resources/jdbc.properties"));
-			driver = config.getString("db.driver");
-			url = config.getString("db.url");
-			url = url.replace(config.getString("db.name"), config.getString("db.path")).replace("true", "false");
-		} catch (ConfigurationException e) {
-			//e.printStackTrace();
-			logger.info("读取jdbc配置文件失败");
-		}
-		
-		 */
-		logger.debug(driver);
-		logger.debug(url);
 		DbUtils.loadDriver(driver);
 	}
 	
 	public static Connection getConnection() {
 		Connection conn = null;
 		try {
-			logger.debug(url);
-			conn = DriverManager.getConnection(url);
+			conn = DriverManager.getConnection(url, user, password);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

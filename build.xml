@@ -32,10 +32,7 @@
 			<include name="**/*.jar" />
 			<include name="/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" />
 			<include name="/org/apache/ddlutils/ddlutils/1.0/*.jar" />
-			<include name="/Users/eastseven/.m2/repository/com/oracle/ojdbc14/*.jar"/>
-		</fileset>
-		<fileset dir="${basedir}/src/main/webapp/WEB-INF/lib">
-			<include name="derby*.jar"/>
+			<include name="/org/apache/derby/derbyclient/10.8.2.2/derbyclient-10.8.2.2.jar"/>
 		</fileset>
 	</path>
 	<target name="clean">
@@ -44,9 +41,14 @@
 	<target name="database-setup" depends="clean" description="Creates the database structure and inserts data into the database">
 		<taskdef name="ddlToDatabase" classname="org.apache.ddlutils.task.DdlToDatabaseTask">
 			<classpath refid="runtime-classpath" />
+			<classpath>
+				<filelist>
+					<file name="${user.home}/.m2/repository/org/apache/derby/derbyclient/10.8.2.2/derbyclient-10.8.2.2.jar"/>
+				</filelist>
+			</classpath>
 		</taskdef>
 		
-		<ddlToDatabase>
+		<ddlToDatabase databasetype="DERBY">
 			<database url="${db.url}" driverClassName="${db.driver}" username="${db.name}" password="${db.password}" />
 			<fileset dir="src/main/resources">
 				<include name="project-schema.xml" />

@@ -185,6 +185,12 @@
 			<artifactId>derbyclient</artifactId>
 			<version>10.8.2.2</version>
 		</dependency>
+		<dependency>
+			<groupId>ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.6.5</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>analytics</finalName>

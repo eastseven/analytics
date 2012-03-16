@@ -18,10 +18,10 @@ public class DbHelper {
 
 	final static Log logger = LogFactory.getLog(DbHelper.class);
 	
-	static String driver = "org.apache.derby.jdbc.ClientDriver";
-	static String url = "jdbc:derby://localhost:1527/analytics;create=true;upgrade=true";
-	static String user = "analytics";
-	static String password = "analytics";
+	public static String driver = "org.apache.derby.jdbc.ClientDriver";
+	public static String url = "jdbc:derby://localhost:1527/analytics;create=true;upgrade=true";
+	public static String user = "analytics";
+	public static String password = "analytics";
 	
 	static {
 		DbUtils.loadDriver(driver);

@@ -82,6 +82,7 @@ public class QuestionnaireComposer extends GenericForwardComposer {
 		try {
 			QueryRunner query = new QueryRunner();
 			String sql = "select a.version, count(a.question_id) questions from question a group by a.version";
+			sql = "select a.version, count(a.question_id) questions from question a where not exists(select 1 from questionnaire_open b where a.version = b.version) group by a.version";
 			
 			list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Map<Object, Object>>>() {
 				@Override

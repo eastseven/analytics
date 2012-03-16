@@ -1,44 +1,49 @@
 <?page title="" contentType="text/html;charset=UTF-8"?>
 <zk>
-	<borderlayout height="95%">
-		<west size="20%" splittable="true" collapsible="true">
-		<tree>
-			<treecols>
-				<treecol label="" />
-			</treecols>
-			<treechildren>
-				<treeitem>
-					<treerow>
-						<treecell label="b" />
-					</treerow>
-				</treeitem>
-				<treeitem>
-					<treerow>
-						<treecell label="b" />
-					</treerow>
-				</treeitem>
-				<treeitem>
-					<treerow>
-						<treecell label="b" />
-					</treerow>
-				</treeitem>
-			</treechildren>
-		</tree>
-		</west>
-		<center border="normal">
-		<grid>
-			<columns>
-				<column label="a" />
-				<column label="b" />
-				<column label="c" />
-				<column label="d" />
-				<column label="e" />
-				<column label="f" />
-			</columns>
-			<rows>
-				<row></row>
-			</rows>
-		</grid>
-		</center>
-	</borderlayout>
+	<grid id="openGrid" apply="org.dongq.analytics.ui.QuestionnaireOpenComposer" mold="paging" pageSize="10" width="100%">
+		<columns>
+			<column width="40px" />
+			<column label="问卷编号" />
+			<column label="上传时间" />
+			<column label="题目数量" width="60px"/>
+			<column label="操作"/>
+		</columns>
+		<rows>
+			<row>
+				<detail>
+					<hbox>
+						<image sclass="myimg" width="100px"
+							height="100px" src="/widgets/grid/master_detail/img/item1.jpg" />
+						<vbox>
+							<label
+								value="Item Specifics - Item Condition"
+								style="font-weight:bold;font-style: italic;" />
+							<hbox>
+								<label value="Condition:" />
+								<label value="Used" sclass="heavy" />
+							</hbox>
+							<hbox>
+								<label value="Brand:" />
+								<label value="Apple" sclass="heavy" />
+							</hbox>
+							<hbox>
+								<label value="Technology:" />
+								<label value="DVI" sclass="heavy" />
+							</hbox>
+							<hbox>
+								<label value="Monitor Type:" />
+								<label value="LCD/Flat Panel"
+									sclass="heavy" />
+							</hbox>
+						</vbox>
+					</hbox>
+				</detail>
+				<label value="Apple 20-inch Aluminum Cinema Display M9177/A" />
+				<label style="color:green;float:right;"
+					value="US $202.50" />
+				<label value="Tulsa, OK, United States" />
+				<button label="生成Excel数据"/>
+			</row>
+		</rows>
+	</grid>
 </zk>

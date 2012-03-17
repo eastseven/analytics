@@ -11,9 +11,13 @@ import java.util.List;
  */
 public class Question {
 
+	/** 1 */
 	public static final int TYPE_NORMAL      = 1;
+	/** 2 */
 	public static final int TYPE_MATRIX      = 2;
+	/** 3 */
 	public static final int TYPE_MATRIX_NET  = 3;
+	/** 4 */
 	public static final int TYPE_MATRIX_PLUS = 4;
 
 	private long id;

@@ -316,28 +316,36 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return r;
 	}
 	
-	List<QuestionGroup> getQuestionGroupOfVersion(long version) throws SQLException {
+	public List<QuestionGroup> getQuestionGroupOfVersion(long version, int type) {
 		List<QuestionGroup> list = new ArrayList<QuestionGroup>();
-		String sql = "select a.title, a.option_group_id from question a where a.version = " + version + " and a.type = " + Question.TYPE_NORMAL + " group by a.title, a.option_group_id";
-		logger.debug(sql);
-		list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<QuestionGroup>>() {
-			@Override
-			public List<QuestionGroup> handle(ResultSet rs) throws SQLException {
-				List<QuestionGroup> list = new ArrayList<QuestionGroup>();
-				while(rs.next()) {
-					QuestionGroup e = new QuestionGroup();
-					e.setTitle(rs.getString("title"));
-					e.setId(rs.getLong("option_group_id"));
-					e.setOptions(getOptionsForQuestion(e.getId()));
-					e.setQuestions(getQuestionsOfOptionGroupId(e.getId()));
-					list.add(e);
+		try {
+			String sql = "select a.title, a.option_group_id from question a where a.version = " + version + " and a.type = " + type + " group by a.title, a.option_group_id";
+			logger.debug(sql);
+			list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<QuestionGroup>>() {
+				@Override
+				public List<QuestionGroup> handle(ResultSet rs) throws SQLException {
+					List<QuestionGroup> list = new ArrayList<QuestionGroup>();
+					while(rs.next()) {
+						QuestionGroup e = new QuestionGroup();
+						e.setTitle(rs.getString("title"));
+						e.setId(rs.getLong("option_group_id"));
+						e.setOptions(getOptionsForQuestion(e.getId()));
+						e.setQuestions(getQuestionsOfOptionGroupId(e.getId()));
+						list.add(e);
+					}
+					return list;
 				}
-				return list;
-			}
+				
+			});
 			
-		});
-		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return list;
+	}
+	
+	List<QuestionGroup> getQuestionGroupOfVersion(long version) throws SQLException {
+		return getQuestionGroupOfVersion(version, Question.TYPE_NORMAL);
 	}
 	
 	List<Question> getQuestionsOfVersion(long version) throws SQLException {
@@ -1413,5 +1421,21 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		wb.write(fileOut);
 	    fileOut.close();
 	    System.out.println("done...");
+	}
+	
+	@Override
+	public Long getOpenPaperVersion() {
+		long version = 0;
+		
+		String sql = "select max(a.version) version from QUESTIONNAIRE_OPEN a";
+		QueryRunner q = new QueryRunner();
+		try {
+			Map<String, Object> result = q.query(DbHelper.getConnection(), sql, new MapHandler());
+			version = (Long)result.get("VERSION");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return version;
 	}
 }

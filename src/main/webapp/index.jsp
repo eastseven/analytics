@@ -1,3 +1,4 @@
+
 <%
 
 out.print("request.getAuthType()           : " + request.getAuthType() + "<br/>");

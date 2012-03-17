@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dongq.analytics.model.Option;
 import org.dongq.analytics.model.Question;
+import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
@@ -43,6 +44,8 @@ public class ControllerServlet extends HttpServlet {
 	final String GetQuestionnaireMatrixNetByResponderId = "getQuestionnaireMatrixNetByResponderId";
 	final String GetQuestionnaireMatrixNetAnswer = "getQuestionnaireMatrixNetAnswer";
 	final String GetQuestionnaireTitle = "getQuestionnaireTitle";
+	
+	final String GetQuestionnaireOpenPaper = "getQuestionnaireOpenPaper";
 	
 	private QuestionnairePaperService service;
 
@@ -72,8 +75,10 @@ public class ControllerServlet extends HttpServlet {
 			getQuestionnaireMatrixNetByResponderId(req, resp);
 		} else if(GetQuestionnaireMatrixNetAnswer.equals(method)) {
 			getQuestionnaireMatrixNetAnswer(req, resp);
-		} else if(GetQuestionnaireTitle.equals("getQuestionnaireTitle")) {
+		} else if(GetQuestionnaireTitle.equals(method)) {
 			getQuestionnaireTitle(req, resp);
+		} else if(GetQuestionnaireOpenPaper.equals(method)) {
+			getQuestionnaireOpenPaper(req, resp);
 		}
 	}
 
@@ -262,4 +267,26 @@ public class ControllerServlet extends HttpServlet {
 		}
 	}
 	
+	void getQuestionnaireOpenPaper(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		try {
+			Long version = service.getOpenPaperVersion();
+			List<QuestionGroup> normal = service.getQuestionGroupOfVersion(version, Question.TYPE_NORMAL);
+			List<QuestionGroup> matrix = service.getQuestionGroupOfVersion(version, Question.TYPE_MATRIX);
+			List<QuestionGroup> matrixNet = service.getQuestionGroupOfVersion(version, Question.TYPE_MATRIX_NET);
+			
+			Map<String, Object> data = new HashMap<String, Object>(3);
+			data.put("normal", normal);
+			data.put("matrix", matrix);
+			data.put("matrixNet", matrixNet);
+			
+			String result = JSON.toJSONString(data);
+			PrintWriter out = resp.getWriter();
+			logger.debug("\ngetQuestionnaireOpenPaper:\n" + result);
+			out.write(result);
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

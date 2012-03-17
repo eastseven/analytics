@@ -37,6 +37,8 @@ public class InitServlet extends HttpServlet {
 		logger.debug(method);
 		if("login".equalsIgnoreCase(method)) {
 			login(req, resp);
+		} else if("loginOpen".equalsIgnoreCase(method)) {
+			loginOpen(req, resp);
 		}
 	}
 	
@@ -63,4 +65,11 @@ public class InitServlet extends HttpServlet {
 		
 	}
 	
+	void loginOpen(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String name = req.getParameter("name");
+		
+		logger.debug("responder name is " + name);
+		req.setAttribute("name", name);
+		req.getRequestDispatcher("paper_open.jsp").forward(req, resp);
+	}
 }

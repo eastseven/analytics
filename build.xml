@@ -49,7 +49,7 @@
 		</taskdef>
 		
 		<ddlToDatabase databasetype="DERBY">
-			<database url="${db.url}" driverClassName="${db.driver}" username="${db.name}" password="${db.password}" />
+			<database url="jdbc:derby://127.0.0.1/analytics;create=true;upgrade=true" driverClassName="${db.driver}" username="${db.name}" password="${db.password}" />
 			<fileset dir="src/main/resources">
 				<include name="project-schema.xml" />
 			</fileset>

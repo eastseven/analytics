@@ -24,6 +24,7 @@ import org.zkoss.zul.Detail;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Html;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Row;
@@ -102,8 +103,9 @@ public class QuestionnaireOpenComposer extends GenericForwardComposer {
 				final String version = DateFormatUtils.format((Long)map.get("version"), pattern);
 				
 				Detail detail = new Detail();
-				Html html = new Html("");
-				detail.appendChild(html);
+				Html html = new Html("<h1>Demo</h1><jsp:include page='index.jsp'></jsp:include>");
+				//detail.appendChild(html);
+				detail.appendChild(new Include("NewFile.jsp"));
 				row.appendChild(detail);
 				row.appendChild(new Label(map.get("version").toString()));
 				row.appendChild(new Label(version));

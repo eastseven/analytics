@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dongq.analytics.model.Question;
+import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
 import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
@@ -45,4 +46,9 @@ public interface QuestionnairePaperService {
 	public Workbook generateExcelForQuestionnaireMatrixNet(long version);
 	
 	public Workbook generateExcelForQuestionnaire(Object[][] normalQuestion, Map<Object, Object[][]> matrixQuestion);
+	
+	//open
+	public Long getOpenPaperVersion();
+	
+	public List<QuestionGroup> getQuestionGroupOfVersion(long version, int type);
 }

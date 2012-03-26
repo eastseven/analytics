@@ -1,11 +1,11 @@
-<?page title="Questionnaire Demo" contentType="text/html;charset=UTF-8"?>
-
+<?page title="new page title" contentType="text/html;charset=UTF-8"?>
 <zk>
-	<zscript>
-		String no = (String)execution.getAttribute("no");
-		String pwd = (String)execution.getAttribute("pwd");
-	</zscript>
-	<include src="index.jsp">
-	</include>
-
+	<grid mold="paging" pageSize="10" apply="org.dongq.analytics.ui.QuestionnaireOpenResponderComposer" height="100%">
+		<columns>
+			<column label="姓名" />
+			<column label="时间" />
+			<column label="版本" />
+			<column label="操作"/>
+		</columns>
+	</grid>
 </zk>

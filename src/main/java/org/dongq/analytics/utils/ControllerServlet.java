@@ -21,6 +21,7 @@ import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dongq.analytics.model.Option;
+import org.dongq.analytics.model.OptionGroup;
 import org.dongq.analytics.model.Question;
 import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
@@ -274,11 +275,12 @@ public class ControllerServlet extends HttpServlet {
 			List<QuestionGroup> normal = service.getQuestionGroupOfVersion(version, Question.TYPE_NORMAL);
 			List<QuestionGroup> matrix = service.getQuestionGroupOfVersion(version, Question.TYPE_MATRIX);
 			List<QuestionGroup> matrixNet = service.getQuestionGroupOfVersion(version, Question.TYPE_MATRIX_NET);
-			
+			List<OptionGroup> optionGroups = service.getResponderPropertyOfVersion(version);
 			Map<String, Object> data = new HashMap<String, Object>(3);
 			data.put("normal", normal);
 			data.put("matrix", matrix);
 			data.put("matrixNet", matrixNet);
+			data.put("optionGroups", optionGroups);
 			
 			String result = JSON.toJSONString(data);
 			PrintWriter out = resp.getWriter();

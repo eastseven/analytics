@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.dongq.analytics.model.OptionGroup;
 import org.dongq.analytics.model.Question;
 import org.dongq.analytics.model.QuestionGroup;
 import org.dongq.analytics.model.Questionnaire;
@@ -51,4 +52,6 @@ public interface QuestionnairePaperService {
 	public Long getOpenPaperVersion();
 	
 	public List<QuestionGroup> getQuestionGroupOfVersion(long version, int type);
+	
+	public List<OptionGroup> getResponderPropertyOfVersion(long version);
 }

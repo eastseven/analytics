@@ -47,8 +47,12 @@ public class FckEditorComposer extends GenericForwardComposer {
 		Connection conn = DbHelper.getConnection();
 		PreparedStatement ps = conn.prepareStatement("select version, title from questionnaire_title where version = " + version);
 		ResultSet rs = ps.executeQuery();
-		if (rs.next()) {  
-			String content = getDerbyClobContent(rs.getClob("title"));
+		if (rs.next()) {
+			//getDerbyClobContent(rs.getClob("title"));
+			Clob clob = rs.getClob("title");
+			int length = (int)clob.length();
+			String content = clob.getSubString(1, length);
+			logger.debug(content);
 			fckeditor.setValue(content);
 		}
 		
@@ -98,12 +102,13 @@ public class FckEditorComposer extends GenericForwardComposer {
 
 	private ByteArrayInputStream derbyAsciiStream(String content) throws Exception {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
-		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(b, "UTF-8"));
+		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(b,"utf-8"));
 		w.write(content);
 		w.close();
 		return new ByteArrayInputStream(b.toByteArray());
 	}
 
+	@SuppressWarnings("unused")
 	private String getDerbyClobContent(Clob derbyClob) throws Exception {
 		BufferedInputStream in = new BufferedInputStream(derbyClob.getAsciiStream());
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();

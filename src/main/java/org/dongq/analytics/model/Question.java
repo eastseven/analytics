@@ -125,7 +125,7 @@ public class Question {
 		String html = "";
 		if (this.options != null && !this.options.isEmpty() && this.type == TYPE_NORMAL) {
 			for(Option o : this.options) {
-				html += "<input type='radio' name='question_"+this.id+"' value='"+o.getKey()+"' />" + o.getValue() + "  ";
+				html += "<tr><td><input type='radio' name='question_"+this.id+"' value='"+o.getKey()+"' />" + o.getValue() + "</td></tr>";
 			}
 		}
 		return html;

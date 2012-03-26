@@ -23,7 +23,6 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Detail;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.Html;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
@@ -99,20 +98,22 @@ public class QuestionnaireOpenComposer extends GenericForwardComposer {
 				@SuppressWarnings("unchecked")
 				HashMap<Object, Object> map = (HashMap<Object, Object>)data;
 				final String pattern = "yyyy-MM-dd HH:mm:ss";
-				//final Long fileName = (Long)map.get("version");
 				final String version = DateFormatUtils.format((Long)map.get("version"), pattern);
 				
 				Detail detail = new Detail();
-				Html html = new Html("<h1>Demo</h1><jsp:include page='index.jsp'></jsp:include>");
-				//detail.appendChild(html);
-				detail.appendChild(new Include("NewFile.jsp"));
+				Include src = new Include("demo.zul");
+				src.setDynamicProperty("version", map.get("version").toString());
+				detail.appendChild(src);
 				row.appendChild(detail);
 				row.appendChild(new Label(map.get("version").toString()));
 				row.appendChild(new Label(version));
 				row.appendChild(new Label(map.get("questions").toString()));
 				
 				Button excelBtn = new Button("生成Excel数据");
+				
 				Button editTitleBtn = new Button("编辑问卷标题");
+				editTitleBtn.addEventListener("onClick", new EditTilteListener(openGrid.getParent(), map));
+				
 				Div div = new Div();
 				div.appendChild(excelBtn);
 				div.appendChild(editTitleBtn);

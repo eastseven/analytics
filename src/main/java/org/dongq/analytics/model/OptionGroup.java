@@ -49,7 +49,7 @@ public class OptionGroup {
 		String html = "";
 		if (this.options != null && !this.options.isEmpty()) {
 			for(Option o : this.options) {
-				html += "<input type='radio' name='property_"+this.id+"' value='"+o.getId()+"' />" + o.getDisplay() + "  ";
+				html += "<tr><td><input type='radio' name='property_a' value='"+o.getId()+"' />" + o.getDisplay() + "</td></tr>";
 			}
 		}
 		return html;

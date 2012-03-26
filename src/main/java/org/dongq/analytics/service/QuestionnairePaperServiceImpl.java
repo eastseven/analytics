@@ -104,10 +104,14 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		PreparedStatement ps;
 		String data = "";
 		try {
-			ps = conn.prepareStatement("select version, title from questionnaire_title where version = " + version);
+			if(version == null) version = getOpenPaperVersion();
+			String sql = "select version, title from questionnaire_title where version = " + version;
+			ps = conn.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {  
-				data = getDerbyClobContent(rs.getClob("title"));
+				//data = getDerbyClobContent(rs.getClob("title"));
+				Clob clob = rs.getClob("title");
+				data = clob.getSubString(1, (int)clob.length());
 			}
 			
 			DbUtils.close(rs);
@@ -120,6 +124,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return data;
 	}
 	
+	@Deprecated
+	@SuppressWarnings("unused")
 	private String getDerbyClobContent(Clob derbyClob) throws Exception {
 		BufferedInputStream in = new BufferedInputStream(derbyClob.getAsciiStream());
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();
@@ -195,39 +201,44 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return blankPaper;
 	}
 	
-	List<OptionGroup> getResponderPropertyOfVersion(long version) throws SQLException {
+	public List<OptionGroup> getResponderPropertyOfVersion(long version) {
+		List<OptionGroup> optionGroups = new ArrayList<OptionGroup>();
 
 		QueryRunner query = new QueryRunner();
-		List<OptionGroup> optionGroups = new ArrayList<OptionGroup>();
 		String sql = "select responder_property_key from responder_property where version = " + version + " group by responder_property_key";
-		List<Object> list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
-		logger.debug(list.size() + ":" + sql);
-		for(Object o : list) {
-			OptionGroup e = new OptionGroup();
-			e.setName(o.toString());
-			e.setVersion(version);
-			sql = "select a.responder_property_id,a.responder_property_display,a.responder_property_value ";
-			sql += " from responder_property a "; 
-			sql += "where a.version = ? and a.responder_property_key = ?";
-			List<Option> options = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Option>>() {
-				@Override
-				public List<Option> handle(ResultSet rs) throws SQLException {
-					List<Option> list = new ArrayList<Option>();
-					while(rs.next()) {
-						Option e = new Option();
-						e.setId(rs.getLong("responder_property_id"));
-						e.setDisplay(rs.getString("responder_property_display"));
-						e.setValue(String.valueOf(rs.getInt("responder_property_value")));
-						list.add(e);
+		List<Object> list;
+		try {
+			list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
+			logger.debug(list.size() + ":" + sql);
+			for(Object o : list) {
+				OptionGroup e = new OptionGroup();
+				e.setName(o.toString());
+				e.setVersion(version);
+				sql = "select a.responder_property_id,a.responder_property_display,a.responder_property_value ";
+				sql += " from responder_property a "; 
+				sql += "where a.version = ? and a.responder_property_key = ?";
+				List<Option> options = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Option>>() {
+					@Override
+					public List<Option> handle(ResultSet rs) throws SQLException {
+						List<Option> list = new ArrayList<Option>();
+						while(rs.next()) {
+							Option e = new Option();
+							e.setId(rs.getLong("responder_property_id"));
+							e.setDisplay(rs.getString("responder_property_display"));
+							e.setValue(String.valueOf(rs.getInt("responder_property_value")));
+							list.add(e);
+						}
+						return list;
 					}
-					return list;
-				}
-			}, version, e.getName());
-			logger.debug(options.size()+":"+sql);
-			if(options.isEmpty()) continue;
-			e.getOptions().addAll(options);
-			logger.debug("getQuestionnaire:"+e);
-			optionGroups.add(e);
+				}, version, e.getName());
+				logger.debug(options.size()+":"+sql);
+				if(options.isEmpty()) continue;
+				e.getOptions().addAll(options);
+				logger.debug("getQuestionnaire:"+e);
+				optionGroups.add(e);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
 		return optionGroups;
 	
@@ -475,6 +486,9 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			if(responder.getId() == 0) {
 				//TODO add responder object to the database and generate a responder id
 				logger.debug(prefix_property);
+				responder.setId(System.currentTimeMillis() + 1);
+				String add = "insert into responder(responder_id,responder_name,version) values(?,?,?)";
+				query.update(DbHelper.getConnection(), add, responder.getId(), responder.getName(), responder.getVersion());
 			}
 			
 			long responderId = responder.getId();

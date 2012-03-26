@@ -19,7 +19,7 @@ public class DbHelper {
 	final static Log logger = LogFactory.getLog(DbHelper.class);
 	
 	public static String driver = "org.apache.derby.jdbc.ClientDriver";
-	public static String url = "jdbc:derby://127.0.0.1/analytics";
+	public static String url = "jdbc:derby://127.0.0.1/analytics;territory=zh_CN";
 	public static String user = "analytics";
 	public static String password = "analytics";
 	

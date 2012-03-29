@@ -99,6 +99,7 @@ public class QuestionnaireOpenComposer extends GenericForwardComposer {
 				HashMap<Object, Object> map = (HashMap<Object, Object>)data;
 				final String pattern = "yyyy-MM-dd HH:mm:ss";
 				final String version = DateFormatUtils.format((Long)map.get("version"), pattern);
+				final Long fileName = (Long)map.get("version");
 				
 				Detail detail = new Detail();
 				Include src = new Include("demo.zul");
@@ -110,12 +111,17 @@ public class QuestionnaireOpenComposer extends GenericForwardComposer {
 				row.appendChild(new Label(map.get("questions").toString()));
 				
 				Button excelBtn = new Button("生成Excel数据");
+				excelBtn.addEventListener("onClick", new ExcelGenerateEventListener(fileName, 1));
+				
+				Button matrixBtn = new Button("生成网络数据");
+				matrixBtn.addEventListener("onClick", new ExcelGenerateEventListener(fileName, 2));
 				
 				Button editTitleBtn = new Button("编辑问卷标题");
 				editTitleBtn.addEventListener("onClick", new EditTilteListener(openGrid.getParent(), map));
 				
 				Div div = new Div();
 				div.appendChild(excelBtn);
+				div.appendChild(matrixBtn);
 				div.appendChild(editTitleBtn);
 				row.appendChild(div);
 			}

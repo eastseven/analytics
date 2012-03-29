@@ -331,24 +331,41 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		List<QuestionGroup> list = new ArrayList<QuestionGroup>();
 		try {
 			String sql = "select a.title, a.option_group_id from question a where a.version = " + version + " and a.type = " + type + " group by a.title, a.option_group_id";
-			logger.debug(sql);
-			list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<QuestionGroup>>() {
-				@Override
-				public List<QuestionGroup> handle(ResultSet rs) throws SQLException {
-					List<QuestionGroup> list = new ArrayList<QuestionGroup>();
-					while(rs.next()) {
-						QuestionGroup e = new QuestionGroup();
-						e.setTitle(rs.getString("title"));
-						e.setId(rs.getLong("option_group_id"));
-						e.setOptions(getOptionsForQuestion(e.getId()));
-						e.setQuestions(getQuestionsOfOptionGroupId(e.getId()));
-						list.add(e);
-					}
-					return list;
-				}
-				
-			});
 			
+			
+			if(type == Question.TYPE_MATRIX) {
+				sql = "select a.title, a.question_id from question a where a.version = " + version + " and a.type = " + type ;
+				list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<QuestionGroup>>() {
+					@Override
+					public List<QuestionGroup> handle(ResultSet rs) throws SQLException {
+						List<QuestionGroup> list = new ArrayList<QuestionGroup>();
+						while(rs.next()) {
+							QuestionGroup e = new QuestionGroup();
+							e.setTitle(rs.getString("title"));
+							e.setId(rs.getLong("question_id"));
+							list.add(e);
+						}
+						return list;
+					}
+				});
+			} else {
+				list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<QuestionGroup>>() {
+					@Override
+					public List<QuestionGroup> handle(ResultSet rs) throws SQLException {
+						List<QuestionGroup> list = new ArrayList<QuestionGroup>();
+						while(rs.next()) {
+							QuestionGroup e = new QuestionGroup();
+							e.setTitle(rs.getString("title"));
+							e.setId(rs.getLong("option_group_id"));
+							e.setOptions(getOptionsForQuestion(e.getId()));
+							e.setQuestions(getQuestionsOfOptionGroupId(e.getId()));
+							list.add(e);
+						}
+						return list;
+					}
+				});
+			}
+			logger.debug(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

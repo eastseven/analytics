@@ -41,10 +41,12 @@
 						<div id="title"><%=service.getQuestionnaireTitle(request.getAttribute("v")) %></div>
 					</div>
 					<ol class="content">
-						<div id="matrix"/>
-						<div id="matrixNet"/>
-						<div id="normal"/>
 					<!-- 
+						<div id="matrix"/>
+						<div id="matrixNet">
+						</div>
+						<div id="matrixPlus" />
+						<div id="normal"/>
 						<li class="part select">
 							<h4 class="title">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</h4>
 							<table class="options">

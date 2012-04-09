@@ -693,7 +693,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			//{矩阵题}
 			Sheet matrix = workbook.getSheetAt(3);
 			logger.info(matrix.getSheetName());
-			parseRequestionsOfMatrix(matrix, version);
+			parseRequestionsOfMatrix(matrix, version, type);
 			
 			//{网络题}
 			Sheet matrixNet = workbook.getSheetAt(4);
@@ -916,11 +916,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		parseRequestions(requestions, version, Question.TYPE_NORMAL);
 	}
 	
-	void parseRequestionsOfMatrix(Sheet matrix, final long version) throws Exception {
+	void parseRequestionsOfMatrix(Sheet matrix, final long version, String type) throws Exception {
 		int index = 0;
 		for(Iterator<Row> rowIter = matrix.iterator(); rowIter.hasNext();) {
 			Row row = rowIter.next();
 			if(row.getCell(0) != null && !StringUtils.isBlank(toConvert(row.getCell(0))) && index > 0) {
+				
 				Question q = new Question();
 				q.setId(System.currentTimeMillis());
 				try {
@@ -935,6 +936,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				logger.info(q);
 			}
 			
+			//开放式问卷中，网络题只有一道
+			if(type.equals(QuestionnairePaperService.TYPE_OPEN) && index == 1) break;
 			index++;
 		}
 	}

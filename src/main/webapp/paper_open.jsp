@@ -32,7 +32,7 @@
 	<h1><%=request.getAttribute("name") %></h1>
 	<div id="main">
 		<div id="info"/>
-		<form method="post" id="survey">
+		<!-- <form method="post" id="survey"> -->
 			<div class="survey_body">
 				<link rel="stylesheet" href="./a_files/default(1).css" type="text/css">
 				<div class="page">
@@ -41,23 +41,7 @@
 						<div id="title"><%=service.getQuestionnaireTitle(request.getAttribute("v")) %></div>
 					</div>
 					<ol class="content">
-					<!-- 
-						<div id="matrix"/>
-						<div id="matrixNet">
-						</div>
-						<div id="matrixPlus" />
-						<div id="normal"/>
-						<li class="part select">
-							<h4 class="title">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</h4>
-							<table class="options">
-								<tbody>
-									<tr class="odd"><td>A</td></tr>
-									<tr class="even"><td>B</td></tr>
-									<tr class="odd"><td>C</td></tr>
-								</tbody>
-							</table>
-						</li>
-					 -->
+					
 					</ol>
 				</div>
 			</div>
@@ -66,8 +50,8 @@
 				<input type="hidden" name="version" value="<%=service.getOpenPaperVersion() %>"/>
 				<input type="hidden" name="ctx" value="<%=ctx %>"/>
 			</div>
-		</form>
+		<!-- </form> -->
 	</div>
-	<a style="cursor: pointer;"><button class="subutton">提交</button></a>
+	<a style="cursor: pointer;" name="submit"><button class="subutton">提交</button></a>
 </body>
 </html>

@@ -128,11 +128,11 @@ function loadMatrixNet(result) {
 				} else {
 					trapezoid += '<td align="center"><select>';
 					trapezoid += '<option value=-1>请选择</option>';
-					trapezoid += '<option value=0>1</option>';
-					trapezoid += '<option value=0>2</option>';
-					trapezoid += '<option value=1>3</option>';
-					trapezoid += '<option value=1>4</option>';
-					trapezoid += '<option value=1>5</option>';
+					trapezoid += '<option value=0>完全不认识</option>';
+					trapezoid += '<option value=0>不熟悉</option>';
+					trapezoid += '<option value=1>一般</option>';
+					trapezoid += '<option value=1>比较熟悉</option>';
+					trapezoid += '<option value=1>非常熟悉</option>';
 					trapezoid += '</select></td>';
 				}
 			}

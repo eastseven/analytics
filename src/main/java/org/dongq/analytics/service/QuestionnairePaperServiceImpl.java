@@ -493,19 +493,24 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		final String prefix_matrix   = "matrix_";
 		final String prefix_property = "property_";
 		
-		final String prefix_matrixNet = "matrixNet_";
+		final String prefix_matrixNet  = "matrixNet_";
 		final String prefix_matrixPlus = "matrixPlus_";
+		final String prefix_person     = "person";
+		
+		String type = TYPE_CLOSE;
 		
 		final long finishTime = System.currentTimeMillis();
 		QueryRunner query = new QueryRunner();
+		Connection conn = DbHelper.getConnection();
 		try {
 			
 			if(responder.getId() == 0) {
-				//TODO add responder object to the database and generate a responder id
 				logger.debug(prefix_property);
 				responder.setId(System.currentTimeMillis() + 1);
 				String add = "insert into responder(responder_id,responder_name,version) values(?,?,?)";
-				query.update(DbHelper.getConnection(), add, responder.getId(), responder.getName(), responder.getVersion());
+				query.update(conn, add, responder.getId(), responder.getName(), responder.getVersion());
+				
+				type = TYPE_OPEN;
 			}
 			
 			long responderId = responder.getId();
@@ -514,6 +519,23 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			List<QuestionnairePaper> list = new ArrayList<QuestionnairePaper>();
 			List<ResponderProperty> properties = new ArrayList<ResponderProperty>();
 			List<QuestionnaireMatrixNet> matrixNets = new ArrayList<QuestionnaireMatrixNet>();
+			
+			List<Responder> personList = new ArrayList<Responder>();
+			for(String key : keySet) {
+				String value = (String)answer.get(key);
+				if(key.startsWith(prefix_person)) {
+					String personName = value;
+					Responder e = new Responder();
+					e.setId(System.currentTimeMillis() + 1);
+					e.setName(personName);
+					e.setPersonNo(key);
+					e.setPid(responderId);
+					e.setVersion(version);
+					personList.add(e);
+					saveResponder(e);
+				}
+			}
+			
 			for(String key : keySet) {
 				String value = (String)answer.get(key);
 				if(key.startsWith(prefix_question)) {
@@ -532,8 +554,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				
 				if(key.startsWith(prefix_matrixPlus)) {
 					String[] persons = key.replaceAll(prefix_matrixPlus, replacement).split("_");
-					long personRow = Long.valueOf(persons[0]);
-					long personCol = Long.valueOf(persons[1]);
+					long personRow = type.equals(TYPE_CLOSE) ? Long.valueOf(persons[0]) : getPersonId(version, persons[0], responderId);
+					long personCol = type.equals(TYPE_CLOSE) ? Long.valueOf(persons[1]) : getPersonId(version, persons[1], responderId);
 					long optionKey = Long.valueOf(value);
 					QuestionnairePaper row = new QuestionnairePaper();
 					row.setResponderId(responderId);
@@ -572,7 +594,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						if(StringUtils.isBlank(_value)) continue;
 						String[] _values = _value.split("_");
 						long optionKey = Long.valueOf(_values[0]);
-						long peopleId = Long.valueOf(_values[1]);
+						long peopleId = type.equals(TYPE_CLOSE) ? Long.valueOf(_values[1]) : getPersonId(version, _values[1], responderId);
 						
 						QuestionnaireMatrixNet e = new QuestionnaireMatrixNet();
 						e.setResponderId(responderId);
@@ -590,6 +612,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					ResponderProperty e = new ResponderProperty(responderPropertyId);
 					properties.add(e);
 				}
+				
 			}
 			
 			if(!list.isEmpty()) {
@@ -628,7 +651,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			
 			//responder property
 			if(!properties.isEmpty()) {
-				Connection conn = DbHelper.getConnection();
+				//Connection conn = DbHelper.getConnection();
 				conn.setAutoCommit(false);
 				final String delete = "delete from responder_properties where responder_id = "+responderId+" and version = " + version;
 				int deleteRecord = query.update(DbHelper.getConnection(), delete);
@@ -653,6 +676,17 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			bln = true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			try {
+				DbUtils.rollback(conn);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				DbUtils.close(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return bln;
 	}
@@ -994,8 +1028,20 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return update;
 	}
 	
+	long getPersonId(long version, String personNo, long responderId) throws Exception {
+		final String sql = "select responder_id rid from responder where version = ? and responder_person = ? and responder_pid = ?";
+		Map<String, Object> map = new QueryRunner().query(DbHelper.getConnection(), sql, new MapHandler(), version, personNo, responderId);
+		return (Long)map.get("RID");
+	}
+	
+	void saveResponder(Responder person) throws Exception {
+		final String insertResponder = "insert into responder values(?,?,?,?,?,?,?)";
+		QueryRunner query = new QueryRunner();
+		query.update(DbHelper.getConnection(), insertResponder, person.getId(), person.getName(), person.getVersion(), person.getNo(), person.getPwd(), person.getPid(), person.getPersonNo());
+	}
+	
 	void saveResponder(Responder r, QueryRunner query, Connection conn) throws Exception {
-		final String insertResponder = "insert into responder values(?,?,?,?,?)";
+		final String insertResponder = "insert into responder values(?,?,?,?,?,0,'')";
 		final String insertResponderProperty = "insert into responder_properties(responder_id,responder_property_id,version) values(?,?,?)";
 		
 		boolean bln = true;
@@ -1191,7 +1237,18 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	@Override
 	public Workbook generateExcelForQuestionnaire(long version) {
 		Object[][] normalQuestion = calculate(version);
-		Map<Object, Object[][]> matrixQuestion = calculateForMatrix(version);
+		Map<Object, Object[][]> matrixQuestion = new HashMap<Object, Object[][]>();//calculateForMatrix(version);
+		
+		String sql = "select count(version) v from questionnaire_open where version = ?";
+		QueryRunner query = new QueryRunner();
+		try {
+			Map<String, Object> map = query.query(DbHelper.getConnection(), sql, new MapHandler(), version);
+			int v = (Integer)map.get("v".toUpperCase());
+			if(v == 0) matrixQuestion = calculateForMatrix(version);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return generateExcelForQuestionnaire(normalQuestion, matrixQuestion);
 	}
 	

@@ -49,7 +49,7 @@ public class QuestionnaireOpenResponderComposer extends GenericForwardComposer {
 		List<Responder> list = new ArrayList<Responder>();
 		try {
 			QueryRunner query = new QueryRunner();
-			String sql = "select * from responder where version = " + version;
+			String sql = "select * from responder where responder_person is null and version = " + version;
 			logger.debug(sql);
 			list = query.query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Responder>>() {
 				@Override

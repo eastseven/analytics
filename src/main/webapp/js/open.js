@@ -6,7 +6,9 @@ var prefix_matrix_plus = 'matrixPlus_';
 
 $(function() {
 	ctx = $('input[name=ctx]').val();
-
+	
+	$('a[name=submit]').hide();
+	
 	var matrix = {};
 	var matrixNet = {};
 	var normal = {};
@@ -18,38 +20,56 @@ $(function() {
 		
 		loadMatrix(result);
 		
-		$('tr:odd').addClass('odd');
-		$('tr:even').addClass('even');
-		$('li').each(function(i) {
-			var id = i + 1;
-			$(this).attr('id', 'li'+id);
-			//$(this).attr('name', 'li'+id);
-		});
 	});
 	
 	//提交按钮
 	$('a[name=submit]').bind('click', function() {
-		alert('submit button');
-//		var selectedOk = true;
-//		var lis = $('li');
-//		for(var index = 0; index < lis.length; index++) {
-//			var li = lis[index];
-//			var id = $(li).attr('id');
-//			var content = $(li).find('h4 > span').text();
-//			var radio = $(li).find('table > tbody > tr > td > input:checked');
-//			if(radio == null || radio.length == 0) {
-//				selectedOk = false;
-//				this.href = '#' + id;
-//				alert('题目："' + content + '"没有填写!');
-//				break;
-//			}
-//		}
-//		
-//		if(selectedOk) {
-//			$('form').attr('method', 'post');
-//			$('form').attr('action', 'handler.jsp');
-//			$('form').submit();
-//		}
+		var selectedOk = true;
+
+		var select = $('option:selected');
+		for(var index = 0; index < select.length; index++) {
+			var option = select[index];
+			if($(option).val() == -2) {
+				//li2
+				var content = $('#li2').find('h4 > span').text();
+				selectedOk = false;
+				this.href = '#li2';
+				alert('题目："' + content + '"没有填写!');
+				break;
+			} else if($(option).val() == -1) {
+				//li3
+				var content = $('#li3').find('h4 > span').text();
+				selectedOk = false;
+				this.href = '#li3';
+				alert('题目："' + content + '"没有填写!');
+				break;
+			}
+		}
+		
+		if(selectedOk) {
+			var lis = $('li');
+			for(var index = 0; index < lis.length; index++) {
+				if(index > 2) {
+					var li = lis[index];
+					var id = $(li).attr('id');
+					var content = $(li).find('h4 > span').text();
+					var radio = $(li).find('table > tbody > tr > td > input:checked');
+					if(radio == null || radio.length == 0) {
+						selectedOk = false;
+						this.href = '#' + id;
+						alert('题目："' + content + '"没有填写!');
+						break;
+					}
+				}
+			}
+		}
+		console.debug(selectedOk);
+		if(selectedOk) {
+			$('#info').wrap('<form></form>');
+			$('form').attr('method', 'post');
+			$('form').attr('action', 'handler.jsp');
+			$('form').submit();
+		}
 	});
 	
 });
@@ -60,19 +80,19 @@ function loadMatrix(result) {
 		
 		var question = matrix[index];
 		var title = question.title;
-		var questionNo = prefix_matrix + question.id;
+		var questionNo = 'person' ;//+ question.id;
 
 		var table = '<table><tbody>';
-		table += '<tr><td>第一人 : <input type="text"  value=""  id="'+questionNo+'_0"/></td></tr>';
-		table += '<tr><td>第二人 : <input type="text"  value=""  id="'+questionNo+'_1"/></td></tr>';
-		table += '<tr><td>第三人 : <input type="text"  value=""  id="'+questionNo+'_2"/></td></tr>';
-		table += '<tr><td>第四人 : <input type="text"  value=""  id="'+questionNo+'_3"/></td></tr>';
-		table += '<tr><td>第五人 : <input type="text"  value=""  id="'+questionNo+'_4"/></td></tr>';
-		table += '<tr><td>第六人 : <input type="text"  value=""  id="'+questionNo+'_5"/></td></tr>';
-		table += '<tr><td>第七人 : <input type="text"  value=""  id="'+questionNo+'_6"/></td></tr>';
-		table += '<tr><td>第八人 : <input type="text"  value=""  id="'+questionNo+'_7"/></td></tr>';
-		table += '<tr><td>第九人 : <input type="text"  value=""  id="'+questionNo+'_8"/></td></tr>';
-		table += '<tr><td>第十人 : <input type="text"  value=""  id="'+questionNo+'_9"/></td></tr>';
+		table += '<tr><td>第一人 : <input type="text"  value=""  id="'+questionNo+'0" name="'+questionNo+'0"/></td></tr>';
+		table += '<tr><td>第二人 : <input type="text"  value=""  id="'+questionNo+'1" name="'+questionNo+'1"/></td></tr>';
+		table += '<tr><td>第三人 : <input type="text"  value=""  id="'+questionNo+'2" name="'+questionNo+'2"/></td></tr>';
+		table += '<tr><td>第四人 : <input type="text"  value=""  id="'+questionNo+'3" name="'+questionNo+'3"/></td></tr>';
+		table += '<tr><td>第五人 : <input type="text"  value=""  id="'+questionNo+'4" name="'+questionNo+'4"/></td></tr>';
+		table += '<tr><td>第六人 : <input type="text"  value=""  id="'+questionNo+'5" name="'+questionNo+'5"/></td></tr>';
+		table += '<tr><td>第七人 : <input type="text"  value=""  id="'+questionNo+'6" name="'+questionNo+'6"/></td></tr>';
+		table += '<tr><td>第八人 : <input type="text"  value=""  id="'+questionNo+'7" name="'+questionNo+'7"/></td></tr>';
+		table += '<tr><td>第九人 : <input type="text"  value=""  id="'+questionNo+'8" name="'+questionNo+'8"/></td></tr>';
+		table += '<tr><td>第十人 : <input type="text"  value=""  id="'+questionNo+'9" name="'+questionNo+'9"/></td></tr>';
 		
 		table += '<tr><td align="center" id="button">';
 		table += '<a style="cursor: pointer;"            onclick="nextpage()" name="nextpage"><button class="subutton">下一页</button></a>';
@@ -92,7 +112,7 @@ function loadMatrixNet(result) {
 	matrixNet = result.matrixNet;
 	//matrix net
 	matrixNetTr = '';
-	var matrixNetTable = '<table id="matrixNet"><thead><tr><td align="right">姓名</td>';
+	var matrixNetTable = '<table id="matrixNet" border=1><thead><tr><td align="right">姓名</td>';
 	for(var index = 0; index < matrixNet.length; index++) {
 		var net = matrixNet[index].questions[0];
 		matrixNetTable += '<td align="center">'+net.content+'</td>';
@@ -103,7 +123,7 @@ function loadMatrixNet(result) {
 	matrixNetTable += '</tbody></table>';
 	
 	//matrix trapezoid
-	var trapezoid = '<table id="trapezoid"><tbody>';
+	var trapezoid = '<table id="trapezoid" border=1><tbody>';
 	//load people
 	var people = $(':text[value!=""]');
 	var rownum = people.length + 1;
@@ -117,6 +137,7 @@ function loadMatrixNet(result) {
 				if(col == 0) trapezoid += '<td />';
 				else {
 					var name = $(people[col-1]).val();
+					var peopleId = $(people[col-1]).attr('id');
 					trapezoid += '<td align="center">'+name+'</td>';
 				}
 			} else {
@@ -126,8 +147,12 @@ function loadMatrixNet(result) {
 				}else if(row <= col) {
 					trapezoid += '<td />';
 				} else {
-					trapezoid += '<td align="center"><select>';
-					trapezoid += '<option value=-1>请选择</option>';
+					//[row,column]
+					var rId = $(people[row-1]).attr('id');
+					var cId = $(people[col-1]).attr('id');
+					var _id = prefix_matrix_plus + rId + '_' + cId;
+					trapezoid += '<td align="center"><select name='+_id+'>';
+					trapezoid += '<option value=-2>请选择</option>';
 					trapezoid += '<option value=0>完全不认识</option>';
 					trapezoid += '<option value=0>不熟悉</option>';
 					trapezoid += '<option value=1>一般</option>';
@@ -143,7 +168,7 @@ function loadMatrixNet(result) {
 	}
 	trapezoid += '</tbody></table>';
 	
-	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息 Matrix Plus</span></h4>'+trapezoid+'</li>');
+	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>'+trapezoid+'</li>');
 	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>'+matrixNetTable+'</li>');
 	
 }
@@ -174,6 +199,12 @@ function loadNormal(result) {
 		table += '</tbody></table>';
 		$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >'+property.name+'</span></h4>'+table+'</li>');
 	}
+	
+	$('li').each(function(i) {
+		var id = i + 1;
+		$(this).attr('id', 'li'+id);
+		$(this).attr('name', 'li'+id);
+	});
 }
 
 // ----- Event ----- //
@@ -198,6 +229,8 @@ function nextpage() {
 		$(':text[value!=""]').each(function() {
 			add(this);
 		});
+		
+		$('a[name=submit]').show();
 	}
 }
 
@@ -214,7 +247,7 @@ function reset() {
 	
 	$('a[name=nextpage]').show();
 	$('a[name=reset]').hide();
-	
+	$('a[name=submit]').hide();
 	$('#matrixNetTbody').empty();
 }
 
@@ -224,7 +257,8 @@ function add(input) {
 	var value = $(input).val();
 	
 	if($('#'+id).length == 0) {
-		$('#matrixNetTbody').append('<tr id="'+id+'"><td id="'+tdId+'" align="right">'+value+'</td>'+matrixNetTr+'</tr>');
+		var _matrixNetTr = matrixNetTr.replace(/personid/g, $(input).attr('id'));
+		$('#matrixNetTbody').append('<tr id="'+id+'"><td id="'+tdId+'" align="right">'+value+'</td>'+_matrixNetTr+'</tr>');
 	} else {
 		var origin = $('#'+tdId).text();
 		//console.debug('当前值：'+value + ',原始值：' + origin);

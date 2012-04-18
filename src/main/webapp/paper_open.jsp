@@ -17,6 +17,12 @@
 
 <style type="text/css">
 .subutton{ background:url(./images/button_bg3.gif); width:100px; height:34px; border:none;}
+/* 
+.trapezoid table { border-collapse:collapse; }
+.trapezoid table, th, td { border: 1px solid black; }
+.matrixNet table { border-collapse:collapse; }
+.matrixNet table, th, td { border: 1px solid black; }
+ */
 </style>
 
 <%

@@ -114,7 +114,7 @@ public class Question {
 				html = "<select name='question_" + this.id + "'>";
 			}
 			for (Option o : this.options) {
-				html += "<option value='" + o.getKey() + "'>" + o.getValue() + "</option>";
+				html += "<option value='" + o.getKey() + "_personid'>" + o.getValue() + "</option>";
 			}
 			html += "</select>";
 		}

@@ -9,6 +9,7 @@
 	final String prefix_matrix_net   = "matrixNet_";
 	final String prefix_matrix_plus  = "matrixPlus_";
 	final String prefix_property     = "property_";
+	final String prefix_person       = "person";
 	Map params = request.getParameterMap();
 	Set keys = params.keySet();
 
@@ -46,6 +47,14 @@
 			text = text.replace(",", "");
 			answer.put(prefix_property+text, text);
 			out.print(prefix_property+"="+key+":"+text+"<br/>");
+		}
+		
+		if(key.startsWith(prefix_person)) {
+			if(!StringUtils.endsWith(text, ",")) {
+				text = text.replace(",", "");
+				answer.put(key, text);
+				out.print(prefix_person+"="+key+":"+text+"<br/>");
+			}
 		}
 		
 	}

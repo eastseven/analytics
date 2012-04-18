@@ -21,6 +21,10 @@ public class Responder {
 	private String no;
 
 	private String pwd;
+	
+	private long pid;
+	
+	private String personNo;
 
 	private Set<ResponderProperty> properties = new HashSet<ResponderProperty>();
 
@@ -82,6 +86,22 @@ public class Responder {
 
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
+	}
+
+	public long getPid() {
+		return pid;
+	}
+
+	public void setPid(long pid) {
+		this.pid = pid;
+	}
+
+	public String getPersonNo() {
+		return personNo;
+	}
+
+	public void setPersonNo(String personNo) {
+		this.personNo = personNo;
 	}
 
 	@Override

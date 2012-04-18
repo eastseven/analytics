@@ -27,6 +27,8 @@
 		<column name="version" type="BIGINT" />
 		<column name="responder_no" type="CHAR" size="6" />
 		<column name="responder_pwd" type="CHAR" size="6" />
+		<column name="responder_pid" type="BIGINT" />
+		<column name="responder_person" type="VARCHAR" size="50"/>
 	</table>
 	<table name="question_option">
 		<column name="option_group_id" type="BIGINT"/>

@@ -44,6 +44,8 @@ $(function() {
 				alert('题目："3.' + content + '"没有填写!');
 				break;
 			}
+			
+			if(!selectedOk) break;
 		}
 		
 		if(selectedOk) {
@@ -205,7 +207,7 @@ function loadNormal(result) {
 	$('li').each(function(i) {
 		var id = i + 1;
 		$(this).attr('id', 'li'+id);
-		//$(this).attr('name', 'li'+id);
+		$(this).attr('name', 'li_normal');
 	});
 }
 

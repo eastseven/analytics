@@ -80,7 +80,11 @@ public class QuestionnaireOpenResponderComposer extends GenericForwardComposer {
 			row.appendChild(new Label(DateFormatUtils.format(Long.valueOf(e.getId()), pattern)));
 			row.appendChild(new Label(String.valueOf(e.getVersion())));
 			
-			row.appendChild(new Button("查看"));
+			Button btn = new Button("查看");
+			btn.setVisible(false);
+			btn.setHref("open.zul?rid="+e.getId());
+			btn.setTarget("blank");
+			row.appendChild(btn);
 		}
 		
 	}

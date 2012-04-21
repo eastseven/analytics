@@ -34,14 +34,14 @@ $(function() {
 				var content = $('#li2').find('h4 > span').text();
 				selectedOk = false;
 				this.href = '#li2';
-				alert('题目："' + content + '"没有填写!');
+				alert('题目："2.' + content + '"没有填写!');
 				break;
 			} else if($(option).val() == -1) {
 				//li3
 				var content = $('#li3').find('h4 > span').text();
 				selectedOk = false;
 				this.href = '#li3';
-				alert('题目："' + content + '"没有填写!');
+				alert('题目："3.' + content + '"没有填写!');
 				break;
 			}
 		}
@@ -57,13 +57,14 @@ $(function() {
 					if(radio == null || radio.length == 0) {
 						selectedOk = false;
 						this.href = '#' + id;
-						alert('题目："' + content + '"没有填写!');
+						var idString = ''+id;
+						alert('题目："'+idString.replace(/li/, '')+'.' + content + '"没有填写!');
 						break;
 					}
 				}
 			}
 		}
-		console.debug(selectedOk);
+		//console.debug(selectedOk);
 		if(selectedOk) {
 			$('#info').wrap('<form></form>');
 			$('form').attr('method', 'post');
@@ -168,7 +169,7 @@ function loadMatrixNet(result) {
 	}
 	trapezoid += '</tbody></table>';
 	
-	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>'+trapezoid+'</li>');
+	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相互熟悉程度</span></h4>'+trapezoid+'</li>');
 	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>'+matrixNetTable+'</li>');
 	
 }
@@ -191,6 +192,7 @@ function loadNormal(result) {
 	}
 	
 	//person properties
+	$('.content').append('<div><h3>个人相关信息</h3></div>');
 	for(var index = 0; index < properties.length; index++) {
 		var property = properties[index];
 		var property_ = 'property_'+index;
@@ -203,7 +205,7 @@ function loadNormal(result) {
 	$('li').each(function(i) {
 		var id = i + 1;
 		$(this).attr('id', 'li'+id);
-		$(this).attr('name', 'li'+id);
+		//$(this).attr('name', 'li'+id);
 	});
 }
 

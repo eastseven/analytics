@@ -8,6 +8,7 @@ var columnNum = 10;
 var globalArray = [];
 var globalCounter = 1;
 var ctx = '';
+var title = '';
 $(function() {
 	var responderId = $('input[name=responderId]').val();
 	var paperType = $('input[name=paperType]').val();
@@ -50,6 +51,7 @@ function prepareBlankPaper(responderId, version, name) {
 				if($(li).find(cssSelector + 'input:checked').length == 0) {
 					this.href = '#' + $(li).attr('id');
 					alert('题目："' + $(li).find('h4 > span').text() + '"没有填写!');
+					bln = true;
 					break;
 				}
 			} else if($(li).find(selectTr).length > 0 && $(li).find(selectTr + ' > td > select[id=""]').length > 0) {//2
@@ -65,53 +67,34 @@ function prepareBlankPaper(responderId, version, name) {
 				}
 			}
 			
-			//console.debug($(li).find('table > tbody > tr > td > :radio'));
-			
 			if(bln) {
 				break;
 			}
 		}
-		
-		var selectedOk = true;
-		/*
-		$.each($('tr:visible > td'), function(i, item) {
-			var peopleId = $(this).attr('id');
-			if(peopleId != undefined) {
-				var selected = $(this).children('select');
-				selected = $(selected[0]).children('option[selected]');
-				var value = $(selected).attr('value');
-				if(value == -1) {
-					selectedOk = selectedOk & false;
+		//alert(this.href);
+		if(!bln) {
+			var selectedOk = true;
+			var lis = $('li[name=li_normal]');
+			for(var index = 0; index < lis.length; index++) {
+				var li = lis[index];
+				var id = $(li).attr('id');
+				var content = $(li).find('h4 > span').text();
+				var radio = $(li).find('table > tbody > tr > td > input:checked');
+				if(radio == null || radio.length == 0) {
+					selectedOk = false;
+					this.href = '#' + id;
+					alert('题目："' + content + '"没有填写!');
+					break;
 				}
-				value = value + '_' + peopleId;
-				selected.attr('value', value);
 			}
-		});
-		
-		var checkedRadios = 0;
-		$(':radio').each(function() {
-			if($(this).attr('checked') == 'checked') checkedRadios++;
-		});
-		 */
-		
-		var lis = $('li[name=li_normal]');
-		for(var index = 0; index < lis.length; index++) {
-			var li = lis[index];
-			var id = $(li).attr('id');
-			var content = $(li).find('h4 > span').text();
-			var radio = $(li).find('table > tbody > tr > td > input:checked');
-			if(radio == null || radio.length == 0) {
-				selectedOk = false;
-				this.href = '#' + id;
-				alert('题目："' + content + '"没有填写!');
-				break;
+			
+			if(selectedOk) {
+				$('form').attr('method', 'post');
+				$('form').attr('action', 'handler.jsp');
+				$('form').submit();
 			}
 		}
-		if(selectedOk) {
-			$('form').attr('method', 'post');
-			$('form').attr('action', 'handler.jsp');
-			$('form').submit();
-		}
+		
 	});
 }
 
@@ -485,6 +468,7 @@ function loadPaper(version, responderId) {
 		var selfInfo = result.optionGroups;
 		if (selfInfo.length > 0) {
 			var html = '';
+			$('.content').append('<div><h3>个人相关信息</h3></div>');
 			$.each(selfInfo, function(i, item) {
 				html += '<li class="part select" name="li_normal"><h4 class=title ><span class=subject >' + item.name + '</span></h4>';
 				var table = '<table class=options>';

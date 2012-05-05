@@ -44,7 +44,10 @@
 				<div class="page">
 					<div class="page-header">
 						<h1 class="survey-title">调查表</h1>
-						<div id="title"><%=service.getQuestionnaireTitle(request.getAttribute("v")) %></div>
+						<div id="title">
+							<div><%=service.getQuestionnaireTitle(request.getAttribute("v")) %></div>
+							<div><img alt="example" src="images/example.jpg"/></div>
+						</div>
 					</div>
 					<ol class="content">
 					

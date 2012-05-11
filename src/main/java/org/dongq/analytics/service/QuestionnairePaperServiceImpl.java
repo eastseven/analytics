@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
@@ -1266,10 +1267,15 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				//总人数
 				int n = 0;
 				
+				List<Map<String, Object>> differentList = new ArrayList<Map<String,Object>>();
+				
 				for(int sheetIndex = 0; sheetIndex < list.size(); sheetIndex++) {
 					Responder responder = getResponder((Long)list.get(sheetIndex));
 					String sheetname = responder.getName();
 					Sheet sheet = workbook.createSheet(sheetname);
+					
+					Map<String, Object> responderDiff = new TreeMap<String, Object>();
+					responderDiff.put("responderName", responder.getName());
 					
 					sql = "select question_id from questionnaire_matrixnet where responder_id = " + responder.getId() + " group by question_id";
 					List<Object> questionIds = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
@@ -1330,6 +1336,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						formula = k + "*(" + n2 + "-" + formula.replaceFirst("\\+", "") + ") / " + n2 + "*" + (k-1);
 						logger.debug(formula);
 						
+						responderDiff.put(question.getDescription(), String.valueOf(different));
+						
 						//平均值
 						Cell mediumValueCell =  row.createCell(row.getLastCellNum());
 						double a = (double)(new Double(values) / columns);
@@ -1383,7 +1391,36 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 							}
 						}
 					}
+					differentList.add(responderDiff);
+				}
+				
+				//参与调查的人员异质性数值统计sheet
+				if(!differentList.isEmpty()) {
+					Sheet diffSheet = workbook.createSheet("异质性数值统计");
 					
+					//表头
+					Map<String, Object> map = differentList.get(0);
+					Row title = diffSheet.createRow(0);
+					int col = 1;
+					for(String key : map.keySet()) {
+						if(key.equals("responderName")) continue;
+						Cell cell =  title.createCell(col);
+						cell.setCellValue(key);
+						col++;
+					}
+					
+					int index = 1;
+					for(Map<String, Object> person : differentList) {
+						Row row = diffSheet.createRow(index);
+						int column = 0;
+						for(String key : person.keySet()) {
+							Cell cell = row.createCell(column);
+							cell.setCellValue(person.get(key).toString());
+							column++;
+						}
+						
+						index++;
+					}
 				}
 			}
 		} catch (SQLException e) {

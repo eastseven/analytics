@@ -1271,11 +1271,11 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				
 				for(int sheetIndex = 0; sheetIndex < list.size(); sheetIndex++) {
 					Responder responder = getResponder((Long)list.get(sheetIndex));
-					String sheetname = responder.getName();
+					String sheetname = (sheetIndex + 1) + responder.getName();
 					Sheet sheet = workbook.createSheet(sheetname);
 					
 					Map<String, Object> responderDiff = new TreeMap<String, Object>();
-					responderDiff.put("responderName", responder.getName());
+					responderDiff.put("responderName", sheetname);
 					
 					sql = "select question_id from questionnaire_matrixnet where responder_id = " + responder.getId() + " group by question_id";
 					List<Object> questionIds = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());

@@ -23,26 +23,14 @@
             <name>EBR External Release Repository</name>  
             <url>http://repository.springsource.com/maven/bundles/external</url>  
         </repository>  
-		<!-- 
-		 
 		<repository>
-			<id>MirrorRepository</id>
-			<name>Mirror Repository 
-		in justinmobile's LAN</name>
-			<url>http://118.122.114.104:8085/maven2</url>
+			<id>nexus</id>
+			<name>nexus Repository</name>
+			<url>http://183.221.125.150:8081/nexus/content/groups/public</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
-		<repository>
-			<id>justinmobileRepository</id>
-			<name>justinmobile's 
-		repository</name>
-			<url>http://118.122.114.104:8085/JMRepos</url>
-		</repository>
-		<repository>
-			<id>maven2proxy</id>
-			<name>proxy for maven's repository</name>
-			<url>http://118.122.114.104:9999/repository</url>
-		</repository>
-		-->
 	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -210,37 +198,6 @@
 			${basedir}/src/main/webapp/WEB-INF/classes
 		</outputDirectory>
 		<plugins>
-			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<version>6.1.10</version>
-				<configuration>
-					<scanIntervalSeconds>10</scanIntervalSeconds>
-					<stopKey>foo</stopKey>
-					<stopPort>9999</stopPort>
-					<classesDirectory>${project.artifactId}/src/main/webapp/WEB-INF/classes</classesDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>start-jetty</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<scanIntervalSeconds>0</scanIntervalSeconds>
-							<daemon>true</daemon>
-						</configuration>
-					</execution>
-					<execution>
-						<id>stop-jetty</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<!-- compiler插件, 设定JDK版本 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -356,6 +313,12 @@
 						${basedir}/src/main/webapp/WEB-INF/lib
 					</outputDirectory>
 				</configuration>
+			</plugin>
+			<!-- tomcat插件 -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.0-beta-1</version>
 			</plugin>
 		</plugins>
 	</build>

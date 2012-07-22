@@ -31,17 +31,17 @@ $(function() {
 			var option = select[index];
 			if($(option).val() == -2) {
 				//li2
-				var content = $('#li2').find('h4 > span').text();
-				selectedOk = false;
-				this.href = '#li2';
-				alert('题目："2.' + content + '"没有填写!');
-				break;
-			} else if($(option).val() == -1) {
-				//li3
 				var content = $('#li3').find('h4 > span').text();
 				selectedOk = false;
 				this.href = '#li3';
 				alert('题目："3.' + content + '"没有填写!');
+				break;
+			} else if($(option).val() == -1) {
+				//li3
+				var content = $('#li4').find('h4 > span').text();
+				selectedOk = false;
+				this.href = '#li4';
+				alert('题目："4.' + content + '"没有填写!');
 				break;
 			}
 			
@@ -171,6 +171,7 @@ function loadMatrixNet(result) {
 	}
 	trapezoid += '</tbody></table>';
 	
+	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >(本题为示例，无须作答)请选择您所填写的这些人的相互熟悉程度</span></h4>'+sampleTable+'</li>');
 	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相互熟悉程度</span></h4>'+trapezoid+'</li>');
 	$('.content').append('<li class="part select" ><h4 class=title ><span class=subject >请选择您所填写的这些人的相关信息</span></h4>'+matrixNetTable+'</li>');
 	

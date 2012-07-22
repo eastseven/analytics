@@ -34,7 +34,7 @@ $(function() {
 	});
 });
 </script>
-<title>登录</title>
+<title>封闭式社会网络问卷调查</title>
 </head>
 <body>
 <!-- Layout 3 -->

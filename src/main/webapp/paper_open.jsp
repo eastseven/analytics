@@ -34,7 +34,7 @@
 <body>
 
 <script type="text/javascript" src="js/open.js"></script>
-
+<script type="text/javascript" src="js/sample.js"></script>
 	<h1><%=request.getAttribute("name") %></h1>
 	<div id="main">
 		<div id="info"/>
@@ -46,7 +46,7 @@
 						<h1 class="survey-title">调查表</h1>
 						<div id="title">
 							<div><%=service.getQuestionnaireTitle(request.getAttribute("v")) %></div>
-							<div><img alt="example" src="images/example.jpg"/></div>
+							<!-- <div><img alt="example" src="images/example.png"/></div> -->
 						</div>
 					</div>
 					<ol class="content">

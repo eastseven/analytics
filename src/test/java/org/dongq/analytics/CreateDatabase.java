@@ -15,7 +15,7 @@ public class CreateDatabase {
 		System.out.println("start...");
 		Properties p = new Properties();
 		p.put("driverClassName", DbHelper.driver);
-		p.put("url", "jdbc:derby://127.0.0.1/analytics;create=true");
+		p.put("url", "jdbc:derby://localhost/analytics;create=true");
 		p.put("username", DbHelper.user);
 		p.put("password", DbHelper.password);
 		BasicDataSource dataSource = (BasicDataSource)BasicDataSourceFactory.createDataSource(p);

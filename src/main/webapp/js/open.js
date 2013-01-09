@@ -51,7 +51,7 @@ $(function() {
 		if(selectedOk) {
 			var lis = $('li');
 			for(var index = 0; index < lis.length; index++) {
-				if(index > 2) {
+				if(index > 3) {
 					var li = lis[index];
 					var id = $(li).attr('id');
 					var content = $(li).find('h4 > span').text();

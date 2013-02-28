@@ -2,13 +2,13 @@ package org.dongq.analytics.model;
 
 public class QuestionnaireMatrixNet extends QuestionnairePaper {
 
-	private long relationPersonId;
+	private String relationPersonId;
 
-	public long getRelationPersonId() {
+	public String getRelationPersonId() {
 		return relationPersonId;
 	}
 
-	public void setRelationPersonId(long relationPersonId) {
+	public void setRelationPersonId(String relationPersonId) {
 		this.relationPersonId = relationPersonId;
 	}
 

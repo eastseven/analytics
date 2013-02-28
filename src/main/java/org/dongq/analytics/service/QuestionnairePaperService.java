@@ -18,7 +18,7 @@ public interface QuestionnairePaperService {
 	public static final String TYPE_OPEN  = "open";
 	public static final String TYPE_CLOSE = "close";
 	
-	public boolean hasAnswered(long responderId);
+	public boolean hasAnswered(String responderId);
 	
 	public Responder login(String no, String pwd);
 	
@@ -26,11 +26,11 @@ public interface QuestionnairePaperService {
 	
 	public List<Responder> getRespondersOfVersion(long version);
 	
-	public Questionnaire getQuestionnaire(long responderId);
+	public Questionnaire getQuestionnaire(String responderId);
 	
 	public Questionnaire getBlankQuestionnaire(long version);
 	
-	public List<Question> getQuestionsOfVersion(long version, int type, Long responderId) throws SQLException;
+	public List<Question> getQuestionsOfVersion(long version, int type, String responderId) throws SQLException;
 	
 	public boolean saveQuestionnairePaper(QuestionnairePaper paper);
 	

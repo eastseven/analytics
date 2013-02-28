@@ -25,35 +25,35 @@
 		
 		if(key.startsWith(prefix_question)) {
 			answer.put(key, value[0]);
-			//out.print(prefix_question+"="+key + ":" + value[0] + "<br/>");
+			out.print(prefix_question+"="+key + ":" + value[0] + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix)) {
 			answer.put(key, text);
-			//out.print(prefix_matrix+"="+key + ":" + text + "<br/>");
+			out.print(prefix_matrix+"="+key + ":" + text + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix_net)) {
 			answer.put(key, text);
-			//out.print(prefix_matrix_net+"="+key + ":" + text + "<br/>");
+			out.print(prefix_matrix_net+"="+key + ":" + text + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_matrix_plus)) {
 			answer.put(key, value[0]);
-			//out.print(prefix_matrix_plus+"="+key + ":" + value[0] + "<br/>");
+			out.print(prefix_matrix_plus+"="+key + ":" + value[0] + "<br/>");
 		}
 		
 		if(key.startsWith(prefix_property)) {
 			text = text.replace(",", "");
 			answer.put(prefix_property+text, text);
-			//out.print(prefix_property+"="+key+":"+text+"<br/>");
+			out.print(prefix_property+"="+key+":"+text+"<br/>");
 		}
 		
 		if(key.startsWith(prefix_person)) {
 			if(!StringUtils.endsWith(text, ",")) {
 				text = text.replace(",", "");
 				answer.put(key, text);
-				//out.print(prefix_person+"="+key+":"+text+"<br/>");
+				out.print(prefix_person+"="+key+":"+text+"<br/>");
 			}
 		}
 		
@@ -65,10 +65,10 @@
 	responder.setVersion(Long.valueOf(version));
 	
 	if(StringUtils.isBlank(responderId)) {
-		responder.setId(0);
+		responder.setId(null);
 		responder.setName(request.getParameter("name"));
 	} else {
-		responder.setId(Long.valueOf(responderId));
+		responder.setId(responderId);
 	}
 	
 	boolean bln = new QuestionnairePaperServiceImpl().saveQuestionnairePaper(responder, answer);

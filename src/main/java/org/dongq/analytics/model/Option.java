@@ -9,7 +9,7 @@ package org.dongq.analytics.model;
  */
 public class Option {
 
-	private long id;
+	private String id;
 
 	private int key;
 
@@ -21,11 +21,11 @@ public class Option {
 
 	private boolean selected;
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

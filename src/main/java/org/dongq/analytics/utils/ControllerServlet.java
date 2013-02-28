@@ -37,16 +37,16 @@ public class ControllerServlet extends HttpServlet {
 	private static final long serialVersionUID = 8908347914853579104L;
 	private static final Log logger = LogFactory.getLog(ControllerServlet.class);
 
-	final String METHOD = "action";
-	final String GetRespondersOfVersion = "getRespondersOfVersion";
-	final String GetMatrixNetOfVersion = "getMatrixNetOfVersion";
-	final String GetQuestionnairePaper = "getQuestionnairePaper";
-	final String GetQuestionnaireByResponderId = "getQuestionnaireByResponderId";
+	final String METHOD                                 = "action";
+	final String GetRespondersOfVersion                 = "getRespondersOfVersion";
+	final String GetMatrixNetOfVersion                  = "getMatrixNetOfVersion";
+	final String GetQuestionnairePaper                  = "getQuestionnairePaper";
+	final String GetQuestionnaireByResponderId          = "getQuestionnaireByResponderId";
 	final String GetQuestionnaireMatrixNetByResponderId = "getQuestionnaireMatrixNetByResponderId";
-	final String GetQuestionnaireMatrixNetAnswer = "getQuestionnaireMatrixNetAnswer";
-	final String GetQuestionnaireTitle = "getQuestionnaireTitle";
+	final String GetQuestionnaireMatrixNetAnswer        = "getQuestionnaireMatrixNetAnswer";
+	final String GetQuestionnaireTitle                  = "getQuestionnaireTitle";
 	
-	final String GetQuestionnaireOpenPaper = "getQuestionnaireOpenPaper";
+	final String GetQuestionnaireOpenPaper              = "getQuestionnaireOpenPaper";
 	
 	private QuestionnairePaperService service;
 
@@ -122,9 +122,9 @@ public class ControllerServlet extends HttpServlet {
 		
 		long version = Long.parseLong(versionString);
 		logger.info("v:" + version);
-		long responderId = Long.parseLong(responderIdString);
+		//long responderId = Long.parseLong(responderIdString);
 		
-		Questionnaire blankPaper = service.getQuestionnaire(responderId);
+		Questionnaire blankPaper = service.getQuestionnaire(responderIdString);
 		logger.debug(blankPaper);
 		String result = JSON.toJSONString(blankPaper);
 		PrintWriter out = resp.getWriter();
@@ -146,8 +146,8 @@ public class ControllerServlet extends HttpServlet {
 						QuestionnairePaper e = new QuestionnairePaper();
 						e.setFinishTime(rs.getLong("finish_time"));
 						e.setOptionKey(rs.getLong("option_key"));
-						e.setQuestionId(rs.getLong("question_id"));
-						e.setResponderId(rs.getLong("responder_id"));
+						e.setQuestionId(rs.getString("question_id"));
+						e.setResponderId(rs.getString("responder_id"));
 						e.setType(rs.getInt("type"));
 						e.setVersion(rs.getLong("version"));
 						list.add(e);
@@ -172,12 +172,12 @@ public class ControllerServlet extends HttpServlet {
 	void getQuestionnaireMatrixNetByResponderId(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String responderIdString = req.getParameter("responderId");
 		String versionString = req.getParameter("version");
-		String sql = "select relation_person_id from questionnaire_matrixnet where responder_id = " + responderIdString + " group by relation_person_id";
+		String sql = "select relation_person_id from questionnaire_matrixnet where responder_id = '" + responderIdString + "' group by relation_person_id";
 		QueryRunner query = new QueryRunner();
 		try {
 			List<Object> relationPersonIds = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
 			
-			List<Question> questions = service.getQuestionsOfVersion(Long.valueOf(versionString), Question.TYPE_MATRIX_NET, Long.valueOf(responderIdString));
+			List<Question> questions = service.getQuestionsOfVersion(Long.valueOf(versionString), Question.TYPE_MATRIX_NET, responderIdString);
 			logger.debug("questions size : "+questions.size());
 			List<Map<String, Object>> finalData = new ArrayList<Map<String,Object>>();
 			
@@ -186,9 +186,9 @@ public class ControllerServlet extends HttpServlet {
 				List<Map<String, Object>> questionList = new ArrayList<Map<String,Object>>();
 				for(Question q : questions) {
 					sql = "select option_key from questionnaire_matrixnet where ";
-					sql += " responder_id = " + responderIdString;
-					sql += " and relation_person_id = " + relationPersonId;
-					sql += " and question_id = " + q.getId();
+					sql += " responder_id = '" + responderIdString + "'";
+					sql += " and relation_person_id = '" + relationPersonId + "'";
+					sql += " and question_id = '" + q.getId() + "'";
 					logger.debug("\n\n"+sql+"\n\n");
 					Map<String, Object> mapOptionKey = query.query(DbHelper.getConnection(), sql, new MapHandler());
 					long optionKey = (Long)mapOptionKey.get("OPTION_KEY");

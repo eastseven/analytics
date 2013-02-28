@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class Responder {
 
-	private long id;
+	private String id;
 
 	private String name;
 
@@ -22,7 +22,7 @@ public class Responder {
 
 	private String pwd;
 	
-	private long pid;
+	private String pid;
 	
 	private String personNo;
 
@@ -32,7 +32,7 @@ public class Responder {
 		super();
 	}
 
-	public Responder(long id, String name, long version, Set<ResponderProperty> properties) {
+	public Responder(String id, String name, long version, Set<ResponderProperty> properties) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -40,11 +40,11 @@ public class Responder {
 		this.properties = properties;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -88,11 +88,11 @@ public class Responder {
 		this.pwd = pwd;
 	}
 
-	public long getPid() {
+	public String getPid() {
 		return pid;
 	}
 
-	public void setPid(long pid) {
+	public void setPid(String pid) {
 		this.pid = pid;
 	}
 
@@ -109,14 +109,6 @@ public class Responder {
 		return "Responder [id=" + id + ", name=" + name + ", version="
 				+ version + ", no=" + no + ", pwd=" + pwd + ", properties="
 				+ properties + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
 	}
 
 	@Override

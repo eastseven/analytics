@@ -75,7 +75,7 @@ public class QuestionnaireOpenComposer extends GenericForwardComposer {
 					while(rs.next()) {
 						Map<Object, Object> map = new HashMap<Object, Object>();
 						map.put("version", rs.getLong("version"));
-						map.put("questions", rs.getLong("questions"));
+						map.put("questions", rs.getString("questions"));
 						
 						list.add(map);
 					}

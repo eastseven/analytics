@@ -9,9 +9,9 @@ package org.dongq.analytics.model;
  */
 public class QuestionnairePaper {
 
-	private long responderId;
+	private String responderId;
 
-	private long questionId;
+	private String questionId;
 
 	private long optionKey;
 
@@ -21,19 +21,19 @@ public class QuestionnairePaper {
 
 	private long finishTime;
 
-	public long getResponderId() {
+	public String getResponderId() {
 		return responderId;
 	}
 
-	public void setResponderId(long responderId) {
+	public void setResponderId(String responderId) {
 		this.responderId = responderId;
 	}
 
-	public long getQuestionId() {
+	public String getQuestionId() {
 		return questionId;
 	}
 
-	public void setQuestionId(long questionId) {
+	public void setQuestionId(String questionId) {
 		this.questionId = questionId;
 	}
 

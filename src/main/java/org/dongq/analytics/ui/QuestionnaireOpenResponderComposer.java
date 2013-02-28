@@ -57,7 +57,7 @@ public class QuestionnaireOpenResponderComposer extends GenericForwardComposer {
 					List<Responder> list = new ArrayList<Responder>();
 					while(rs.next()) {
 						Responder e = new Responder();
-						e.setId(rs.getLong("responder_id"));
+						e.setId(rs.getString("responder_id"));
 						e.setName(rs.getString("responder_name"));
 						e.setVersion(rs.getLong("version"));
 						list.add(e);
@@ -77,7 +77,8 @@ public class QuestionnaireOpenResponderComposer extends GenericForwardComposer {
 		public void render(Row row, Object data) throws Exception {
 			Responder e = (Responder)data;
 			row.appendChild(new Label(e.getName()));
-			row.appendChild(new Label(DateFormatUtils.format(Long.valueOf(e.getId()), pattern)));
+			//row.appendChild(new Label(DateFormatUtils.format(Long.valueOf(e.getId()), pattern)));
+			row.appendChild(new Label(e.getId()));
 			row.appendChild(new Label(String.valueOf(e.getVersion())));
 			
 			Button btn = new Button("查看");

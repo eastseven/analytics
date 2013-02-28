@@ -20,11 +20,11 @@ public class Question {
 	/** 4 */
 	public static final int TYPE_MATRIX_PLUS = 4;
 
-	private long id;
+	private String id;
 
 	private String title;
 	private String content;
-	private long optionId;
+	private String optionId;
 	private long version;
 	private int type;
 	private String answer;
@@ -32,11 +32,11 @@ public class Question {
 	private List<Option> options;
 	private List<Responder> people;
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -56,11 +56,11 @@ public class Question {
 		this.content = content;
 	}
 
-	public long getOptionId() {
+	public String getOptionId() {
 		return optionId;
 	}
 
-	public void setOptionId(long optionId) {
+	public void setOptionId(String optionId) {
 		this.optionId = optionId;
 	}
 

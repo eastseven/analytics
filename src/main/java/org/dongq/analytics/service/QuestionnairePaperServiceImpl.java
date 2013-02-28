@@ -48,13 +48,14 @@ import org.dongq.analytics.model.QuestionnairePaper;
 import org.dongq.analytics.model.Responder;
 import org.dongq.analytics.model.ResponderProperty;
 import org.dongq.analytics.utils.DbHelper;
+import org.dongq.analytics.utils.UUIDGenerator;
 
 public class QuestionnairePaperServiceImpl implements QuestionnairePaperService {
 
 	final static Log logger = LogFactory.getLog(QuestionnairePaperServiceImpl.class);
 	
 	@Override
-	public boolean hasAnswered(long responderId) {
+	public boolean hasAnswered(String responderId) {
 		boolean answered = true;
 		
 		try {
@@ -83,7 +84,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				public Responder handle(ResultSet rs) throws SQLException {
 					if(rs.next()) {
 						Responder r = new Responder();
-						r.setId(rs.getLong("responder_id"));
+						r.setId(rs.getString("responder_id"));
 						r.setName(rs.getString("responder_name"));
 						r.setNo(rs.getString("responder_no"));
 						r.setPwd(rs.getString("responder_pwd"));
@@ -139,7 +140,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return new String(bs.toString());
 	}
 	
-	public Questionnaire getQuestionnaire(long id) {
+	public Questionnaire getQuestionnaire(String id) {
 		Questionnaire blankPaper = new Questionnaire();
 		QueryRunner query = new QueryRunner();
 		
@@ -151,7 +152,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				public Responder handle(ResultSet rs) throws SQLException {
 					if(rs.next()) {
 						Responder responder = new Responder();
-						responder.setId(rs.getLong("responder_id"));
+						responder.setId(rs.getString("responder_id"));
 						responder.setName(rs.getString("responder_name"));
 						responder.setVersion(rs.getLong("version"));
 						return responder;
@@ -224,7 +225,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						List<Option> list = new ArrayList<Option>();
 						while(rs.next()) {
 							Option e = new Option();
-							e.setId(rs.getLong("responder_property_id"));
+							e.setId(rs.getString("responder_property_id"));
 							e.setDisplay(rs.getString("responder_property_display"));
 							e.setValue(String.valueOf(rs.getInt("responder_property_value")));
 							list.add(e);
@@ -245,7 +246,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	
 	}
 	
-	List<OptionGroup> getResponderPropertyOfVersion(long version, long responderId) throws SQLException {
+	List<OptionGroup> getResponderPropertyOfVersion(long version, String responderId) throws SQLException {
 		QueryRunner query = new QueryRunner();
 		List<OptionGroup> optionGroups = new ArrayList<OptionGroup>();
 		String sql = "select responder_property_key from responder_property where version = " + version + " group by responder_property_key";
@@ -264,7 +265,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					List<Option> list = new ArrayList<Option>();
 					while(rs.next()) {
 						Option e = new Option();
-						e.setId(rs.getLong("responder_property_id"));
+						e.setId(rs.getString("responder_property_id"));
 						e.setDisplay(rs.getString("responder_property_display"));
 						e.setValue(String.valueOf(rs.getInt("responder_property_value")));
 						boolean selected = rs.getObject("selected") != null;
@@ -283,10 +284,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return optionGroups;
 	}
 	
-	public List<Responder> getRespondersOfVersion(long version, Long exceptSelf) {
+	public List<Responder> getRespondersOfVersion(long version, String exceptSelf) {
 		List<Responder> list = new ArrayList<Responder>();
 		String sql = "select * from responder a where a.version = " + version;
-		if(exceptSelf != null) sql += " and a.responder_id <> " + exceptSelf;
+		if(exceptSelf != null) sql += " and a.responder_id <> '" + exceptSelf + "'";
 		logger.debug(sql);
 		try {
 			list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Responder>>() {
@@ -295,7 +296,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					List<Responder> list = new ArrayList<Responder>();
 					while(rs.next()) {
 						Responder e = new Responder();
-						e.setId(rs.getLong("responder_id"));
+						e.setId(rs.getString("responder_id"));
 						e.setName(rs.getString("responder_name"));
 						e.setVersion(rs.getLong("version"));
 						list.add(e);
@@ -313,14 +314,14 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return getRespondersOfVersion(version, null);
 	}
 	
-	Responder getResponder(long responderId) throws SQLException {
+	Responder getResponder(String responderId) throws SQLException {
 		Responder r = null;
 		
-		String sql = "select * from responder where responder_id = " + responderId;
+		String sql = "select * from responder where responder_id = '" + responderId + "'";
 		Map<String, Object> map = new QueryRunner().query(DbHelper.getConnection(), sql, new MapHandler());
 		if(map != null && !map.isEmpty()) {
 			r = new Responder();
-			r.setId((Long)map.get("responder_id".toUpperCase()));
+			r.setId((String)map.get("responder_id".toUpperCase()));
 			r.setName((String)map.get("responder_name".toUpperCase()));
 			r.setVersion((Long)map.get("version".toUpperCase()));
 		}
@@ -343,7 +344,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						while(rs.next()) {
 							QuestionGroup e = new QuestionGroup();
 							e.setTitle(rs.getString("title"));
-							e.setId(rs.getLong("question_id"));
+							e.setId(rs.getString("question_id"));
 							list.add(e);
 						}
 						return list;
@@ -357,7 +358,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						while(rs.next()) {
 							QuestionGroup e = new QuestionGroup();
 							e.setTitle(rs.getString("title"));
-							e.setId(rs.getLong("option_group_id"));
+							e.setId(rs.getString("option_group_id"));
 							e.setOptions(getOptionsForQuestion(e.getId()));
 							e.setQuestions(getQuestionsOfOptionGroupId(e.getId()));
 							list.add(e);
@@ -381,7 +382,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return getQuestionsOfVersion(version, Question.TYPE_MATRIX, null);
 	}
 	
-	public List<Question> getQuestionsOfVersion(long version, int type, Long responderId) throws SQLException {
+	public List<Question> getQuestionsOfVersion(long version, int type, String responderId) throws SQLException {
 		List<Question> list = new ArrayList<Question>();
 		QueryRunner query = new QueryRunner();
 		String sql = "select * from question a where a.version = " + version + " and a.type = " + type;
@@ -392,10 +393,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				List<Question> list = new ArrayList<Question>();
 				while(rs.next()) {
 					Question e = new Question();
-					e.setId(rs.getLong("question_id"));
+					e.setId(rs.getString("question_id"));
 					e.setTitle(rs.getString("title"));
 					e.setContent(rs.getString("content"));
-					e.setOptionId(rs.getLong("option_group_id"));
+					e.setOptionId(rs.getString("option_group_id"));
 					e.setOptions(getOptionsForQuestion(e.getOptionId()));
 					e.setVersion(rs.getLong("version"));
 					e.setType(rs.getInt("type"));
@@ -410,15 +411,15 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return list;
 	}
 	
-	Question getQuestion(long questionId) throws SQLException {
+	Question getQuestion(String questionId) throws SQLException {
 		Question q = null;
-		String sql = "select * from question a where a.question_id = " + questionId;
+		String sql = "select * from question a where a.question_id = '" + questionId + "'";
 		Map<String, Object> map = new QueryRunner().query(DbHelper.getConnection(), sql, new MapHandler());
 		if(map != null && !map.isEmpty()) {
 			q = new Question();
 			q.setContent((String)map.get("content"));
-			q.setId((Long)map.get("question_id"));
-			q.setOptionId((Long)map.get("option_group_id"));
+			q.setId((String)map.get("question_id"));
+			q.setOptionId((String)map.get("option_group_id"));
 			q.setOptions(getOptionsForQuestion(q.getOptionId()));
 			q.setTitle((String)map.get("title"));
 			q.setVersion((Long)map.get("version"));
@@ -427,10 +428,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return q;
 	}
 	
-	List<Question> getQuestionsOfOptionGroupId(long optionGroupId) throws SQLException {
+	List<Question> getQuestionsOfOptionGroupId(String optionGroupId) throws SQLException {
 
 		List<Question> list = new ArrayList<Question>();
-		String sql = "select * from question a where a.option_group_id = " + optionGroupId;
+		String sql = "select * from question a where a.option_group_id = '" + optionGroupId+"'";
 		logger.debug(sql);
 		list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Question>>() {
 			@Override
@@ -438,10 +439,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				List<Question> list = new ArrayList<Question>();
 				while(rs.next()) {
 					Question e = new Question();
-					e.setId(rs.getLong("question_id"));
+					e.setId(rs.getString("question_id"));
 					e.setTitle(rs.getString("title"));
 					e.setContent(rs.getString("content"));
-					e.setOptionId(rs.getLong("option_group_id"));
+					e.setOptionId(rs.getString("option_group_id"));
 					e.setVersion(rs.getLong("version"));
 					e.setType(rs.getInt("type"));
 					e.setOptions(getOptionsForQuestion(e.getOptionId()));
@@ -456,9 +457,9 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	
 	}
 	
-	List<Option> getOptionsForQuestion(long id) throws SQLException {
+	List<Option> getOptionsForQuestion(String id) throws SQLException {
 		List<Option> list = new ArrayList<Option>();
-		String sql = "select * from question_option a where a.option_group_id = " + id;
+		String sql = "select * from question_option a where a.option_group_id = '" + id + "'";
 		logger.debug(sql);
 		list = new QueryRunner().query(DbHelper.getConnection(), sql, new ResultSetHandler<List<Option>>() {
 			@Override
@@ -466,7 +467,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				List<Option> list = new ArrayList<Option>();
 				while(rs.next()) {
 					Option e = new Option();
-					e.setId(rs.getLong("option_group_id"));
+					e.setId(rs.getString("option_group_id"));
 					e.setKey(rs.getInt("option_key"));
 					e.setValue(rs.getString("option_value"));
 					e.setVersion(rs.getLong("version"));
@@ -505,16 +506,16 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		Connection conn = DbHelper.getConnection();
 		try {
 			
-			if(responder.getId() == 0) {
+			if(responder.getId() == null) {
 				logger.debug(prefix_property);
-				responder.setId(System.currentTimeMillis() + 1);
+				responder.setId(UUIDGenerator.generateUUID());
 				String add = "insert into responder(responder_id,responder_name,version) values(?,?,?)";
 				query.update(conn, add, responder.getId(), responder.getName(), responder.getVersion());
 				
 				type = TYPE_OPEN;
 			}
 			
-			long responderId = responder.getId();
+			String responderId = responder.getId();
 			long version = responder.getVersion();
 			Set<String> keySet = answer.keySet();
 			List<QuestionnairePaper> list = new ArrayList<QuestionnairePaper>();
@@ -527,7 +528,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				if(key.startsWith(prefix_person)) {
 					String personName = value;
 					Responder e = new Responder();
-					e.setId(System.currentTimeMillis() + 1);
+					
+					e.setId(UUIDGenerator.generateUUID());
 					e.setName(personName);
 					e.setPersonNo(key);
 					e.setPid(responderId);
@@ -540,7 +542,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			for(String key : keySet) {
 				String value = (String)answer.get(key);
 				if(key.startsWith(prefix_question)) {
-					long questionId = Long.valueOf(key.replaceAll(prefix_question, replacement));
+					String questionId = key.replaceAll(prefix_question, replacement);
 					long optionKey = Long.valueOf(value);
 					QuestionnairePaper row = new QuestionnairePaper();
 					row.setResponderId(responderId);
@@ -555,8 +557,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				
 				if(key.startsWith(prefix_matrixPlus)) {
 					String[] persons = key.replaceAll(prefix_matrixPlus, replacement).split("_");
-					long personRow = type.equals(TYPE_CLOSE) ? Long.valueOf(persons[0]) : getPersonId(version, persons[0], responderId);
-					long personCol = type.equals(TYPE_CLOSE) ? Long.valueOf(persons[1]) : getPersonId(version, persons[1], responderId);
+					String personRow = type.equals(TYPE_CLOSE) ? persons[0] : getPersonId(version, persons[0], responderId);
+					String personCol = type.equals(TYPE_CLOSE) ? persons[1] : getPersonId(version, persons[1], responderId);
 					long optionKey = Long.valueOf(value);
 					QuestionnairePaper row = new QuestionnairePaper();
 					row.setResponderId(responderId);
@@ -564,13 +566,13 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					row.setType(Question.TYPE_MATRIX_PLUS);
 					row.setVersion(version);
 					row.setQuestionId(personRow);
-					row.setFinishTime(personCol);
+					//row.setFinishTime(personCol);
 					logger.debug("MatrixPlus: "+row);
 					list.add(row);
 				}
 				
 				if(key.startsWith(prefix_matrix)) {
-					long questionId = Long.valueOf(key.replaceAll(prefix_matrix, replacement));
+					String questionId = key.replaceAll(prefix_matrix, replacement);
 					String[] values = value.split(",");
 					for(String v : values) {
 						if(StringUtils.isBlank(v)) continue;
@@ -590,12 +592,12 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				//单独处理
 				if(key.startsWith(prefix_matrixNet)) {
 					String[] values = value.split(",");
-					long questionId = Long.valueOf(key.replaceAll(prefix_matrixNet, replacement));
+					String questionId = key.replaceAll(prefix_matrixNet, replacement);
 					for(String _value : values) {
 						if(StringUtils.isBlank(_value)) continue;
 						String[] _values = _value.split("_");
 						long optionKey = Long.valueOf(_values[0]);
-						long peopleId = type.equals(TYPE_CLOSE) ? Long.valueOf(_values[1]) : getPersonId(version, _values[1], responderId);
+						String peopleId = type.equals(TYPE_CLOSE) ? _values[1] : getPersonId(version, _values[1], responderId);
 						
 						QuestionnaireMatrixNet e = new QuestionnaireMatrixNet();
 						e.setResponderId(responderId);
@@ -609,7 +611,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				}
 				
 				if(key.startsWith(prefix_property)) {
-					long responderPropertyId = Long.valueOf(value);
+					String responderPropertyId = value;
 					ResponderProperty e = new ResponderProperty(responderPropertyId);
 					properties.add(e);
 				}
@@ -654,7 +656,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			if(!properties.isEmpty()) {
 				//Connection conn = DbHelper.getConnection();
 				conn.setAutoCommit(false);
-				final String delete = "delete from responder_properties where responder_id = "+responderId+" and version = " + version;
+				final String delete = "delete from responder_properties where responder_id = '"+responderId+"' and version = " + version;
 				int deleteRecord = query.update(DbHelper.getConnection(), delete);
 				logger.debug(deleteRecord+":"+delete);
 				
@@ -782,12 +784,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						String textValue = toConvert(cell);
 						if(!StringUtils.isBlank(textValue) && columnIndex > 1) {
 							ResponderProperty p = new ResponderProperty();
-							p.setId(System.currentTimeMillis());
-							try {
-								Thread.sleep(1);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
+							p.setId(UUIDGenerator.generateUUID());
 							p.setDisplay(textValue);
 							p.setName(name);
 							p.setValue(value);
@@ -817,7 +814,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			public List<ResponderProperty> handle(ResultSet rs) throws SQLException {
 				List<ResponderProperty> list = new ArrayList<ResponderProperty>();
 				while(rs.next()) {
-					ResponderProperty e = new ResponderProperty(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getLong(5));
+					ResponderProperty e = new ResponderProperty(rs.getString(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getLong(5));
 					list.add(e);
 				}
 				return list;
@@ -864,7 +861,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			if(rowIndex != 0) {
 				Responder responder = new Responder();
 				responder.setVersion(version);
-				responder.setId(System.currentTimeMillis());
+				responder.setId(UUIDGenerator.generateUUID());
 				Thread.sleep(1);
 				for(int colIndex = 0; colIndex < colnum; colIndex++) {
 					String key = matrix[0][colIndex].toString();
@@ -881,7 +878,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 								List<ResponderProperty> list = new ArrayList<ResponderProperty>();
 								while(rs.next()) {
 									ResponderProperty e = new ResponderProperty();
-									e.setId(rs.getLong("responder_property_id"));
+									e.setId(rs.getString("responder_property_id"));
 									e.setDisplay(rs.getString("responder_property_display"));
 									e.setName(rs.getString("responder_property_key"));
 									e.setValue(rs.getInt("responder_property_value"));
@@ -913,7 +910,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				logger.debug(index + " : " + row.getCell(0));
 				String title = toConvert(row.getCell(0));
 				String optionString = toConvert(row.getCell(1));
-				long optionGroupId = parseOptions(optionString, version).get(0).getId();
+				String optionGroupId = parseOptions(optionString, version).get(0).getId();
 				
 				//迭代小题
 				int columnIndex = 0;
@@ -925,12 +922,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					String content = toConvert(cell);
 					if(columnIndex > 1) {
 						Question q = new Question();
-						q.setId(System.currentTimeMillis());
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+						q.setId(UUIDGenerator.generateUUID());
+						
 						q.setContent(content);
 						q.setOptionId(optionGroupId);
 						q.setTitle(title);
@@ -958,12 +951,8 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			if(row.getCell(0) != null && !StringUtils.isBlank(toConvert(row.getCell(0))) && index > 0) {
 				
 				Question q = new Question();
-				q.setId(System.currentTimeMillis());
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				q.setId(UUIDGenerator.generateUUID());
+				
 				q.setTitle(toConvert(row.getCell(0)));
 				q.setVersion(version);
 				q.setType(Question.TYPE_MATRIX);
@@ -1000,7 +989,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 	}
 	
 	List<Option> parseOptions(String optionString, long version) throws Exception {
-		long optionGroupId = System.currentTimeMillis();
+		String optionGroupId = UUIDGenerator.generateUUID();
 		List<Option> list = new ArrayList<Option>();
 		
 		logger.debug(optionString);
@@ -1029,10 +1018,10 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 		return update;
 	}
 	
-	long getPersonId(long version, String personNo, long responderId) throws Exception {
+	String getPersonId(long version, String personNo, String responderId) throws Exception {
 		final String sql = "select responder_id rid from responder where version = ? and responder_person = ? and responder_pid = ?";
 		Map<String, Object> map = new QueryRunner().query(DbHelper.getConnection(), sql, new MapHandler(), version, personNo, responderId);
-		return (Long)map.get("RID");
+		return (String)map.get("RID");
 	}
 	
 	void saveResponder(Responder person) throws Exception {
@@ -1094,7 +1083,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			String sql = "select a.responder_id from questionnaire a where a.type = " + Question.TYPE_NORMAL + " and a.version = " + version + " group by a.responder_id";
 			List<Object> _list = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
 			String ids = "";
-			for(Object e : _list) ids += "," + e;
+			for(Object e : _list) ids += "," + "'" + e + "'";
 			ids = ids.replaceFirst(",", "");
 			sql = "select a.responder_id, a.responder_name from responder a where a.responder_id in ("+ids+") order by a.responder_id asc";
 			List<Object[]> list = query.query(DbHelper.getConnection(), sql, new ArrayListHandler());
@@ -1123,16 +1112,16 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			
 			for(int rowIndex = 1; rowIndex < rowSize; rowIndex++) {
 				Object[] responderAttr = (Object[])list.get(rowIndex-1);
-				Long responderId = (Long)responderAttr[0];
+				String responderId = (String)responderAttr[0];
 				String responderName = (String)responderAttr[1];
-				sql = "select a.question_id, a.option_key from questionnaire a where a.type = "+Question.TYPE_NORMAL+" and a.responder_id = " + responderId;
+				sql = "select a.question_id, a.option_key from questionnaire a where a.type = "+Question.TYPE_NORMAL+" and a.responder_id = '" + responderId + "'";
 				logger.debug(sql);
 				Map<Object, Map<String, Object>> map = query.query(DbHelper.getConnection(), sql, new KeyedHandler());
 				if(map.isEmpty()) continue;
 				data[rowIndex][0] = responderName;
 				for(int columnIndex = 1; columnIndex < columnSize; columnIndex++) {
 					Question ref = (Question)data[0][columnIndex];
-					long key = ref.getId();
+					String key = ref.getId();
 					Map<String, Object> value = map.get(key);
 					data[rowIndex][columnIndex] = value.get("OPTION_KEY");
 				}
@@ -1140,7 +1129,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 			
 			for(int rowIndex = 1; rowIndex < rowSize; rowIndex++) {
 				Object[] responderAttr = (Object[])list.get(rowIndex-1);
-				Long responderId = (Long)responderAttr[0];
+				String responderId = (String)responderAttr[0];
 				
 				for(int columnIndex = 0; columnIndex < columnSizeOfProperty; columnIndex++) {
 					OptionGroup ref = (OptionGroup)data[0][columnSize + columnIndex];
@@ -1270,17 +1259,17 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 				List<Map<String, Object>> differentList = new ArrayList<Map<String,Object>>();
 				
 				for(int sheetIndex = 0; sheetIndex < list.size(); sheetIndex++) {
-					Responder responder = getResponder((Long)list.get(sheetIndex));
+					Responder responder = getResponder((String)list.get(sheetIndex));
 					String sheetname = (sheetIndex + 1) + responder.getName();
 					Sheet sheet = workbook.createSheet(sheetname);
 					
 					Map<String, Object> responderDiff = new TreeMap<String, Object>();
 					responderDiff.put("responderName", sheetname);
 					
-					sql = "select question_id from questionnaire_matrixnet where responder_id = " + responder.getId() + " group by question_id";
+					sql = "select question_id from questionnaire_matrixnet where responder_id = '" + responder.getId() + "' group by question_id";
 					List<Object> questionIds = query.query(DbHelper.getConnection(), sql, new ColumnListHandler());
 					
-					String _sql = "select relation_person_id from questionnaire_matrixnet where responder_id = " + responder.getId() + " group by relation_person_id ";
+					String _sql = "select relation_person_id from questionnaire_matrixnet where responder_id = '" + responder.getId() + "' group by relation_person_id ";
 					List<Map<String, Object>> relationPersons = query.query(DbHelper.getConnection(), _sql, new MapListHandler());
 					n = relationPersons.size();
 					logger.debug(relationPersons);
@@ -1289,14 +1278,14 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					for(int column = 0; column < relationPersons.size(); column++) {
 						Cell cell = first.createCell(column + 1);
 						Map<String, Object> relationPerson = relationPersons.get(column);
-						Responder person = getResponder((Long)relationPerson.get("relation_person_id".toUpperCase()));
+						Responder person = getResponder((String)relationPerson.get("relation_person_id".toUpperCase()));
 						cell.setCellValue(person.getName());
 					}
 					first.createCell(first.getLastCellNum()).setCellValue("异质性指标");
 					first.createCell(first.getLastCellNum()).setCellValue("平均值");
 
 					for(int rownum = 1; rownum <= questionIds.size(); rownum++,globalRownum++) {
-						Question question = getQuestion((Long)questionIds.get(rownum-1));
+						Question question = getQuestion((String)questionIds.get(rownum-1));
 						
 						int columns = relationPersons.size();
 						int values = 0;
@@ -1358,7 +1347,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 							Cell cell = row.createCell(column);
 							if(rownum == 0 && column == 0) {
 								cell.setCellValue("");
-								String SQL = "select sum(option_key) sumvalue from questionnaire where version = " + version + " and responder_id = " + responder.getId() + " and type = " + Question.TYPE_MATRIX_PLUS ;
+								String SQL = "select sum(option_key) sumvalue from questionnaire where version = " + version + " and responder_id = '" + responder.getId() + "' and type = " + Question.TYPE_MATRIX_PLUS ;
 								Map<String, Object> map = query.query(DbHelper.getConnection(), SQL, new MapHandler());
 								if(map != null && !map.isEmpty()) {
 									double sumvalue = (Long)map.get("sumvalue".toUpperCase());
@@ -1368,19 +1357,19 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 								}
 							} else if(rownum == 0 && column > 0) {
 								Map<String, Object> relationPerson = relationPersons.get(column - 1);
-								Responder person = getResponder((Long)relationPerson.get("relation_person_id".toUpperCase()));
+								Responder person = getResponder((String)relationPerson.get("relation_person_id".toUpperCase()));
 								cell.setCellValue(person.getName());
 							} else if(rownum > 0 && column == 0) {
 								Map<String, Object> relationPerson = relationPersons.get(rownum - 1);
-								Responder person = getResponder((Long)relationPerson.get("relation_person_id".toUpperCase()));
+								Responder person = getResponder((String)relationPerson.get("relation_person_id".toUpperCase()));
 								cell.setCellValue(person.getName());
 							} else if(rownum > 0 && column > 0) {
 								Map<String, Object> relationPersonRow = relationPersons.get(rownum - 1);
 								Map<String, Object> relationPersonCol = relationPersons.get(column - 1);
-								Responder personRow = getResponder((Long)relationPersonRow.get("relation_person_id".toUpperCase()));
-								Responder personCol = getResponder((Long)relationPersonCol.get("relation_person_id".toUpperCase()));
+								Responder personRow = getResponder((String)relationPersonRow.get("relation_person_id".toUpperCase()));
+								Responder personCol = getResponder((String)relationPersonCol.get("relation_person_id".toUpperCase()));
 								
-								String SQL = "select * from questionnaire where version = " + version + " and responder_id = " + responder.getId() + " and type = " + Question.TYPE_MATRIX_PLUS + " and question_id = " + personRow.getId() + " and finish_time = " + personCol.getId();
+								String SQL = "select * from questionnaire where version = " + version + " and responder_id = '" + responder.getId() + "' and type = " + Question.TYPE_MATRIX_PLUS + " and question_id = '" + personRow.getId() + "' and finish_time = '" + personCol.getId() + "'";
 								Map<String, Object> map = query.query(DbHelper.getConnection(), SQL, new MapHandler());
 								logger.debug(SQL);
 								logger.debug(map);

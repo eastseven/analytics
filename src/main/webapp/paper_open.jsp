@@ -28,6 +28,8 @@
 <%
 	QuestionnairePaperService service = new QuestionnairePaperServiceImpl();
 	String ctx = "http://"+request.getServerName()+":"+request.getServerPort()+""+request.getContextPath();
+	String name = (String) request.getAttribute("name");
+	name = new String(name.getBytes("iso-8859-1"), "utf8");
 %>
 
 </head>
@@ -35,7 +37,7 @@
 
 <script type="text/javascript" src="js/open.js"></script>
 <script type="text/javascript" src="js/sample.js"></script>
-	<h1><%=request.getAttribute("name") %></h1>
+	<h1><%=name %></h1>
 	<div id="main">
 		<div id="info"/>
 		<!-- <form method="post" id="survey"> -->
@@ -55,7 +57,7 @@
 				</div>
 			</div>
 			<div id="questionnaire">
-				<input type="hidden" name="name" value="<%=request.getAttribute("name") %>" />
+				<input type="hidden" name="name" value="<%=name %>" />
 				<input type="hidden" name="version" value="<%=service.getOpenPaperVersion() %>"/>
 				<input type="hidden" name="ctx" value="<%=ctx %>"/>
 			</div>

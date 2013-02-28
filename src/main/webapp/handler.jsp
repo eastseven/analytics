@@ -52,6 +52,7 @@
 		if(key.startsWith(prefix_person)) {
 			if(!StringUtils.endsWith(text, ",")) {
 				text = text.replace(",", "");
+				text = new String(text.getBytes("iso-8859-1"), "utf8");
 				answer.put(key, text);
 				out.print(prefix_person+"="+key+":"+text+"<br/>");
 			}
@@ -66,7 +67,8 @@
 	
 	if(StringUtils.isBlank(responderId)) {
 		responder.setId(null);
-		responder.setName(request.getParameter("name"));
+		String name = (String) request.getParameter("name");
+		responder.setName(new String(name.getBytes("iso-8859-1"), "utf8"));
 	} else {
 		responder.setId(responderId);
 	}

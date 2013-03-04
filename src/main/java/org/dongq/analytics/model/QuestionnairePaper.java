@@ -19,7 +19,7 @@ public class QuestionnairePaper {
 
 	private long version;
 
-	private long finishTime;
+	private String finishTime;
 
 	public String getResponderId() {
 		return responderId;
@@ -61,11 +61,11 @@ public class QuestionnairePaper {
 		this.type = type;
 	}
 
-	public long getFinishTime() {
+	public String getFinishTime() {
 		return finishTime;
 	}
 
-	public void setFinishTime(long finishTime) {
+	public void setFinishTime(String finishTime) {
 		this.finishTime = finishTime;
 	}
 

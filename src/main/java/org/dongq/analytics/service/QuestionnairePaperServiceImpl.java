@@ -550,7 +550,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					row.setOptionKey(optionKey);
 					row.setType(Question.TYPE_NORMAL);
 					row.setVersion(version);
-					row.setFinishTime(finishTime);
+					row.setFinishTime(String.valueOf(finishTime));
 					logger.debug("Normal: "+row);
 					list.add(row);
 				}
@@ -566,7 +566,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 					row.setType(Question.TYPE_MATRIX_PLUS);
 					row.setVersion(version);
 					row.setQuestionId(personRow);
-					//row.setFinishTime(personCol);
+					row.setFinishTime(personCol);
 					logger.debug("MatrixPlus: "+row);
 					list.add(row);
 				}
@@ -583,7 +583,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						row.setOptionKey(optionKey);
 						row.setType(Question.TYPE_MATRIX);
 						row.setVersion(version);
-						row.setFinishTime(finishTime);
+						row.setFinishTime(String.valueOf(finishTime));
 						logger.debug("Matrix: "+row);
 						list.add(row);
 					}
@@ -604,7 +604,7 @@ public class QuestionnairePaperServiceImpl implements QuestionnairePaperService 
 						e.setQuestionId(questionId);
 						e.setOptionKey(optionKey);
 						e.setRelationPersonId(peopleId);
-						e.setFinishTime(finishTime);
+						e.setFinishTime(String.valueOf(finishTime));
 						e.setVersion(version);
 						matrixNets.add(e);
 					}

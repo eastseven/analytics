@@ -144,7 +144,7 @@ public class ControllerServlet extends HttpServlet {
 					List<QuestionnairePaper> list = new ArrayList<QuestionnairePaper>();
 					while(rs.next()) {
 						QuestionnairePaper e = new QuestionnairePaper();
-						e.setFinishTime(rs.getLong("finish_time"));
+						e.setFinishTime(rs.getString("finish_time"));
 						e.setOptionKey(rs.getLong("option_key"));
 						e.setQuestionId(rs.getString("question_id"));
 						e.setResponderId(rs.getString("responder_id"));

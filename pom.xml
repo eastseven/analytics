@@ -13,6 +13,7 @@
 			<name>fastjson</name>
 			<url>http://code.alibabatech.com/mvn/releases/</url>
 		</repository>
+		<!--
 		<repository>  
             <id>com.springsource.repository.bundles.release</id>  
             <name>EBR Spring Release Repository</name>  
@@ -31,6 +32,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		-->
 	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
